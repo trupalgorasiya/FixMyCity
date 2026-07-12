@@ -1,0 +1,370 @@
+
+/* ==========================================================
+   DASHBOARD
+========================================================== */
+
+.dashboard{
+
+    min-height:calc(100vh - 75px);
+
+    background:#f3f4f6;
+
+    padding:35px;
+
+    font-family:'Poppins',sans-serif;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.dashboard-header{
+
+    margin-bottom:35px;
+
+}
+
+.dashboard-header h1{
+
+    font-size:34px;
+
+    color:#111827;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.dashboard-header p{
+
+    color:#6b7280;
+
+    font-size:16px;
+
+}
+
+/* ==========================================================
+   STAT CARD GRID
+========================================================== */
+
+.dashboard-body{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+
+    gap:25px;
+
+}
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.dashboard-card{
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    padding:25px;
+
+    border:1px solid #e5e7eb;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+
+    transition:.3s;
+
+    cursor:pointer;
+
+    min-height:150px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    font-size:22px;
+
+    font-weight:600;
+
+    color:#111827;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 18px 40px rgba(0,0,0,.12);
+
+}
+
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.dashboard-section{
+
+    margin-top:35px;
+
+}
+
+.dashboard-section h2{
+
+    font-size:24px;
+
+    color:#111827;
+
+    margin-bottom:20px;
+
+}
+
+/* ==========================================================
+   CONTENT BOX
+========================================================== */
+
+.dashboard-box{
+
+    background:#ffffff;
+
+    border-radius:18px;
+
+    border:1px solid #e5e7eb;
+
+    padding:25px;
+
+    box-shadow:0 8px 20px rgba(0,0,0,.05);
+
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.dashboard-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.dashboard-table th{
+
+    background:#f9fafb;
+
+    color:#374151;
+
+    padding:16px;
+
+    text-align:left;
+
+    font-size:15px;
+
+    border-bottom:1px solid #e5e7eb;
+
+}
+
+.dashboard-table td{
+
+    padding:16px;
+
+    border-bottom:1px solid #e5e7eb;
+
+    color:#4b5563;
+
+    font-size:15px;
+
+}
+
+.dashboard-table tr:hover{
+
+    background:#f8fafc;
+
+}
+
+/* ==========================================================
+   BUTTON
+========================================================== */
+
+.dashboard-btn{
+
+    padding:12px 24px;
+
+    background:#2563eb;
+
+    color:#ffffff;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.dashboard-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+/* ==========================================================
+   STATUS BADGES
+========================================================== */
+
+.status{
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.status.pending{
+
+    background:#fef3c7;
+
+    color:#92400e;
+
+}
+
+.status.progress{
+
+    background:#dbeafe;
+
+    color:#1d4ed8;
+
+}
+
+.status.completed{
+
+    background:#dcfce7;
+
+    color:#15803d;
+
+}
+
+.status.rejected{
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+}
+
+/* ==========================================================
+   QUICK ACTION GRID
+========================================================== */
+
+.quick-actions{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+    gap:20px;
+
+}
+
+.action-card{
+
+    background:#ffffff;
+
+    border-radius:16px;
+
+    padding:22px;
+
+    border:1px solid #e5e7eb;
+
+    text-align:center;
+
+    transition:.3s;
+
+    cursor:pointer;
+
+}
+
+.action-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+    .dashboard{
+
+        padding:25px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .dashboard{
+
+        padding:20px;
+
+    }
+
+    .dashboard-header h1{
+
+        font-size:28px;
+
+    }
+
+    .dashboard-body{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .dashboard{
+
+        padding:15px;
+
+    }
+
+    .dashboard-header h1{
+
+        font-size:24px;
+
+    }
+
+    .dashboard-card{
+
+        min-height:120px;
+
+        font-size:18px;
+
+    }
+
+}

@@ -1,0 +1,78 @@
+.faq-page{
+    background:#f5f5f5;
+    color:#111827;
+    min-height:100vh;
+    padding:120px 8%;
+}
+
+.faq-page h1{
+    text-align:center;
+    margin-bottom:15px;
+    font-size:42px;
+    font-weight:700;
+    color:#111827;
+}
+
+.faq-page > p{
+    text-align:center;
+    color:#6b7280;
+    margin-bottom:50px;
+}
+
+.faq-container{
+    max-width:900px;
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.faq-card{
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:25px 30px;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    transition:.3s ease;
+}
+
+.faq-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 15px 35px rgba(0,0,0,.10);
+}
+
+.faq-card h3{
+    color:#111827;
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:12px;
+}
+
+.faq-card p{
+    color:#6b7280;
+    line-height:1.8;
+    font-size:15px;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:768px){
+
+    .faq-page{
+        padding:100px 20px 60px;
+    }
+
+    .faq-page h1{
+        font-size:34px;
+    }
+
+    .faq-card{
+        padding:22px;
+    }
+
+    .faq-card h3{
+        font-size:18px;
+    }
+}

@@ -1,0 +1,697 @@
+/* ===========================
+   GOOGLE FONT
+=========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ===========================
+   RESET
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f5f5f5;
+}
+
+/* ===========================
+   MAIN CONTAINER
+=========================== */
+
+.auth-container{
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:40px 20px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+    linear-gradient(135deg,#ffffff,#f3f4f6,#e5e7eb);
+
+}
+
+/* ===========================
+   BACKGROUND EFFECT
+=========================== */
+
+.auth-container::before{
+
+    content:"";
+
+    width:500px;
+    height:500px;
+
+    background:#d1d5db;
+
+    position:absolute;
+
+    top:-200px;
+    left:-150px;
+
+    border-radius:50%;
+
+    filter:blur(180px);
+
+    opacity:.55;
+
+}
+
+.auth-container::after{
+
+    content:"";
+
+    width:450px;
+    height:450px;
+
+    background:#9ca3af;
+
+    position:absolute;
+
+    right:-120px;
+    bottom:-120px;
+
+    border-radius:50%;
+
+    filter:blur(180px);
+
+    opacity:.35;
+
+}
+
+/* ===========================
+   GLASS CARD
+=========================== */
+
+.auth-card{
+
+    width:100%;
+    max-width:480px;
+
+    background:rgba(255,255,255,.92);
+
+    border:1px solid #d1d5db;
+
+    backdrop-filter:blur(18px);
+
+    border-radius:20px;
+
+    padding:45px;
+
+    position:relative;
+
+    z-index:10;
+
+    box-shadow:
+    0 20px 50px rgba(0,0,0,.08);
+
+}
+
+/* ===========================
+   LOGO
+=========================== */
+
+.logo-section{
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+.logo-circle{
+
+    width:80px;
+    height:80px;
+
+    margin:auto;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#111827;
+
+    color:white;
+
+    font-size:34px;
+
+    margin-bottom:20px;
+
+}
+
+.logo-section h1{
+
+    color:#111827;
+
+    font-size:34px;
+
+}
+
+.logo-section p{
+
+    color:#6b7280;
+
+    margin-top:8px;
+
+    font-size:15px;
+
+}
+
+/* ===========================
+   TITLES
+=========================== */
+
+.title-section{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.title-section h2{
+
+    color:#111827;
+
+    margin-bottom:10px;
+
+}
+
+.title-section p{
+
+    color:#6b7280;
+
+}
+
+/* ===========================
+   INPUTS
+=========================== */
+
+.input-group{
+
+    position:relative;
+
+    margin-bottom:22px;
+
+}
+
+.input-group input{
+
+    width:100%;
+
+    background:#f9fafb;
+
+    border:1px solid #d1d5db;
+
+    color:#111827;
+
+    border-radius:12px;
+
+    padding:15px 50px;
+
+    font-size:15px;
+
+    transition:.3s;
+
+}
+
+.input-group input::placeholder{
+
+    color:#9ca3af;
+
+}
+
+.input-group input:focus{
+
+    outline:none;
+
+    border-color:#374151;
+
+    box-shadow:0 0 0 4px rgba(17,24,39,.08);
+
+}
+
+.input-icon{
+
+    position:absolute;
+
+    left:18px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:#6b7280;
+
+}
+
+.eye-icon{
+
+    position:absolute;
+
+    right:18px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    color:#6b7280;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.eye-icon:hover{
+
+    color:#111827;
+
+}
+
+/* ===========================
+   BUTTON
+=========================== */
+
+.auth-btn{
+
+    width:100%;
+
+    border:none;
+
+    background:#111827;
+
+    color:white;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.auth-btn:hover{
+
+    background:#000000;
+
+    transform:translateY(-2px);
+
+}
+
+/* ===========================
+   LOGIN OPTIONS
+=========================== */
+
+.login-options{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+    color:#4b5563;
+
+    font-size:14px;
+
+}
+
+.login-options label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.login-options a{
+
+    color:#111827;
+
+    text-decoration:none;
+
+    font-weight:500;
+
+}
+
+.login-options a:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ===========================
+   DIVIDER
+=========================== */
+
+.divider{
+
+    display:flex;
+
+    align-items:center;
+
+    margin:30px 0;
+
+}
+
+.divider::before,
+.divider::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:#d1d5db;
+
+}
+
+.divider span{
+
+    color:#6b7280;
+
+    padding:0 15px;
+
+}
+
+/* ===========================
+   FOOTER TEXT
+=========================== */
+
+.bottom-text{
+
+    text-align:center;
+
+    color:#4b5563;
+
+}
+
+.bottom-text a{
+
+    margin-left:8px;
+
+    color:#111827;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+.bottom-text a:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ===========================
+   REGISTER PAGE
+=========================== */
+
+.two-column{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:15px;
+
+}
+
+/* ===========================
+   PASSWORD STRENGTH
+=========================== */
+
+.password-strength{
+
+    margin-top:-8px;
+
+    margin-bottom:18px;
+
+    color:#6b7280;
+
+    font-size:13px;
+
+}
+
+/* ===========================
+   TERMS
+=========================== */
+
+.terms{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:10px;
+
+    color:#4b5563;
+
+    font-size:14px;
+
+    margin-bottom:25px;
+
+}
+
+.terms input{
+
+    margin-top:3px;
+
+}
+
+/* ===========================
+   PROGRESS BAR
+=========================== */
+
+.progress{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin:35px 0;
+
+}
+
+.step{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    flex:1;
+
+    position:relative;
+
+}
+
+.step:not(:last-child)::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:18px;
+
+    left:50%;
+
+    width:100%;
+
+    height:3px;
+
+    background:#d1d5db;
+
+    z-index:-1;
+
+}
+
+.circle{
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    background:#9ca3af;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:white;
+
+    margin-bottom:8px;
+
+}
+
+.active .circle{
+
+    background:#111827;
+
+}
+
+.completed .circle{
+
+    background:#4b5563;
+
+}
+
+.step p{
+
+    color:#4b5563;
+
+    font-size:13px;
+
+}
+
+/* ===========================
+   OTP BOXES
+=========================== */
+
+.otp-container{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    gap:10px;
+
+    margin-bottom:30px;
+
+}
+
+.otp-container input{
+
+    width:55px;
+
+    height:60px;
+
+    border:none;
+
+    background:#f9fafb;
+
+    color:#111827;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    font-size:24px;
+
+    border:1px solid #d1d5db;
+
+}
+
+.otp-container input:focus{
+
+    outline:none;
+
+    border-color:#111827;
+
+    box-shadow:0 0 0 4px rgba(17,24,39,.08);
+
+}
+
+/* ===========================
+   SUCCESS BOX
+=========================== */
+
+.success-box{
+
+    text-align:center;
+
+}
+
+.success-box h2{
+
+    color:#111827;
+
+    margin-bottom:15px;
+
+}
+
+.success-box p{
+
+    color:#4b5563;
+
+    margin-bottom:30px;
+
+}
+
+.step.active .circle{
+    background:#111827;
+}
+
+.step.active::after{
+    background:#111827;
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:768px){
+
+    .auth-card{
+
+        padding:30px 22px;
+
+    }
+
+    .two-column{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .login-options{
+
+        flex-direction:column;
+
+        gap:15px;
+
+        align-items:flex-start;
+
+    }
+
+    .otp-container input{
+
+        width:45px;
+        height:50px;
+    }
+
+}

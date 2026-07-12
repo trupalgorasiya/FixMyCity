@@ -1,0 +1,403 @@
+.tracking-page {
+  min-height: 100vh;
+  padding: 120px 20px 60px;
+  background: #f4f6f9;
+}
+
+.tracking-card {
+  max-width: 1150px;
+  margin: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 40px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.tracking-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.tracking-header h1 {
+  font-size: 34px;
+  color: #111827;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.tracking-header p {
+  color: #6b7280;
+  font-size: 16px;
+  max-width: 700px;
+  margin: auto;
+  line-height: 1.7;
+}
+
+/* ================= SEARCH ================= */
+
+.search-section {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 35px;
+}
+
+.search-section input {
+  flex: 1;
+  color: #000;
+  height: 56px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 20px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.search-section input:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.08);
+}
+
+.search-section button {
+  border: none;
+  background: #111827;
+  color: white;
+  padding: 0 30px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.search-section button:hover {
+  background: #000;
+  transform: translateY(-2px);
+}
+
+/* ================= DETAILS ================= */
+
+.complaint-details {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.detail-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 28px;
+  transition: .3s;
+}
+
+.detail-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0,0,0,.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.card-header h2 {
+  color: #111827;
+  font-size: 22px;
+  margin: 0;
+}
+
+/* ================= STATUS BADGE ================= */
+
+.status-badge {
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-badge.progress {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ================= INFO GRID ================= */
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;
+}
+
+.info-item {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #ececec;
+}
+
+.info-item span {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.info-item strong {
+  color: #111827;
+  font-size: 16px;
+}
+
+.priority.high {
+  color: #dc2626;
+}
+
+/* ================= PROGRESS ================= */
+
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.step {
+  flex: 1;
+  position: relative;
+  text-align: center;
+}
+
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: 60%;
+  width: 80%;
+  height: 3px;
+  background: #d1d5db;
+}
+
+.step-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #d1d5db;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  font-size: 22px;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+}
+
+.step p {
+  margin-top: 12px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.completed .step-circle {
+  background: #10b981;
+  color: white;
+}
+
+.completed::after {
+  background: #10b981 !important;
+}
+
+.current .step-circle {
+  background: #2563eb;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+  0% {
+    box-shadow: 0 0 0 0 rgba(37,99,235,.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(37,99,235,0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(37,99,235,0);
+  }
+
+}
+
+/* ================= HISTORY ================= */
+
+.history-timeline {
+  position: relative;
+  padding-left: 35px;
+}
+
+.history-timeline::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: #d1d5db;
+}
+
+.history-item {
+  position: relative;
+  margin-bottom: 28px;
+}
+
+.history-dot {
+  position: absolute;
+  left: -35px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 4px solid white;
+  box-shadow: 0 0 0 3px #10b981;
+}
+
+.history-dot.active {
+  background: #2563eb;
+  box-shadow: 0 0 0 3px #2563eb;
+}
+
+.history-content {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.history-content h4 {
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.history-content p {
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.history-content span {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* ================= FEEDBACK ================= */
+
+.rating {
+  font-size: 34px;
+  color: #f59e0b;
+  margin-bottom: 18px;
+}
+
+.detail-card textarea {
+  width: 100%;
+  min-height: 140px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 15px;
+  resize: vertical;
+  transition: .3s;
+}
+
+.detail-card textarea:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 4px rgba(17,24,39,.08);
+}
+
+.feedback-btn {
+  margin-top: 20px;
+  background: #111827;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: .3s;
+}
+
+.feedback-btn:hover {
+  background: #000;
+  transform: translateY(-2px);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 992px) {
+
+  .tracking-card {
+    padding: 30px;
+  }
+
+  .timeline {
+    flex-wrap: wrap;
+    row-gap: 30px;
+  }
+
+  .step {
+    min-width: 150px;
+  }
+
+  .step::after {
+    display: none;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .tracking-page {
+    padding: 100px 15px 40px;
+  }
+
+  .tracking-card {
+    padding: 22px;
+  }
+
+  .tracking-header h1 {
+    font-size: 28px;
+  }
+
+  .tracking-header p {
+    font-size: 15px;
+  }
+
+  .search-section {
+    flex-direction: column;
+  }
+
+  .search-section button {
+    height: 54px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .timeline {
+    flex-direction: column;
+  }
+
+  .step {
+    width: 100%;
+  }
+
+}

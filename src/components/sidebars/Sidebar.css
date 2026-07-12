@@ -1,0 +1,454 @@
+/* ==========================================================
+   GOOGLE FONT
+========================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:75px;
+    left:0;
+
+    width:260px;
+    height:calc(100vh - 75px);
+
+    background:#1e293b;
+
+    color:#ffffff;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+
+    overflow-y:auto;
+
+    transition:.3s;
+
+    border-right:1px solid rgba(255,255,255,.08);
+
+    z-index:900;
+
+    font-family:'Poppins',sans-serif;
+
+}
+
+/* ==========================================================
+   LOGO / TITLE
+========================================================== */
+
+.sidebar-header{
+
+    padding:30px 25px 20px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.sidebar-header h2{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+.sidebar-header p{
+
+    margin-top:6px;
+
+    font-size:14px;
+
+    color:#cbd5e1;
+
+}
+
+/* ==========================================================
+   MENU
+========================================================== */
+
+.sidebar-menu{
+
+    padding:25px 15px;
+
+    flex:1;
+
+}
+
+.sidebar-menu ul{
+
+    list-style:none;
+
+}
+
+.sidebar-menu li{
+
+    margin-bottom:10px;
+
+}
+
+/* ==========================================================
+   LINKS
+========================================================== */
+
+.sidebar-menu a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    text-decoration:none;
+
+    color:#e2e8f0;
+
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    transition:.3s;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+.sidebar-menu a:hover{
+
+    background:#334155;
+
+    color:#ffffff;
+
+    transform:translateX(5px);
+
+}
+
+/* ==========================================================
+   ACTIVE LINK
+========================================================== */
+
+/* .sidebar-menu a.active{
+
+    background:#2563eb;
+
+    color:#ffffff;
+
+    box-shadow:0 10px 20px rgba(37,99,235,.25);
+
+} */
+
+/* ==========================================================
+   ICON
+========================================================== */
+
+.sidebar-menu a svg{
+
+    font-size:20px;
+
+    min-width:20px;
+
+}
+
+/* ==========================================================
+   SECTION TITLE
+========================================================== */
+
+.sidebar-title{
+
+    color:#94a3b8;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+    margin:25px 15px 12px;
+
+}
+
+/* ==========================================================
+   BADGE
+========================================================== */
+
+.menu-badge{
+
+    margin-left:auto;
+
+    background:#ef4444;
+
+    color:#ffffff;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    padding:3px 9px;
+
+    border-radius:20px;
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.sidebar-footer{
+
+    padding:20px 15px;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.sidebar-footer a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:14px 18px;
+
+    border-radius:14px;
+
+    text-decoration:none;
+
+    color:#f8fafc;
+
+    transition:.3s;
+
+    font-weight:500;
+
+}
+
+.sidebar-footer a:hover{
+
+    background:#dc2626;
+
+}
+
+/* ==========================================================
+   USER CARD
+========================================================== */
+
+.sidebar-user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:18px;
+
+    margin:15px;
+
+    border-radius:16px;
+
+    background:rgba(255,255,255,.05);
+
+}
+
+.sidebar-user img{
+
+    width:50px;
+    height:50px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+}
+
+.sidebar-user h4{
+
+    font-size:15px;
+
+    margin-bottom:3px;
+
+}
+
+.sidebar-user span{
+
+    color:#cbd5e1;
+
+    font-size:13px;
+
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+.sidebar::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#475569;
+
+    border-radius:20px;
+
+}
+
+.sidebar::-webkit-scrollbar-track{
+
+    background:transparent;
+
+}
+
+/* ==========================================================
+   COLLAPSED SIDEBAR
+========================================================== */
+
+.sidebar.collapsed{
+
+    width:90px;
+
+}
+
+.sidebar.collapsed .sidebar-header h2,
+.sidebar.collapsed .sidebar-header p,
+.sidebar.collapsed .sidebar-title,
+.sidebar.collapsed .sidebar-menu span,
+.sidebar.collapsed .sidebar-footer span,
+.sidebar.collapsed .sidebar-user{
+
+    display:none;
+
+}
+
+.sidebar.collapsed .sidebar-menu a{
+
+    justify-content:center;
+
+    padding:15px;
+
+}
+
+.sidebar.collapsed .sidebar-footer a{
+
+    justify-content:center;
+
+}
+
+.sidebar.collapsed .menu-badge{
+
+    display:none;
+
+}
+
+/* ==========================================================
+   DASHBOARD CONTENT
+========================================================== */
+
+.dashboard-content{
+
+    margin-left:260px;
+
+    margin-top:75px;
+
+    min-height:calc(100vh - 75px);
+
+    background:#f3f4f6;
+
+    padding:30px;
+
+    transition:.3s;
+
+}
+
+.sidebar.collapsed ~ .dashboard-content{
+
+    margin-left:90px;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+    .sidebar{
+
+        left:-260px;
+
+    }
+
+    .sidebar.active{
+
+        left:0;
+
+    }
+
+    .dashboard-content{
+
+        margin-left:0;
+
+        padding:20px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .sidebar{
+
+        width:240px;
+
+    }
+
+    .dashboard-content{
+
+        padding:18px;
+
+    }
+
+}
+
+@media(max-width:576px){
+
+    .sidebar{
+
+        width:220px;
+
+    }
+
+    .sidebar-header{
+
+        padding:20px;
+
+    }
+
+    .sidebar-menu{
+
+        padding:18px 12px;
+
+    }
+
+    .sidebar-menu a{
+
+        padding:12px 15px;
+
+        font-size:14px;
+
+    }
+
+}

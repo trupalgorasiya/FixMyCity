@@ -1,0 +1,396 @@
+/* ==========================
+   REPORT COMPLAINT
+========================== */
+
+.complaint-page {
+    min-height: 100vh;
+    padding: 120px 20px 60px;
+    background: #f3f4f6;
+}
+
+.complaint-card {
+    max-width: 1000px;
+    margin: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    padding: 40px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
+}
+
+.complaint-card h1 {
+    text-align: center;
+    color: #111827;
+    font-size: 34px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.complaint-card>p {
+    text-align: center;
+    color: #6b7280;
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 650px;
+    margin: 0 auto 40px;
+}
+
+/* ==========================
+   SECTION TITLE
+========================== */
+
+.section-title {
+    margin: 40px 0 20px;
+    font-size: 22px;
+    color: #111827;
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* ==========================
+   GRID
+========================== */
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+/* ==========================
+   FORM
+========================== */
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    color: #000;
+    width: 100%;
+    padding: 15px 16px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    transition: .25s;
+    font-family: inherit;
+
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+
+    color: #9ca3af;
+
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    outline: none;
+    background: #ffffff;
+    border-color: #111827;
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, .08);
+
+}
+
+.form-group input[readonly],
+.form-group textarea[readonly] {
+
+    background: #f3f4f6;
+    color: #374151;
+    cursor: default;
+
+}
+
+/* ==========================
+   MAP
+========================== */
+
+.location-map {
+
+    margin-bottom: 30px;
+
+}
+
+.location-map .leaflet-container {
+
+    width: 100%;
+    height: 430px;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.location-map .leaflet-control-zoom {
+
+    border: none !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,.12);
+
+}
+
+.location-map .leaflet-popup-content-wrapper {
+
+    border-radius: 12px;
+
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.location-btn,
+.submit-btn {
+
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: .3s;
+
+}
+
+.location-btn {
+
+    width: 100%;
+    height: 52px;
+    margin-top: 18px;
+    background: #111827;
+    color: #ffffff;
+    font-size: 15px;
+
+}
+
+.location-btn:hover {
+
+    background: #000000;
+    transform: translateY(-2px);
+
+}
+
+.submit-btn {
+
+    width: 100%;
+    margin-top: 10px;
+    padding: 16px;
+    background: #111827;
+    color: white;
+    font-size: 16px;
+
+}
+
+.submit-btn:hover {
+
+    background: #000;
+    transform: translateY(-2px);
+
+}
+
+/* ==========================
+   FILE INPUT
+========================== */
+
+input[type="file"] {
+
+    padding: 12px;
+    background: #f9fafb;
+    border: 2px dashed #d1d5db;
+    cursor: pointer;
+
+}
+
+input[type="file"]:hover {
+
+    border-color: #111827;
+
+}
+
+/* ==========================
+   CHECKBOX
+========================== */
+
+.checkbox-group {
+
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 25px 0;
+
+}
+
+.checkbox-group input {
+
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+
+}
+
+.checkbox-group span {
+
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 15px;
+
+}
+
+/* ==========================
+   SCROLLBAR
+========================== */
+
+textarea::-webkit-scrollbar {
+
+    width: 6px;
+
+}
+
+textarea::-webkit-scrollbar-thumb {
+
+    background: #cbd5e1;
+    border-radius: 10px;
+
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width:992px) {
+
+    .complaint-card {
+
+        padding: 30px;
+
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .complaint-page {
+
+        padding: 100px 15px 40px;
+
+    }
+
+    .complaint-card {
+
+        padding: 22px;
+
+    }
+
+    .complaint-card h1 {
+
+        font-size: 28px;
+
+    }
+
+    .grid-2 {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .location-map .leaflet-container {
+
+        height: 320px;
+
+    }
+
+    .section-title {
+
+        font-size: 20px;
+
+    }
+
+    .location-btn {
+
+        height: 50px;
+
+    }
+
+}
+
+.grid-3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:20px;
+}
+
+@media(max-width:768px){
+
+    .grid-3{
+        grid-template-columns:1fr;
+    }
+
+}
+
+/* ==========================
+   IMAGE PREVIEW
+========================== */
+
+.upload-note{
+    display:block;
+    margin-top:8px;
+    color:#6b7280;
+    font-size:13px;
+}
+
+.preview-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:18px;
+}
+
+.preview-card{
+    width:90px;
+    height:90px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    overflow:hidden;
+    background:#fff;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+    transition:.25s;
+}
+
+.preview-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+
+.preview-card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+@media(max-width:768px){
+
+    .preview-card{
+        width:75px;
+        height:75px;
+    }
+
+}
