@@ -1,0 +1,796 @@
+/* =====================================================
+   FIXMYCITY REPORT PAGE
+===================================================== */
+
+
+.reports-page {
+
+    width:100%;
+
+    min-height:100vh;
+
+    padding:30px;
+
+    background:#f4f6f9;
+
+    box-sizing:border-box;
+
+    overflow-x:hidden;
+
+    font-family:"Segoe UI",Arial,sans-serif;
+
+}
+
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+
+.report-header {
+
+    margin-bottom:30px;
+
+}
+
+
+.report-header h1 {
+
+    margin:0;
+
+    font-size:32px;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+}
+
+
+.report-header p {
+
+    margin-top:8px;
+
+    color:#64748b;
+
+    font-size:15px;
+
+}
+
+
+
+/* =====================================================
+   TOP SUMMARY CARDS
+===================================================== */
+
+
+.stats-grid {
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:24px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+.stat-card {
+
+
+    height:140px;
+
+
+    background:#ffffff;
+
+
+    border-radius:16px;
+
+
+    padding:25px;
+
+
+    box-sizing:border-box;
+
+
+    display:flex;
+
+
+    flex-direction:column;
+
+
+    justify-content:center;
+
+
+    position:relative;
+
+
+    overflow:hidden;
+
+
+    box-shadow:
+
+    0 4px 12px rgba(0,0,0,0.08);
+
+
+}
+
+
+
+.stat-card::before {
+
+
+    content:"";
+
+
+    position:absolute;
+
+
+    left:0;
+
+
+    top:20px;
+
+
+    width:5px;
+
+
+    height:100px;
+
+
+    border-radius:0 5px 5px 0;
+
+
+    background:#2563eb;
+
+
+}
+
+
+
+.stat-card.total::before{
+
+    background:#2563eb;
+
+}
+
+
+.stat-card.assigned::before{
+
+    background:#f59e0b;
+
+}
+
+
+.stat-card.resolved::before{
+
+    background:#10b981;
+
+}
+
+
+.stat-card.completed::before{
+
+    background:#8b5cf6;
+
+}
+
+
+
+.stat-card h2 {
+
+
+    margin:0;
+
+
+    font-size:38px;
+
+
+    font-weight:700;
+
+
+    color:#111827;
+
+
+    line-height:1;
+
+
+}
+
+
+
+.stat-card p {
+
+
+    margin-top:12px;
+
+
+    margin-bottom:0;
+
+
+    font-size:15px;
+
+
+    color:#64748b;
+
+
+    font-weight:500;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   COMMON SECTION
+===================================================== */
+
+
+.section-card {
+
+
+    width:100%;
+
+
+    background:#ffffff;
+
+
+    padding:25px;
+
+
+    margin-bottom:25px;
+
+
+    border-radius:18px;
+
+
+    box-sizing:border-box;
+
+
+    overflow:hidden;
+
+
+    box-shadow:
+
+    0 4px 12px rgba(0,0,0,0.07);
+
+
+}
+
+
+
+.section-card h2 {
+
+
+    margin:0 0 20px;
+
+
+    padding-bottom:12px;
+
+
+    border-bottom:1px solid #e5e7eb;
+
+
+    color:#1e293b;
+
+
+    font-size:22px;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   RECENT COMPLAINT TABLE
+===================================================== */
+
+
+.table-container {
+
+
+    width:100%;
+
+
+    overflow-x:auto;
+
+
+}
+
+
+
+.recent-table {
+
+
+    width:100%;
+
+
+    min-width:700px;
+
+
+    border-collapse:collapse;
+
+
+}
+
+
+
+.recent-table thead {
+
+
+    background:#0f172a;
+
+
+}
+
+
+
+.recent-table th {
+
+
+    padding:15px;
+
+
+    color:white;
+
+
+    font-size:14px;
+
+
+    text-align:left;
+
+
+}
+
+
+
+.recent-table td {
+
+
+    padding:15px;
+
+
+    color:#475569;
+
+
+    font-size:14px;
+
+
+    border-bottom:1px solid #e5e7eb;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+
+.status {
+
+
+    display:inline-block;
+
+
+    padding:6px 14px;
+
+
+    border-radius:20px;
+
+
+    font-size:13px;
+
+
+    font-weight:600;
+
+
+}
+
+
+
+.completed {
+
+
+    background:#dcfce7;
+
+
+    color:#15803d;
+
+
+}
+
+
+
+.pending {
+
+
+    background:#fef3c7;
+
+
+    color:#b45309;
+
+
+}
+
+
+
+.processing {
+
+
+    background:#dbeafe;
+
+
+    color:#1d4ed8;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   ENGINEER PERFORMANCE
+===================================================== */
+
+
+.engineer-performance {
+
+
+    display:grid;
+
+
+    grid-template-columns:repeat(3,1fr);
+
+
+    gap:20px;
+
+
+}
+
+
+
+.engineer-card {
+
+
+    background:#f8fafc;
+
+
+    padding:20px;
+
+
+    border-radius:14px;
+
+
+    box-sizing:border-box;
+
+
+}
+
+
+
+.engineer-card h3 {
+
+
+    margin:0 0 18px;
+
+
+    color:#1e293b;
+
+
+    font-size:18px;
+
+
+}
+
+
+
+.performance-row {
+
+
+    display:flex;
+
+
+    justify-content:space-between;
+
+
+    align-items:center;
+
+
+    padding:12px;
+
+
+    margin-bottom:12px;
+
+
+    background:#ffffff;
+
+
+    border-radius:10px;
+
+
+}
+
+
+
+.performance-label {
+
+
+    color:#64748b;
+
+
+    font-size:14px;
+
+
+}
+
+
+
+.completed-count {
+
+
+    padding:6px 15px;
+
+
+    border-radius:20px;
+
+
+    background:#dcfce7;
+
+
+    color:#15803d;
+
+
+    font-weight:700;
+
+
+}
+
+
+
+.pending-count {
+
+
+    padding:6px 15px;
+
+
+    border-radius:20px;
+
+
+    background:#fef3c7;
+
+
+    color:#b45309;
+
+
+    font-weight:700;
+
+
+}
+
+
+
+
+/* =====================================================
+   RECENT ACTIVITY
+===================================================== */
+
+
+.activity-list {
+
+
+    display:grid;
+
+
+    grid-template-columns:repeat(3,1fr);
+
+
+    gap:20px;
+
+
+}
+
+
+
+.activity-card {
+
+
+    background:#f8fafc;
+
+
+    padding:18px;
+
+
+    border-radius:12px;
+
+
+    border-left:4px solid #2563eb;
+
+
+    color:#334155;
+
+
+    font-size:14px;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   DOWNLOAD PDF BUTTON
+===================================================== */
+
+
+.download-section {
+
+
+    width:100%;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    margin-top:35px;
+
+
+}
+
+
+
+.download-btn {
+
+
+    width:220px;
+
+
+    height:50px;
+
+
+    border:none;
+
+
+    border-radius:10px;
+
+
+    background:#2563eb;
+
+
+    color:white;
+
+
+    font-size:16px;
+
+
+    font-weight:600;
+
+
+    cursor:pointer;
+
+
+}
+
+
+
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+
+@media(max-width:1200px){
+
+
+    .stats-grid{
+
+
+        grid-template-columns:repeat(2,1fr);
+
+
+    }
+
+
+    .engineer-performance,
+
+    .activity-list{
+
+
+        grid-template-columns:repeat(2,1fr);
+
+
+    }
+
+}
+
+
+
+
+@media(max-width:768px){
+
+
+    .reports-page{
+
+
+        padding:20px;
+
+
+    }
+
+
+    .stats-grid,
+
+    .engineer-performance,
+
+    .activity-list{
+
+
+        grid-template-columns:1fr;
+
+
+    }
+
+
+    .download-btn{
+
+
+        width:100%;
+
+
+    }
+
+}
+
+
+
+
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+
+@media print{
+
+
+    .download-section{
+
+
+        display:none;
+
+
+    }
+
+
+    .reports-page{
+
+
+        background:white;
+
+
+        padding:0;
+
+
+    }
+
+
+}
