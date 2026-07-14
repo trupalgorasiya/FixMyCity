@@ -83,9 +83,9 @@ function App() {
     <Route path="edit-profile" element={<EditProfile/>}/>
     <Route path="user-manage" element={<UserManagement/>}></Route>
     <Route path="dept-manage" element={<DepartmentManagement/>}></Route>
-     <Route path="engineer-manage" element={<EngineerManagement/>}></Route>
-     <Route path="complaint-manage" element={<ComplaintManagement/>}></Route>
-     <Route path="report" element={<Report/>}></Route>
+    <Route path="engineer-manage" element={<EngineerManagement/>}></Route>
+    <Route path="complaint-manage" element={<ComplaintManagement/>}></Route>
+    <Route path="report" element={<Report/>}></Route>
 
 </Route>
         

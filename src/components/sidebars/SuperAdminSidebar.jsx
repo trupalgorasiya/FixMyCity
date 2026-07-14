@@ -3,7 +3,7 @@ import {
     FaHome,
     FaUsers,
     FaBuilding,
-    FaUserTie,
+    // FaUserTie,
     FaHardHat,
     FaClipboardList,
     FaChartPie,
@@ -35,19 +35,19 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/dashboard"><FaHome /><span>Dashboard</span></NavLink></li>
 
-                        <li><NavLink to="/admin/users"><FaUsers /><span>Users</span></NavLink></li>
+                        <li><NavLink to="/admin/user-manage"><FaUsers /><span>Users</span></NavLink></li>
 
-                        <li><NavLink to="/admin/departments"><FaBuilding /><span>Departments</span></NavLink></li>
+                        <li><NavLink to="/admin/dept-manage"><FaBuilding /><span>Departments</span></NavLink></li>
 
-                        <li><NavLink to="/admin/department-admins"><FaUserTie /><span>Department Admins</span></NavLink></li>
+                        {/* <li><NavLink to="/admin/department-admins"><FaUserTie /><span>Department Admins</span></NavLink></li> */}
 
-                        <li><NavLink to="/admin/engineers"><FaHardHat /><span>Engineers</span></NavLink></li>
+                        <li><NavLink to="/admin/engineer-manage"><FaHardHat /><span>Engineers</span></NavLink></li>
 
-                        <li><NavLink to="/admin/complaints"><FaClipboardList /><span>Complaints</span></NavLink></li>
+                        <li><NavLink to="/admin/complaint-manage"><FaClipboardList /><span>Complaints</span></NavLink></li>
 
                         <li><NavLink to="/admin/analytics"><FaChartPie /><span>Analytics</span></NavLink></li>
 
-                        <li><NavLink to="/admin/reports"><FaFileAlt /><span>Reports</span></NavLink></li>
+                        <li><NavLink to="/admin/report"><FaFileAlt /><span>Reports</span></NavLink></li>
 
                         <li><NavLink to="/admin/settings"><FaCog /><span>Settings</span></NavLink></li>
 

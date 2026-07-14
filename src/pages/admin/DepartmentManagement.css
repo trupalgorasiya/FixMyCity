@@ -224,6 +224,8 @@ tbody tr:hover{
     padding:14px;
     border-radius:10px;
     border:1px solid #d1d5db;
+    color:black;
+    background-color: #dedede;
 }
 
 /* Table */
