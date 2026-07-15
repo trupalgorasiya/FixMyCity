@@ -14,10 +14,10 @@ import DepartmentManagement from "./pages/admin/DepartmentManagement";
 import EngineerManagement from "./pages/admin/EngineerManagement";
 import ComplaintManagement from "./pages/admin/ComplaintManagement";
 import Report from "./pages/admin/Report";
-
+import ReportComplaint from "./pages/ReportComplaint";
 import MyComplaints from "./pages/user/MyComplaints";
 import Notification from "./pages/user/Notification";
-
+import ComplaintTracking from "./pages/ComplaintTracking";
 import Profile from "./Authentication/Profile";
 import EditProfile from "./Authentication/EditProfile"
 function AppRoutes() {
@@ -32,7 +32,8 @@ function AppRoutes() {
                 <Route path="edit-profile" element={<EditProfile/>}/>
                 <Route path="my-complaints" element={<MyComplaints/>}/>
                 <Route path="notification" element={<Notification/>}/>
-                
+                <Route path="track" element={<ComplaintTracking/>}/>
+                <Route path="report" element={<ReportComplaint/>}/>
 
                 
             </Route>

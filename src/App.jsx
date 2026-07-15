@@ -53,8 +53,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
-        <Route path="/com" element={<ReportComplaint />} />
+        {/* <Route path="/com" element={<ReportComplaint />} /> */}
         <Route path="/tracking" element={<ComplaintTracking />} />
+        
         {/* User Dashboard */}
 
 <Route path="/user" element={<UserLayout />}>
@@ -63,6 +64,8 @@ function App() {
     <Route path="edit-profile" element={<EditProfile/>}/>
     <Route path="my-complaints" element={<MyComplaints/>}/>
     <Route path="notification" element={<Notification/>}/>
+    <Route path="track" element={<ComplaintTracking/>}/>
+    <Route path="report" element={<ReportComplaint/>}/>
 </Route>
 
 {/* Department */}

@@ -1,9 +1,17 @@
-import  { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  FaClipboardList,
+  FaClock,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  // FaSearch
+} from "react-icons/fa";
 import "./MyComplaints.css";
 
 function MyComplaints() {
 
   const [statusFilter, setStatusFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const complaints = [
     {
@@ -43,111 +51,348 @@ function MyComplaints() {
     }
   ];
 
-  const filteredComplaints =
-    statusFilter === "All"
-      ? complaints
-      : complaints.filter(
-          (item) => item.status === statusFilter
-        );
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((complaint) => {
+
+      const statusMatch =
+        statusFilter === "All" ||
+        complaint.status === statusFilter;
+
+      const searchMatch =
+        complaint.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        complaint.department.toLowerCase().includes(searchTerm.toLowerCase());
+
+      return statusMatch && searchMatch;
+
+    });
+  }, [complaints, statusFilter, searchTerm]);
+
+  const totalComplaints = complaints.length;
+
+  const pendingComplaints =
+    complaints.filter(
+      (item) => item.status === "Pending"
+    ).length;
+
+  const resolvedComplaints =
+    complaints.filter(
+      (item) => item.status === "Resolved"
+    ).length;
+
+  const inProgressComplaints =
+    complaints.filter(
+      (item) => item.status === "In Progress"
+    ).length;
 
   const handleTrack = (id) => {
-    alert(`Tracking Complaint: ${id}`);
+    alert(`Tracking Complaint : ${id}`);
   };
 
   return (
+
     <div className="mycomplaints-page">
 
+      {/* =========================
+          PAGE HEADER
+      ========================= */}
+
       <div className="page-header">
-        <h1>My Complaints</h1>
-        <p>
-          View and track all complaints submitted by you.
-        </p>
-      </div>
 
-      <div className="top-bar">
+        <div>
 
-        <select
-          value={statusFilter}
-          onChange={(e) =>
-            setStatusFilter(e.target.value)
-          }
-        >
-          <option value="All">All Complaints</option>
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
-        </select>
+          <h1>My Complaints</h1>
+
+          <p>
+            View, monitor and track every complaint that you have
+            submitted. Stay updated with the latest complaint status
+            and department progress.
+          </p>
+
+        </div>
 
       </div>
 
-      <div className="table-container">
+      {/* =========================
+          SUMMARY CARDS
+      ========================= */}
 
-        <table className="complaints-table">
+      <div className="summary-grid">
 
-          <thead>
-            <tr>
-              <th>Complaint ID</th>
-              <th>Category</th>
-              <th>Department</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        <div className="summary-card">
 
-          <tbody>
+          <div className="summary-content">
+            <span className="summary-title">
+              Total Complaints
+            </span>
 
-            {filteredComplaints.map((complaint) => (
+            <span className="summary-value">
+              {totalComplaints}
+            </span>
+          </div>
 
-              <tr key={complaint.id}>
+          <div className="summary-icon">
+            <FaClipboardList />
+          </div>
 
-                <td className="complaint-id">
-                  {complaint.id}
-                </td>
+        </div>
 
-                <td>{complaint.category}</td>
+        <div className="summary-card">
 
-                <td>{complaint.department}</td>
+          <div className="summary-content">
 
-                <td>{complaint.date}</td>
+            <span className="summary-title">
+              Pending
+            </span>
 
-                <td>
+            <span className="summary-value">
+              {pendingComplaints}
+            </span>
 
-                  <span
-                    className={`status-badge ${complaint.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {complaint.status}
-                  </span>
+          </div>
 
-                </td>
+          <div className="summary-icon">
+            <FaExclamationTriangle />
+          </div>
 
-                <td>
+        </div>
 
-                  <button
-                    className="track-btn"
-                    onClick={() =>
-                      handleTrack(complaint.id)
-                    }
-                  >
-                    Track
-                  </button>
+        <div className="summary-card">
 
-                </td>
+          <div className="summary-content">
 
+            <span className="summary-title">
+              In Progress
+            </span>
+
+            <span className="summary-value">
+              {inProgressComplaints}
+            </span>
+
+          </div>
+
+          <div className="summary-icon">
+            <FaClock />
+          </div>
+
+        </div>
+
+        <div className="summary-card">
+
+          <div className="summary-content">
+
+            <span className="summary-title">
+              Resolved
+            </span>
+
+            <span className="summary-value">
+              {resolvedComplaints}
+            </span>
+
+          </div>
+
+          <div className="summary-icon">
+            <FaCheckCircle />
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* =========================
+          FILTER SECTION
+      ========================= */}
+
+      <div className="filter-section">
+
+        <div className="filter-left">
+
+          <span className="filter-title">
+            Filter Complaints
+          </span>
+
+        </div>
+
+        <div className="filter-right">
+
+          <div className="search-box">
+
+            <input
+              type="text"
+              placeholder="Search Complaint..."
+              value={searchTerm}
+              onChange={(e) =>
+                setSearchTerm(e.target.value)
+              }
+            />
+
+          </div>
+
+          <select
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value)
+            }
+          >
+            <option value="All">
+              All Complaints
+            </option>
+
+            <option value="Pending">
+              Pending
+            </option>
+
+            <option value="In Progress">
+              In Progress
+            </option>
+
+            <option value="Resolved">
+              Resolved
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      {/* TABLE STARTS IN PART 2 */}
+
+      <div className="table-card">
+
+        <div className="table-container">
+                    <table className="complaints-table">
+
+            <thead>
+
+              <tr>
+                <th>Complaint ID</th>
+                <th>Category</th>
+                <th>Department</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {filteredComplaints.length > 0 ? (
+
+                filteredComplaints.map((complaint) => (
+
+                  <tr key={complaint.id}>
+
+                    <td className="complaint-id">
+                      {complaint.id}
+                    </td>
+
+                    <td>
+                      {complaint.category}
+                    </td>
+
+                    <td>
+                      {complaint.department}
+                    </td>
+
+                    <td>
+                      {complaint.date}
+                    </td>
+
+                    <td>
+
+                      <span
+                        className={`status-badge ${complaint.status
+                          .toLowerCase()
+                          .replace(/\s+/g, "-")}`}
+                      >
+                        {complaint.status}
+                      </span>
+
+                    </td>
+
+                    <td>
+
+                      <button
+                        className="track-btn"
+                        onClick={() =>
+                          handleTrack(complaint.id)
+                        }
+                      >
+                        Track
+                      </button>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              ) : (
+
+                <tr>
+
+                  <td
+                    colSpan="6"
+                    className="no-data"
+                  >
+
+                    <h3>
+                      No Complaints Found
+                    </h3>
+
+                    <p>
+                      No complaints match your current
+                      search or filter selection.
+                    </p>
+
+                  </td>
+
+                </tr>
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        {/* =========================
+            PAGINATION
+        ========================= */}
+
+        <div className="pagination">
+
+          <span className="pagination-info">
+            Showing {filteredComplaints.length} of {complaints.length} complaints
+          </span>
+
+          <div className="pagination-buttons">
+
+            <button className="page-btn active">
+              1
+            </button>
+
+            <button className="page-btn">
+              2
+            </button>
+
+            <button className="page-btn">
+              3
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
     </div>
+
   );
+
 }
 
 export default MyComplaints;

@@ -6,7 +6,7 @@ import {
     FaMapMarkedAlt,
     FaBell,
     FaUser,
-    FaQuestionCircle,
+    // FaQuestionCircle,
     FaSignOutAlt
 } from "react-icons/fa";
 
@@ -41,7 +41,7 @@ function UserSidebar() {
 
                         <li> <NavLink to="/user/profile"> <FaUser /> <span>Profile</span> </NavLink> </li>
 
-                        <li> <NavLink to="/user/help"> <FaQuestionCircle /> <span>Help</span> </NavLink> </li>
+                        {/* <li> <NavLink to="/user/help"> <FaQuestionCircle /> <span>Help</span> </NavLink> </li> */}
 
                     </ul>
 
