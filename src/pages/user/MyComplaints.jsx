@@ -9,26 +9,37 @@ function MyComplaints() {
     {
       id: "CMP001",
       category: "Garbage Collection",
-      status: "Pending",
       department: "Sanitation",
       date: "15 Jul 2026",
-      location: "Nikol, Ahmedabad"
+      status: "Pending"
     },
     {
       id: "CMP002",
       category: "Road Damage",
-      status: "In Progress",
       department: "Road Department",
       date: "13 Jul 2026",
-      location: "Bopal, Ahmedabad"
+      status: "In Progress"
     },
     {
       id: "CMP003",
       category: "Street Light Issue",
-      status: "Resolved",
-      department: "Electrical Department",
+      department: "Electrical",
       date: "10 Jul 2026",
-      location: "Satellite, Ahmedabad"
+      status: "Resolved"
+    },
+    {
+      id: "CMP004",
+      category: "Water Leakage",
+      department: "Water Department",
+      date: "08 Jul 2026",
+      status: "Pending"
+    },
+    {
+      id: "CMP005",
+      category: "Drainage Problem",
+      department: "Drainage",
+      date: "05 Jul 2026",
+      status: "Resolved"
     }
   ];
 
@@ -53,7 +64,7 @@ function MyComplaints() {
         </p>
       </div>
 
-      <div className="filter-section">
+      <div className="top-bar">
 
         <select
           value={statusFilter}
@@ -61,85 +72,77 @@ function MyComplaints() {
             setStatusFilter(e.target.value)
           }
         >
-          <option value="All">
-            All Complaints
-          </option>
-
-          <option value="Pending">
-            Pending
-          </option>
-
-          <option value="In Progress">
-            In Progress
-          </option>
-
-          <option value="Resolved">
-            Resolved
-          </option>
-
+          <option value="All">All Complaints</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Resolved">Resolved</option>
         </select>
 
       </div>
 
-      <div className="complaints-grid">
+      <div className="table-container">
 
-        {filteredComplaints.map((complaint) => (
+        <table className="complaints-table">
 
-          <div
-            className="complaint-card"
-            key={complaint.id}
-          >
+          <thead>
+            <tr>
+              <th>Complaint ID</th>
+              <th>Category</th>
+              <th>Department</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-            <div className="card-header">
+          <tbody>
 
-              <h3>{complaint.id}</h3>
+            {filteredComplaints.map((complaint) => (
 
-              <span
-                className={`status-badge ${complaint.status
-                  .toLowerCase()
-                  .replace(" ", "-")}`}
-              >
-                {complaint.status}
-              </span>
+              <tr key={complaint.id}>
 
-            </div>
+                <td className="complaint-id">
+                  {complaint.id}
+                </td>
 
-            <div className="complaint-info">
+                <td>{complaint.category}</td>
 
-              <p>
-                <strong>Category:</strong>
-                {complaint.category}
-              </p>
+                <td>{complaint.department}</td>
 
-              <p>
-                <strong>Department:</strong>
-                {complaint.department}
-              </p>
+                <td>{complaint.date}</td>
 
-              <p>
-                <strong>Date:</strong>
-                {complaint.date}
-              </p>
+                <td>
 
-              <p>
-                <strong>Location:</strong>
-                {complaint.location}
-              </p>
+                  <span
+                    className={`status-badge ${complaint.status
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {complaint.status}
+                  </span>
 
-            </div>
+                </td>
 
-            <button
-              className="track-btn"
-              onClick={() =>
-                handleTrack(complaint.id)
-              }
-            >
-              Track Complaint
-            </button>
+                <td>
 
-          </div>
+                  <button
+                    className="track-btn"
+                    onClick={() =>
+                      handleTrack(complaint.id)
+                    }
+                  >
+                    Track
+                  </button>
 
-        ))}
+                </td>
+
+              </tr>
+
+            ))}
+
+          </tbody>
+
+        </table>
 
       </div>
 
