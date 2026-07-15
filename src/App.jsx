@@ -31,6 +31,10 @@ import ComplaintManagement from "./pages/admin/ComplaintManagement";
 import Report from "./pages/admin/Report";
 
 
+import MyComplaints from "./pages/user/MyComplaints";
+import Notification from "./pages/user/Notification";
+
+
 import EditProfile from "./Authentication/EditProfile";
 import Profile from "./Authentication/Profile";
 
@@ -57,6 +61,8 @@ function App() {
     <Route path="dashboard" element={<UserDashboard />} />
     <Route path="profile" element={<Profile />} />
     <Route path="edit-profile" element={<EditProfile/>}/>
+    <Route path="my-complaints" element={<MyComplaints/>}/>
+    <Route path="notification" element={<Notification/>}/>
 </Route>
 
 {/* Department */}

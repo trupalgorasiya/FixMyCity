@@ -15,6 +15,9 @@ import EngineerManagement from "./pages/admin/EngineerManagement";
 import ComplaintManagement from "./pages/admin/ComplaintManagement";
 import Report from "./pages/admin/Report";
 
+import MyComplaints from "./pages/user/MyComplaints";
+import Notification from "./pages/user/Notification";
+
 import Profile from "./Authentication/Profile";
 import EditProfile from "./Authentication/EditProfile"
 function AppRoutes() {
@@ -27,6 +30,11 @@ function AppRoutes() {
                 <Route path="dashboard" element={<UserDashboard />} />
                 <Route path="profile" element={<Profile />} /> 
                 <Route path="edit-profile" element={<EditProfile/>}/>
+                <Route path="my-complaints" element={<MyComplaints/>}/>
+                <Route path="notification" element={<Notification/>}/>
+                
+
+                
             </Route>
 
             <Route path="/department" element={<DepartmentLayout />}> 

@@ -37,7 +37,7 @@ function UserSidebar() {
 
                         <li> <NavLink to="/user/track"> <FaMapMarkedAlt /> <span>Track Complaint</span> </NavLink> </li>
 
-                        <li> <NavLink to="/user/notifications"> <FaBell /> <span>Notifications</span> </NavLink> </li>
+                        <li> <NavLink to="/user/notification"> <FaBell /> <span>Notifications</span> </NavLink> </li>
 
                         <li> <NavLink to="/user/profile"> <FaUser /> <span>Profile</span> </NavLink> </li>
 
