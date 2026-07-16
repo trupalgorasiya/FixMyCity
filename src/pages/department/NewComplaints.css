@@ -1,0 +1,156 @@
+.new-complaints{
+    padding:30px;
+    background:#f4f6f9;
+    min-height:100vh;
+}
+
+/* Header */
+
+.page-header{
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:32px;
+    color:#111827;
+    margin-bottom:8px;
+}
+
+.page-header p{
+    color:#6b7280;
+}
+
+/* Top Bar */
+
+.top-bar{
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.top-bar input,
+.top-bar select{
+    padding:12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    background:white;
+    min-width:220px;
+}
+
+.top-bar input:focus,
+.top-bar select:focus{
+    outline:none;
+    border-color:#003366;
+}
+
+/* Table */
+
+.table-wrapper{
+    background:white;
+    border-radius:16px;
+    overflow-x:auto;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+}
+
+.complaints-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.complaints-table thead{
+    background:#003366;
+}
+
+.complaints-table th{
+    color:white;
+    padding:16px;
+    text-align:left;
+}
+
+.complaints-table td{
+    padding:16px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+.complaints-table tbody tr:hover{
+    background:#f8fafc;
+}
+
+/* Priority */
+
+.priority{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.high{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+.medium{
+    background:#fef3c7;
+    color:#d97706;
+}
+
+.low{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+/* Status */
+
+.status{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.new{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+/* Button */
+
+.assign-btn{
+    background:#003366;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+}
+
+.assign-btn:hover{
+    background:#0055aa;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    .new-complaints{
+        padding:20px;
+    }
+
+    .top-bar{
+        flex-direction:column;
+    }
+
+    .top-bar input,
+    .top-bar select{
+        width:100%;
+    }
+
+    .complaints-table{
+        min-width:1000px;
+    }
+
+}

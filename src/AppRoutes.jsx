@@ -20,6 +20,13 @@ import Notification from "./pages/user/Notification";
 import ComplaintTracking from "./pages/ComplaintTracking";
 import Profile from "./Authentication/Profile";
 import EditProfile from "./Authentication/EditProfile"
+
+import NewComplaints from "./pages/department/NewComplaints";
+import AllComplaints from "./pages/department/AllComplaints";
+import EngineerManage from "./pages/department/EngineerManage";
+import DepartmentReport from "./pages/department/DepartmentReport";
+import Notify from "./pages/department/Notify";
+
 function AppRoutes() {
 
     return (
@@ -42,12 +49,20 @@ function AppRoutes() {
              <Route path="dashboard" element={<DepartmentDashboard />} /> 
              <Route path="profile" element={<Profile />} />
              <Route path="edit-profile" element={<EditProfile/>}/>
+             <Route path="new-complaints" element={<NewComplaints/>}/>
+             <Route path="all-complaints" element={<AllComplaints/>}/>
+             <Route path="engineer-manage" element={<EngineerManage/>}/>
+             <Route path="department-report" element={<DepartmentReport/>}/>
+             <Route path="department-notification" element={<Notify/>}/>
+
+             
              </Route>
 
             <Route path="/engineer" element={<EngineerLayout />}>
              <Route path="dashboard" element={<EngineerDashboard />} />
              <Route path="profile" element={<Profile />} />
              <Route path="edit-profile" element={<EditProfile/>}/>
+             
              </Route>
 
             <Route path="/admin" element={<SuperAdminLayout />}>

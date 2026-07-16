@@ -35,6 +35,14 @@ import MyComplaints from "./pages/user/MyComplaints";
 import Notification from "./pages/user/Notification";
 
 
+import NewComplaints from "./pages/department/NewComplaints";
+import AllComplaints from "./pages/department/AllComplaints";
+import EngineerManage from "./pages/department/EngineerManage";
+import DepartmentReport from "./pages/department/DepartmentReport";
+import Notify from "./pages/department/Notify";
+
+
+
 import EditProfile from "./Authentication/EditProfile";
 import Profile from "./Authentication/Profile";
 
@@ -53,7 +61,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
-        {/* <Route path="/com" element={<ReportComplaint />} /> */}
+        <Route path="/com" element={<ReportComplaint />} /> 
         <Route path="/tracking" element={<ComplaintTracking />} />
         
         {/* User Dashboard */}
@@ -74,6 +82,16 @@ function App() {
     <Route path="dashboard" element={<DepartmentDashboard />} />
     <Route path="profile" element={<Profile />} />
     <Route path="edit-profile" element={<EditProfile/>}/>
+    <Route path="new-complaints" element={<NewComplaints/>}/>
+    <Route path="all-complaints" element={<AllComplaints/>}/>
+    <Route path="engineer-manage" element={<EngineerManage/>}/>
+    <Route path="department-report" element={<DepartmentReport/>}/>
+    <Route path="department-notification" element={<Notify/>}/>
+
+   
+    
+
+
 </Route>
 
 {/* Engineer */}

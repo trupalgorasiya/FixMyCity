@@ -33,17 +33,17 @@ function DepartmentSidebar() {
 
                         <li><NavLink to="/department/dashboard"><FaHome /><span>Dashboard</span></NavLink></li>
 
-                        <li><NavLink to="/department/new"><FaClipboardCheck /><span>New Complaints</span></NavLink></li>
+                        <li><NavLink to="/department/new-complaints"><FaClipboardCheck /><span>New Complaints</span></NavLink></li>
 
-                        <li><NavLink to="/department/all"><FaTasks /><span>All Complaints</span></NavLink></li>
+                        <li><NavLink to="/department/all-complaints"><FaTasks /><span>All Complaints</span></NavLink></li>
 
                         <li><NavLink to="/department/assign"><FaUserCog /><span>Assign Engineer</span></NavLink></li>
 
-                        <li><NavLink to="/department/engineers"><FaUsers /><span>Engineers</span></NavLink></li>
+                        <li><NavLink to="/department/engineer-manage"><FaUsers /><span>Engineers</span></NavLink></li>
 
-                        <li><NavLink to="/department/reports"><FaChartBar /><span>Reports</span></NavLink></li>
+                        <li><NavLink to="/department/department-report"><FaChartBar /><span>Reports</span></NavLink></li>
 
-                        <li><NavLink to="/department/notifications"><FaBell /><span>Notifications</span></NavLink></li>
+                        <li><NavLink to="/department/department-notification"><FaBell /><span>Notifications</span></NavLink></li>
 
                         <li><NavLink to="/department/profile"><FaUser /><span>Profile</span></NavLink></li>
 
