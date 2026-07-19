@@ -26,6 +26,9 @@ import AllComplaints from "./pages/department/AllComplaints";
 import EngineerManage from "./pages/department/EngineerManage";
 import DepartmentReport from "./pages/department/DepartmentReport";
 import Notify from "./pages/department/Notify";
+import AssignedComplaints from "./pages/engineer/AssignedComplaints";
+import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
+import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
 
 function AppRoutes() {
 
@@ -62,6 +65,9 @@ function AppRoutes() {
              <Route path="dashboard" element={<EngineerDashboard />} />
              <Route path="profile" element={<Profile />} />
              <Route path="edit-profile" element={<EditProfile/>}/>
+             <Route path="complents" element={<AssignedComplaints/>}/>
+             <Route path="history" element={<ComplaintsHistory/>}/>
+             <Route path="today" element={<EngineerWorkDetails/>}/>
              
              </Route>
 

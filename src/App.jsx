@@ -34,7 +34,7 @@ import Report from "./pages/admin/Report";
 import MyComplaints from "./pages/user/MyComplaints";
 import Notification from "./pages/user/Notification";
 
-
+import 'leaflet/dist/leaflet.css';
 import NewComplaints from "./pages/department/NewComplaints";
 import AllComplaints from "./pages/department/AllComplaints";
 import EngineerManage from "./pages/department/EngineerManage";
@@ -45,6 +45,10 @@ import Notify from "./pages/department/Notify";
 
 import EditProfile from "./Authentication/EditProfile";
 import Profile from "./Authentication/Profile";
+import MultiPointLocation from "./pages/MultiPointLocation";
+import AssignedComplaints from "./pages/engineer/AssignedComplaints";
+import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
+import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
 
 function App() {
   return (
@@ -63,6 +67,8 @@ function App() {
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/com" element={<ReportComplaint />} /> 
         <Route path="/tracking" element={<ComplaintTracking />} />
+        <Route path="/location" element={<MultiPointLocation />} />
+        
         
         {/* User Dashboard */}
 
@@ -87,11 +93,6 @@ function App() {
     <Route path="engineer-manage" element={<EngineerManage/>}/>
     <Route path="department-report" element={<DepartmentReport/>}/>
     <Route path="department-notification" element={<Notify/>}/>
-
-   
-    
-
-
 </Route>
 
 {/* Engineer */}
@@ -100,6 +101,11 @@ function App() {
     <Route path="dashboard" element={<EngineerDashboard />} />
     <Route path="profile" element={<Profile />} />
     <Route path="edit-profile" element={<EditProfile/>}/>
+    <Route path="complents" element={<AssignedComplaints/>}/>
+    <Route path="history" element={<ComplaintsHistory/>}/>
+    <Route path="work/:id" element={<EngineerWorkDetails/>}/>
+
+
 </Route>
 
 {/* Super Admin */}

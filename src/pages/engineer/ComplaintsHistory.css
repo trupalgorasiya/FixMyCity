@@ -1,0 +1,1192 @@
+/* ==========================================================
+   COMPLAINT HISTORY PAGE
+   PART 1
+   Root • Layout • Header • Toolbar • Search • Filters
+========================================================== */
+
+/* ==========================================================
+   ROOT
+========================================================== */
+
+.assigned-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+  background: #f4f7fc;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  box-sizing: border-box;
+}
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.assigned-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.assigned-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.assigned-header p {
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.97rem;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+/* ==========================================================
+   TOOLBAR
+========================================================== */
+
+.complaint-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================
+   SEARCH BOX
+========================================================== */
+
+.search-box {
+  flex: 1;
+  min-width: 300px;
+  /* max-width: 520px; */
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  padding: 0 18px;
+  transition: 0.25s;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.search-box:hover {
+  border-color: #2563eb;
+}
+
+.search-box:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.search-box svg {
+  color: #2563eb;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.search-box input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+/* ==========================================================
+   RIGHT SIDE
+========================================================== */
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================
+   FILTER BOX
+========================================================== */
+
+.filter-box {
+  min-width: 190px;
+  height: 52px;
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  transition: 0.25s;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.filter-box:hover {
+  border-color: #2563eb;
+}
+
+.filter-box svg {
+  color: #2563eb;
+  font-size: 16px;
+}
+
+.filter-box select {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 15px;
+  color: #1e293b;
+  appearance: none;
+}
+
+/* ==========================================================
+   TOOLBAR BUTTONS (Future)
+========================================================== */
+
+.toolbar-btn {
+  height: 50px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toolbar-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.toolbar-btn.secondary {
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #dbe3ee;
+}
+
+.toolbar-btn.secondary:hover {
+  background: #eff6ff;
+}
+
+/* ==========================================================
+   SUMMARY CARDS (Optional Future)
+========================================================== */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 22px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+  box-shadow: 0 6px 18px rgba(0,0,0,.04);
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.08);
+}
+
+.summary-info h4 {
+  margin: 0;
+  font-size: .95rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.summary-info h2 {
+  margin-top: 8px;
+  color: #0f172a;
+  font-size: 2rem;
+}
+
+.summary-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 26px;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+  .complaint-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+
+  .filter-box {
+    flex: 1;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .assigned-page {
+    padding: 20px;
+  }
+
+  .assigned-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .assigned-header p {
+    font-size: .9rem;
+  }
+
+  .toolbar-right {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-box,
+  .toolbar-btn,
+  .toolbar-btn.secondary {
+    width: 100%;
+  }
+
+}
+/* ==========================================================
+   COMPLAINT HISTORY PAGE
+   PART 2
+   Card • Table • Priority Badges • Buttons • Empty State
+========================================================== */
+
+/* ==========================================================
+   MAIN CARD
+========================================================== */
+
+.assigned-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  transition: all 0.3s ease;
+}
+
+.assigned-card:hover {
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+/* ==========================================================
+   CARD HEADER
+========================================================== */
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #edf2f7;
+  background: #ffffff;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.card-header p {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================
+   TABLE WRAPPER
+========================================================== */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Custom Scrollbar */
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #eef2f7;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.assigned-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+.assigned-table thead {
+  background: #f8fafc;
+}
+
+.assigned-table thead th {
+  padding: 18px 16px;
+  text-align: left;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.assigned-table tbody tr {
+  transition: background 0.25s ease;
+}
+
+.assigned-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.assigned-table tbody td {
+  padding: 16px;
+  border-bottom: 1px solid #edf2f7;
+  color: #334155;
+  font-size: 0.94rem;
+  vertical-align: middle;
+}
+
+.assigned-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==========================================================
+   COMPLAINT ID
+========================================================== */
+
+.complaint-id {
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 0.3px;
+}
+
+/* ==========================================================
+   EMAIL
+========================================================== */
+
+.assigned-table td:nth-child(3) {
+  color: #475569;
+}
+
+/* ==========================================================
+   PHONE
+========================================================== */
+
+.assigned-table td:nth-child(4) {
+  font-weight: 500;
+}
+
+/* ==========================================================
+   LOCATION BUTTON
+========================================================== */
+
+.location-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.location-btn svg {
+  font-size: 15px;
+}
+
+.location-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* ==========================================================
+   PRIORITY BADGES
+========================================================== */
+
+.priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
+
+/* High */
+
+.priority.high {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Medium */
+
+.priority.medium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* Low */
+
+.priority.low {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+/* ==========================================================
+   STATUS BADGES (Future Ready)
+========================================================== */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 105px;
+  padding: 8px 15px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status.assigned {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status.pending {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status.in-progress {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* ==========================================================
+   ACTION BUTTONS (Future)
+========================================================== */
+
+.action-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+.action-btn:hover {
+  background: #2563eb;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================
+   EMPTY STATE
+========================================================== */
+
+.empty-row {
+  padding: 60px 20px !important;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #fafcff;
+}
+
+/* ==========================================================
+   ROW ANIMATION
+========================================================== */
+
+.assigned-table tbody tr {
+  animation: fadeInUp .35s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+  .assigned-table {
+    min-width: 950px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .card-header {
+    padding: 18px;
+  }
+
+  .card-header h2 {
+    font-size: 1.05rem;
+  }
+
+  .assigned-table thead th,
+  .assigned-table tbody td {
+    padding: 14px;
+  }
+
+  .location-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .priority,
+  .status {
+    min-width: 80px;
+    font-size: 0.78rem;
+  }
+
+}
+/* ==========================================================
+   COMPLAINT HISTORY PAGE
+   PART 3
+   Location Modal • Address • Map • Animations
+========================================================== */
+
+/* ==========================================================
+   MODAL OVERLAY
+========================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 9999;
+  animation: fadeOverlay .25s ease;
+}
+
+@keyframes fadeOverlay {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* ==========================================================
+   MODAL
+========================================================== */
+
+.location-modal {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  animation: modalPop .35s ease;
+}
+
+@keyframes modalPop {
+
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+/* ==========================================================
+   MODAL HEADER
+========================================================== */
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.modal-header h2 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-header h2 svg {
+  font-size: 20px;
+}
+
+/* ==========================================================
+   CLOSE BUTTON
+========================================================== */
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .15);
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: .3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, .28);
+  transform: rotate(90deg);
+}
+
+/* ==========================================================
+   MODAL BODY
+========================================================== */
+
+.modal-body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* ==========================================================
+   INFORMATION GRID
+========================================================== */
+
+.location-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.location-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  transition: .25s;
+}
+
+.location-item:hover {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.location-item label {
+  display: block;
+  font-size: .82rem;
+  color: #64748b;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.location-item span {
+  font-size: .95rem;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-word;
+}
+
+/* ==========================================================
+   ADDRESS BOX
+========================================================== */
+
+.address-box {
+  background: linear-gradient(135deg, #eff6ff, #f8fbff);
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.address-box h4 {
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2563eb;
+  font-size: 1rem;
+}
+
+.address-box p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.7;
+  font-size: .95rem;
+}
+
+/* ==========================================================
+   MAP PLACEHOLDER
+========================================================== */
+
+.map-placeholder {
+  min-height: 260px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 18px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 35px;
+  transition: .3s;
+}
+
+.map-placeholder:hover {
+  background: #eff6ff;
+  border-color: #60a5fa;
+}
+
+.map-placeholder svg {
+  font-size: 55px;
+  color: #2563eb;
+  margin-bottom: 18px;
+}
+
+.map-placeholder h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+}
+
+.map-placeholder p {
+  margin-top: 10px;
+  color: #64748b;
+  max-width: 450px;
+  line-height: 1.7;
+}
+
+/* ==========================================================
+   LEAFLET MAP (Future Ready)
+========================================================== */
+
+.leaflet-container {
+  width: 100%;
+  height: 350px;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 768px) {
+
+  .modal-overlay {
+    padding: 15px;
+  }
+
+  .location-modal {
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    padding: 18px 20px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.05rem;
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .location-info {
+    grid-template-columns: 1fr;
+  }
+
+  .map-placeholder {
+    min-height: 220px;
+    padding: 25px;
+  }
+
+  .map-placeholder svg {
+    font-size: 42px;
+  }
+
+  .leaflet-container {
+    height: 260px;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .close-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .location-item {
+    padding: 15px;
+  }
+
+  .address-box {
+    padding: 18px;
+  }
+
+  .map-placeholder {
+    min-height: 200px;
+  }
+}
+/* ==========================================================
+   COMPLAINT HISTORY PAGE
+   PART 4
+   Pagination • Utilities • Animations • Responsive • Print
+========================================================== */
+
+/* ==========================================================
+   PAGINATION
+========================================================== */
+
+.pagination-wrapper {
+  width: 100%;
+  margin-top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.pagination-wrapper button {
+  height: 46px;
+  min-width: 46px;
+  padding: 0 18px;
+  border: 1px solid #dbe3ee;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.pagination-wrapper button:hover:not(:disabled) {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.25);
+}
+
+.pagination-wrapper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.page-numbers button {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+.page-numbers .active-page {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+}
+
+/* ==========================================================
+   SMOOTH TRANSITIONS
+========================================================== */
+
+* {
+  transition:
+    background-color .25s ease,
+    color .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+/* ==========================================================
+   SELECTION
+========================================================== */
+
+::selection {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* ==========================================================
+   FOCUS ACCESSIBILITY
+========================================================== */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+
+/* ==========================================================
+   OPTIONAL FADE-IN FOR PAGE
+========================================================== */
+
+.assigned-page {
+  animation: pageFadeIn .35s ease;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+
+  .pagination-wrapper {
+    justify-content: center;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .pagination-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-wrapper>button {
+    width: 100%;
+  }
+
+  .page-numbers {
+    justify-content: center;
+  }
+
+  .page-numbers button {
+    width: 42px;
+    height: 42px;
+    font-size: 0.9rem;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .page-numbers {
+    gap: 8px;
+  }
+
+  .page-numbers button {
+    width: 38px;
+    height: 38px;
+    font-size: 0.82rem;
+  }
+
+  .pagination-wrapper button {
+    height: 42px;
+    font-size: 0.85rem;
+  }
+
+}
+
+/* ==========================================================
+   PRINT
+========================================================== */
+
+@media print {
+
+  body {
+    background: #ffffff;
+  }
+
+  .complaint-toolbar,
+  .pagination-wrapper,
+  .location-btn,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  .assigned-page {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .assigned-card {
+    box-shadow: none;
+    border: 1px solid #d1d5db;
+  }
+
+  .assigned-table {
+    min-width: 100%;
+  }
+
+  .assigned-table th,
+  .assigned-table td {
+    border: 1px solid #d1d5db;
+  }
+
+}
+
+/* ==========================================================
+   END OF FILE
+========================================================== */

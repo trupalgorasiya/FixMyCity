@@ -85,7 +85,7 @@ function Register() {
 
           <h1>FixMyCity</h1>
 
-          <p>Smart City Complaint Management System</p>
+          <p>Report. Track. Resolve.</p>
         </div>
 
         {/* Title */}
@@ -93,7 +93,7 @@ function Register() {
         <div className="title-section">
           <h2>Create Account</h2>
 
-          <p>Join our smart city platform</p>
+          <p>Join our smart city community and help build a cleaner, safer city.</p>
         </div>
 
         <form onSubmit={handleSubmit}>

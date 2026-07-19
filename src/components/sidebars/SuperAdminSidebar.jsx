@@ -6,9 +6,7 @@ import {
     // FaUserTie,
     FaHardHat,
     FaClipboardList,
-    FaChartPie,
     FaFileAlt,
-    FaCog,
     FaUser,
     FaSignOutAlt
 } from "react-icons/fa";
@@ -45,11 +43,7 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/complaint-manage"><FaClipboardList /><span>Complaints</span></NavLink></li>
 
-                        <li><NavLink to="/admin/analytics"><FaChartPie /><span>Analytics</span></NavLink></li>
-
                         <li><NavLink to="/admin/report"><FaFileAlt /><span>Reports</span></NavLink></li>
-
-                        <li><NavLink to="/admin/settings"><FaCog /><span>Settings</span></NavLink></li>
 
                         <li><NavLink to="/admin/profile"><FaUser /><span>Profile</span></NavLink></li>
 

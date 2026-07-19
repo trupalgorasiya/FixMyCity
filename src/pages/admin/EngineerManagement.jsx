@@ -381,16 +381,29 @@ function EngineerManagement() {
   // Add Department
 
   const handleAddDepartment = () => {
+  const dept = newDepartment.trim();
 
-    if (!newDepartment.trim()) return;
+  if (!dept) {
+    alert("Please enter a department name.");
+    return;
+  }
 
-    setDepartments([
-      ...departments,
-      newDepartment
-    ]);
+  // Prevent duplicate departments
+  if (
+    departments.some(
+      (item) => item.toLowerCase() === dept.toLowerCase()
+    )
+  ) {
+    alert("Department already exists.");
+    return;
+  }
 
-    setNewDepartment("");
-  };
+  setDepartments((prev) => [...prev, dept]);
+
+  setNewDepartment("");
+
+  alert("Department added successfully!");
+};
 
   // Input Change
 
@@ -577,10 +590,11 @@ function EngineerManagement() {
           />
 
           <button
-            onClick={handleAddDepartment}
-          >
-            Add Department
-          </button>
+    type="button"
+    onClick={handleAddDepartment}
+>
+    Add Department
+</button>
 
         </div>
 

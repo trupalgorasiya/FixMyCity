@@ -53,19 +53,13 @@ function Login() {
 
           <h1>FixMyCity</h1>
 
-          <p>Smart City Complaint Management System</p>
+          <p>Your Voice for a Cleaner, Safer, and Smarter City</p>
 
         </div>
 
         {/* Title */}
 
-        <div className="title-section">
-
-          <h2>Welcome Back 👋</h2>
-
-          <p>Please login to continue</p>
-
-        </div>
+  
 
         {/* Form */}
 

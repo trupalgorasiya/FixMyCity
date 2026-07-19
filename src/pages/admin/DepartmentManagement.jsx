@@ -177,7 +177,6 @@ function DepartmentManagement() {
     {
       id: "D001",
       name: "Road Department",
-      head: "Rahul Sharma",
       email: "road@fixmycity.com",
       contact: "9876543210",
       engineers: 8,
@@ -187,7 +186,6 @@ function DepartmentManagement() {
     {
       id: "D002",
       name: "Water Department",
-      head: "Amit Patel",
       email: "water@fixmycity.com",
       contact: "9876543211",
       engineers: 6,
@@ -198,7 +196,6 @@ function DepartmentManagement() {
 
   const [formData, setFormData] = useState({
     name: "",
-    head: "",
     email: "",
     contact: ""
   });
@@ -216,7 +213,6 @@ function DepartmentManagement() {
 
     if (
       !formData.name ||
-      !formData.head ||
       !formData.email ||
       !formData.contact
     ) {
@@ -254,7 +250,6 @@ function DepartmentManagement() {
 
     setFormData({
       name: "",
-      head: "",
       email: "",
       contact: ""
     });
@@ -266,7 +261,6 @@ function DepartmentManagement() {
 
     setFormData({
       name: dept.name,
-      head: dept.head,
       email: dept.email,
       contact: dept.contact
     });
@@ -302,8 +296,6 @@ function DepartmentManagement() {
         <p>Manage all departments</p>
       </div>
 
-      {/* Statistics */}
-
       <div className="stats-grid">
 
         <div className="stat-card">
@@ -328,8 +320,6 @@ function DepartmentManagement() {
 
       </div>
 
-      {/* Add Department */}
-
       <div className="department-form">
 
         <h2>
@@ -345,14 +335,6 @@ function DepartmentManagement() {
             name="name"
             placeholder="Department Name"
             value={formData.name}
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            name="head"
-            placeholder="Department Head"
-            value={formData.head}
             onChange={handleChange}
           />
 
@@ -385,8 +367,6 @@ function DepartmentManagement() {
 
       </div>
 
-      {/* Search */}
-
       <div className="search-box">
 
         <input
@@ -400,8 +380,6 @@ function DepartmentManagement() {
 
       </div>
 
-      {/* Table */}
-
       <div className="table-container">
 
         <table>
@@ -411,7 +389,6 @@ function DepartmentManagement() {
             <tr>
               <th>ID</th>
               <th>Department</th>
-              <th>Head</th>
               <th>Email</th>
               <th>Contact</th>
               <th>Engineers</th>
@@ -430,7 +407,6 @@ function DepartmentManagement() {
 
                 <td>{dept.id}</td>
                 <td>{dept.name}</td>
-                <td>{dept.head}</td>
                 <td>{dept.email}</td>
                 <td>{dept.contact}</td>
                 <td>{dept.engineers}</td>

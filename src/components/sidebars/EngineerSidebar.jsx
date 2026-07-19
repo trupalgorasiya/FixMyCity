@@ -31,13 +31,11 @@ function EngineerSidebar() {
 
                         <li><NavLink to="/engineer/dashboard"><FaHome /><span>Dashboard</span></NavLink></li>
 
-                        <li><NavLink to="/engineer/tasks"><FaTasks /><span>Assigned Work</span></NavLink></li>
+                        <li><NavLink to="/engineer/complents"><FaTasks /><span>Assigned Work</span></NavLink></li>
 
-                        <li><NavLink to="/engineer/today"><FaCalendarCheck /><span>Today's Tasks</span></NavLink></li>
 
                         <li><NavLink to="/engineer/history"><FaHistory /><span>Work History</span></NavLink></li>
 
-                        <li><NavLink to="/engineer/upload"><FaCamera /><span>Upload Images</span></NavLink></li>
 
                         <li><NavLink to="/engineer/profile"><FaUser /><span>Profile</span></NavLink></li>
 

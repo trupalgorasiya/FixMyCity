@@ -4,10 +4,9 @@ import {
   FaClock,
   FaCheckCircle,
   FaExclamationTriangle,
-  // FaSearch
+  FaSearch
 } from "react-icons/fa";
 import "./MyComplaints.css";
-
 function MyComplaints() {
 
   const [statusFilter, setStatusFilter] = useState("All");
@@ -93,10 +92,6 @@ function MyComplaints() {
 
     <div className="mycomplaints-page">
 
-      {/* =========================
-          PAGE HEADER
-      ========================= */}
-
       <div className="page-header">
 
         <div>
@@ -112,10 +107,6 @@ function MyComplaints() {
         </div>
 
       </div>
-
-      {/* =========================
-          SUMMARY CARDS
-      ========================= */}
 
       <div className="summary-grid">
 
@@ -199,62 +190,43 @@ function MyComplaints() {
 
       </div>
 
-      {/* =========================
-          FILTER SECTION
-      ========================= */}
+      {/* ==========================================
+    SEARCH & FILTER
+========================================== */}
 
-      <div className="filter-section">
+<div className="complaint-toolbar">
 
-        <div className="filter-left">
+    <div className="search-box">
+        <FaSearch />
+        <input
+            type="text"
+            placeholder="Search Complaint..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+        />
+    </div>
 
-          <span className="filter-title">
-            Filter Complaints
-          </span>
+    <div className="toolbar-right">
 
-        </div>
+        <div className="filter-box">
 
-        <div className="filter-right">
+            <FaSearch />
 
-          <div className="search-box">
-
-            <input
-              type="text"
-              placeholder="Search Complaint..."
-              value={searchTerm}
-              onChange={(e) =>
-                setSearchTerm(e.target.value)
-              }
-            />
-
-          </div>
-
-          <select
-            value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value)
-            }
-          >
-            <option value="All">
-              All Complaints
-            </option>
-
-            <option value="Pending">
-              Pending
-            </option>
-
-            <option value="In Progress">
-              In Progress
-            </option>
-
-            <option value="Resolved">
-              Resolved
-            </option>
-
-          </select>
+            <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+            >
+                <option value="All">All Complaints</option>
+                <option value="Pending">Pending</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+            </select>
 
         </div>
 
-      </div>
+    </div>
+
+</div>
 
       {/* TABLE STARTS IN PART 2 */}
 

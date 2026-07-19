@@ -1,403 +1,1541 @@
-.tracking-page {
-  min-height: 100vh;
-  padding: 120px 20px 60px;
-  background: #f4f6f9;
+/* ==========================================================
+   COMPLAINT TRACKING PAGE
+   PART 1 - BASIC STRUCTURE
+========================================================== */
+
+
+/* ==========================
+   PAGE BACKGROUND
+========================== */
+
+.tracking-page{
+
+    min-height:100vh;
+
+    padding:100px 30px 60px;
+
+    background:#f8fafc;
+
+    font-family:'Poppins',sans-serif;
 }
 
-.tracking-card {
-  max-width: 1150px;
-  margin: auto;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-  padding: 40px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-}
 
-.tracking-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
 
-.tracking-header h1 {
-  font-size: 34px;
-  color: #111827;
-  margin-bottom: 10px;
-  font-weight: 700;
-}
+/* ==========================
+   MAIN CONTAINER
+========================== */
 
-.tracking-header p {
-  color: #6b7280;
-  font-size: 16px;
-  max-width: 700px;
-  margin: auto;
-  line-height: 1.7;
-}
+.tracking-container{
 
-/* ================= SEARCH ================= */
+    max-width:1200px;
 
-.search-section {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 35px;
-}
-
-.search-section input {
-  flex: 1;
-  color: #000;
-  height: 56px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  background: #fff;
-  padding: 0 20px;
-  font-size: 15px;
-  transition: 0.3s;
-}
-
-.search-section input:focus {
-  outline: none;
-  border-color: #111827;
-  box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.08);
-}
-
-.search-section button {
-  border: none;
-  background: #111827;
-  color: white;
-  padding: 0 30px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: .3s;
-}
-
-.search-section button:hover {
-  background: #000;
-  transform: translateY(-2px);
-}
-
-/* ================= DETAILS ================= */
-
-.complaint-details {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.detail-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 28px;
-  transition: .3s;
-}
-
-.detail-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 35px rgba(0,0,0,.08);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-}
-
-.card-header h2 {
-  color: #111827;
-  font-size: 22px;
-  margin: 0;
-}
-
-/* ================= STATUS BADGE ================= */
-
-.status-badge {
-  padding: 8px 18px;
-  border-radius: 50px;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.status-badge.progress {
-  background: #dbeafe;
-  color: #2563eb;
-}
-
-/* ================= INFO GRID ================= */
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap: 20px;
-}
-
-.info-item {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 18px;
-  border: 1px solid #ececec;
-}
-
-.info-item span {
-  display: block;
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
-.info-item strong {
-  color: #111827;
-  font-size: 16px;
-}
-
-.priority.high {
-  color: #dc2626;
-}
-
-/* ================= PROGRESS ================= */
-
-.timeline {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.step {
-  flex: 1;
-  position: relative;
-  text-align: center;
-}
-
-.step:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 28px;
-  left: 60%;
-  width: 80%;
-  height: 3px;
-  background: #d1d5db;
-}
-
-.step-circle {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: #d1d5db;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-  font-size: 22px;
-  font-weight: bold;
-  position: relative;
-  z-index: 2;
-}
-
-.step p {
-  margin-top: 12px;
-  color: #374151;
-  font-weight: 600;
-}
-
-.completed .step-circle {
-  background: #10b981;
-  color: white;
-}
-
-.completed::after {
-  background: #10b981 !important;
-}
-
-.current .step-circle {
-  background: #2563eb;
-  color: white;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-
-  0% {
-    box-shadow: 0 0 0 0 rgba(37,99,235,.5);
-  }
-
-  70% {
-    box-shadow: 0 0 0 15px rgba(37,99,235,0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(37,99,235,0);
-  }
+    margin:auto;
 
 }
 
-/* ================= HISTORY ================= */
 
-.history-timeline {
-  position: relative;
-  padding-left: 35px;
-}
 
-.history-timeline::before {
-  content: "";
-  position: absolute;
-  left: 8px;
-  top: 0;
-  width: 3px;
-  height: 100%;
-  background: #d1d5db;
-}
+/* ==========================
+   HEADER SECTION
+========================== */
 
-.history-item {
-  position: relative;
-  margin-bottom: 28px;
-}
+.tracking-header{
 
-.history-dot {
-  position: absolute;
-  left: -35px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #10b981;
-  border: 4px solid white;
-  box-shadow: 0 0 0 3px #10b981;
-}
+    text-align:center;
 
-.history-dot.active {
-  background: #2563eb;
-  box-shadow: 0 0 0 3px #2563eb;
-}
-
-.history-content {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 18px 20px;
-}
-
-.history-content h4 {
-  margin-bottom: 8px;
-  color: #111827;
-}
-
-.history-content p {
-  color: #2563eb;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.history-content span {
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-/* ================= FEEDBACK ================= */
-
-.rating {
-  font-size: 34px;
-  color: #f59e0b;
-  margin-bottom: 18px;
-}
-
-.detail-card textarea {
-  width: 100%;
-  min-height: 140px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  padding: 16px;
-  font-size: 15px;
-  resize: vertical;
-  transition: .3s;
-}
-
-.detail-card textarea:focus {
-  outline: none;
-  border-color: #111827;
-  box-shadow: 0 0 0 4px rgba(17,24,39,.08);
-}
-
-.feedback-btn {
-  margin-top: 20px;
-  background: #111827;
-  color: white;
-  border: none;
-  padding: 14px 28px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-  transition: .3s;
-}
-
-.feedback-btn:hover {
-  background: #000;
-  transform: translateY(-2px);
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media (max-width: 992px) {
-
-  .tracking-card {
-    padding: 30px;
-  }
-
-  .timeline {
-    flex-wrap: wrap;
-    row-gap: 30px;
-  }
-
-  .step {
-    min-width: 150px;
-  }
-
-  .step::after {
-    display: none;
-  }
+    margin-bottom:40px;
 
 }
 
-@media (max-width: 768px) {
 
-  .tracking-page {
-    padding: 100px 15px 40px;
-  }
 
-  .tracking-card {
-    padding: 22px;
-  }
+.tracking-header h1{
 
-  .tracking-header h1 {
-    font-size: 28px;
-  }
+    font-size:36px;
 
-  .tracking-header p {
-    font-size: 15px;
-  }
+    font-weight:700;
 
-  .search-section {
-    flex-direction: column;
-  }
+    color:#0f172a;
 
-  .search-section button {
-    height: 54px;
-  }
+    margin-bottom:12px;
 
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
+}
 
-  .timeline {
-    flex-direction: column;
-  }
 
-  .step {
-    width: 100%;
-  }
+
+.tracking-header p{
+
+    max-width:750px;
+
+    margin:auto;
+
+    color:#64748b;
+
+    font-size:16px;
+
+    line-height:1.8;
+
+}
+
+
+
+/* ==========================
+   SEARCH CARD
+========================== */
+
+
+.search-card{
+
+    background:#ffffff;
+
+    padding:30px;
+
+    border-radius:22px;
+
+    border:1px solid #e2e8f0;
+
+    box-shadow:
+    0 15px 40px rgba(15,23,42,.06);
+
+    margin-bottom:35px;
+
+}
+
+
+
+.search-box{
+
+    display:flex;
+
+    gap:35px;
+
+}
+
+
+
+.search-box input{
+
+    flex:1;
+
+    height:60px;
+
+    padding:0 22px;
+
+    border-radius:14px;
+
+    border:1px solid #cbd5e1;
+
+    font-size:15px;
+
+    color:#0f172a;
+
+    transition:.3s;
+
+}
+
+
+
+.search-box input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+.search-box button{
+
+    height:60px;
+
+    padding:0 32px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+
+.search-box button:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+
+    0 15px 30px rgba(37,99,235,.25);
+
+}
+
+
+
+/* ==========================
+   CONTENT WRAPPER
+========================== */
+
+
+.tracking-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:28px;
+
+}
+
+
+
+/* ==========================
+   COMMON CARD
+========================== */
+
+
+.card{
+
+    background:#ffffff;
+
+    border-radius:22px;
+
+    border:1px solid #e2e8f0;
+
+    padding:30px;
+
+    box-shadow:
+
+    0 12px 35px rgba(15,23,42,.05);
+
+    transition:.35s;
+
+}
+
+
+
+.card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+    0 20px 45px rgba(15,23,42,.09);
+
+}
+
+
+
+/* ==========================
+   CARD TITLE
+========================== */
+
+
+.card-title{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:28px;
+
+    gap:20px;
+
+}
+
+
+
+.card-title h2{
+
+    font-size:24px;
+
+    color:#0f172a;
+
+    font-weight:700;
+
+    margin:0;
+
+}
+
+
+
+/* ==========================
+   STATUS BADGE
+========================== */
+
+
+.status{
+
+    padding:10px 22px;
+
+    border-radius:50px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+
+
+.status.progress{
+
+    background:#dbeafe;
+
+    color:#2563eb;
+
+}
+
+
+
+/* ==========================
+   DETAILS GRID
+========================== */
+
+
+.details-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(3,minmax(220px,1fr));
+
+    gap:20px;
+
+}
+
+
+
+/* ==========================
+   DETAIL ITEM
+========================== */
+
+
+.detail-item{
+
+    background:#f8fafc;
+
+    border:1px solid #e2e8f0;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    transition:.3s;
+
+}
+
+
+
+.detail-item:hover{
+
+    background:#eff6ff;
+
+    border-color:#bfdbfe;
+
+    transform:translateY(-3px);
+
+}
+
+
+
+.detail-item label{
+
+    display:block;
+
+    color:#64748b;
+
+    font-size:13px;
+
+    font-weight:500;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    margin-bottom:10px;
+
+}
+
+
+
+.detail-item h4{
+
+    margin:0;
+
+    font-size:16px;
+
+    color:#0f172a;
+
+    font-weight:600;
+
+}
+
+
+
+/* ==========================
+   PRIORITY
+========================== */
+
+
+.priority.high{
+
+    color:#dc2626;
+
+}
+/* ==========================================================
+   STATUS PROGRESS
+   PART 2 - PROFESSIONAL HORIZONTAL STEPPER
+========================================================== */
+
+
+/* ==========================
+   MAIN PROGRESS WRAPPER
+========================== */
+
+
+.status-progress{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    padding:20px 10px 10px;
+
+    overflow:hidden;
+
+}
+
+
+
+/* ==========================
+   BACKGROUND LINE
+========================== */
+
+
+.status-progress::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:50px;
+
+    left:10%;
+
+    right:10%;
+
+    height:5px;
+
+    background:#e2e8f0;
+
+    border-radius:20px;
+
+    z-index:0;
+
+}
+
+
+
+/* ==========================
+   COMPLETED PROGRESS LINE
+========================== */
+
+
+.progress-line{
+
+    position:absolute;
+
+    top:50px;
+
+    left:10%;
+
+    width:62%;
+
+    height:5px;
+
+    background:#16a34a;
+
+    border-radius:20px;
+
+    z-index:1;
+
+    animation:
+
+    progressAnimation 1.2s ease;
+
+}
+
+
+
+/* Progress animation */
+
+
+@keyframes progressAnimation{
+
+
+    from{
+
+        width:0;
+
+    }
+
+
+    to{
+
+        width:62%;
+
+    }
+
+}
+
+
+
+/* ==========================
+   EACH STEP
+========================== */
+
+
+.progress-step{
+
+    flex:1;
+
+    position:relative;
+
+    z-index:2;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    text-align:center;
+
+}
+
+
+
+/* ==========================
+   STEP CIRCLE
+========================== */
+
+
+.progress-circle{
+
+    width:64px;
+
+    height:64px;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+
+    background:#ffffff;
+
+
+    border:4px solid #cbd5e1;
+
+
+    color:#94a3b8;
+
+
+    font-size:22px;
+
+
+    font-weight:700;
+
+
+    transition:.35s;
+
+
+    box-shadow:
+
+    0 8px 20px rgba(15,23,42,.08);
+
+}
+
+
+
+/* ==========================
+   COMPLETED STEP
+========================== */
+
+
+.progress-step.completed .progress-circle{
+
+    background:#22c55e;
+
+    border-color:#16a34a;
+
+    color:white;
+
+    box-shadow:none;
+
+}
+.status-completed{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+
+
+/* ==========================
+   CURRENT STEP
+========================== */
+
+
+.progress-step.current .progress-circle{
+
+
+    background:#2563eb;
+
+
+    border-color:#2563eb;
+
+
+    color:white;
+
+
+    box-shadow:
+
+    0 12px 30px rgba(37,99,235,.40);
+
+
+    animation:
+
+    currentPulse 2s infinite;
+
+}
+
+
+
+/* ==========================
+   PENDING STEP
+========================== */
+
+
+.progress-step:not(.completed):not(.current)
+.progress-circle{
+
+
+    background:#ffffff;
+
+
+    border-color:#cbd5e1;
+
+
+    color:#94a3b8;
+
+}
+
+
+
+/* ==========================
+   STEP TITLE
+========================== */
+
+
+.progress-step h4{
+
+
+    margin-top:18px;
+
+
+    margin-bottom:6px;
+
+
+    font-size:15px;
+
+
+    font-weight:700;
+
+
+    color:#0f172a;
+
+
+}
+
+
+
+/* ==========================
+   STEP DATE / TEXT
+========================== */
+
+
+.progress-step span{
+
+
+    font-size:13px;
+
+
+    color:#64748b;
+
+
+}
+
+
+
+/* ==========================
+   HOVER EFFECT
+========================== */
+
+
+.progress-step:hover .progress-circle{
+
+
+    transform:
+
+    translateY(-6px)
+
+    scale(1.08);
+
+}
+
+
+
+.progress-step:hover h4{
+
+
+    color:#2563eb;
+
+}
+
+
+
+/* ==========================
+   CURRENT PULSE
+========================== */
+
+
+@keyframes currentPulse{
+
+
+    0%{
+
+
+        box-shadow:
+
+        0 0 0 0 rgba(37,99,235,.45);
+
+    }
+
+
+    70%{
+
+
+        box-shadow:
+
+        0 0 0 18px rgba(37,99,235,0);
+
+    }
+
+
+    100%{
+
+
+        box-shadow:
+
+        0 0 0 0 rgba(37,99,235,0);
+
+    }
+
+
+}
+
+
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+
+@media(max-width:900px){
+
+
+    .status-progress{
+
+
+        overflow-x:auto;
+
+        min-width:750px;
+
+        padding-bottom:20px;
+
+    }
+
+
+}
+/* ==========================================================
+   STATUS HISTORY
+   PART 3 - TIMELINE + FEEDBACK + RESPONSIVE
+========================================================== */
+
+
+/* ==========================
+   HISTORY WRAPPER
+========================== */
+
+
+.history-container{
+
+    position:relative;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+
+    padding-left:35px;
+
+}
+
+
+
+/* ==========================
+   VERTICAL LINE
+========================== */
+
+
+.history-container::before{
+
+
+    content:"";
+
+
+    position:absolute;
+
+
+    left:10px;
+
+
+    top:0;
+
+
+    bottom:0;
+
+
+    width:4px;
+
+
+    background:#dbeafe;
+
+
+    border-radius:20px;
+
+
+}
+
+
+
+/* ==========================
+   HISTORY ITEM
+========================== */
+
+
+.history-item{
+
+
+    position:relative;
+
+
+    display:flex;
+
+
+    gap:22px;
+
+
+    align-items:flex-start;
+
+
+    animation:historyFade .5s ease;
+
+
+}
+
+
+
+/* ==========================
+   HISTORY ICON
+========================== */
+
+
+.history-icon{
+
+
+    position:absolute;
+
+
+    left:-35px;
+
+
+    width:28px;
+
+
+    height:28px;
+
+
+    border-radius:50%;
+
+
+    display:flex;
+
+
+    justify-content:center;
+
+
+    align-items:center;
+
+
+    font-size:14px;
+
+
+    font-weight:700;
+
+
+    background:white;
+
+
+    border:4px solid #ffffff;
+
+
+    color:#64748b;
+
+
+    box-shadow:
+
+    0 0 0 4px #cbd5e1;
+
+
+    z-index:2;
+
+
+}
+
+
+
+/* Completed */
+
+
+.history-icon.completed{
+
+
+    background:#22c55e;
+
+
+    color:white;
+
+
+    box-shadow:
+
+    0 0 0 4px rgba(34,197,94,.25);
+
+
+}
+
+
+
+/* Current */
+
+
+.history-icon.current{
+
+
+    background:#2563eb;
+
+
+    color:white;
+
+
+    box-shadow:
+
+    0 0 0 5px rgba(37,99,235,.25);
+
+
+    animation:historyPulse 2s infinite;
+
+
+}
+
+
+
+/* ==========================
+   HISTORY CARD
+========================== */
+
+
+.history-box{
+
+
+    flex:1;
+
+
+    background:#ffffff;
+
+
+    border:1px solid #e2e8f0;
+
+
+    border-radius:18px;
+
+
+    padding:22px 25px;
+
+
+    transition:.35s;
+
+
+}
+
+
+
+/* Hover */
+
+
+.history-box:hover{
+
+
+    transform:translateX(8px);
+
+
+    background:#f8fbff;
+
+
+    border-color:#bfdbfe;
+
+
+    box-shadow:
+
+    0 15px 35px rgba(37,99,235,.08);
+
+
+}
+
+
+
+/* Heading */
+
+
+.history-box h4{
+
+
+    margin:0 0 8px;
+
+
+    font-size:18px;
+
+
+    color:#0f172a;
+
+
+    font-weight:700;
+
+
+}
+
+
+
+/* Time */
+
+
+.history-box p{
+
+
+    margin-bottom:10px;
+
+
+    color:#2563eb;
+
+
+    font-size:14px;
+
+
+    font-weight:600;
+
+
+}
+
+
+
+/* Description */
+
+
+.history-box span{
+
+
+    color:#64748b;
+
+
+    font-size:14px;
+
+
+    line-height:1.7;
+
+
+}
+
+
+
+/* Active history */
+
+
+.history-item.active .history-box{
+
+
+    background:#ffffff;
+
+
+    border-color:#2563eb;
+
+
+}
+
+
+
+/* ==========================
+   HISTORY ANIMATION
+========================== */
+
+
+@keyframes historyFade{
+
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(20px);
+
+    }
+
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+
+@keyframes historyPulse{
+
+
+    0%{
+
+        box-shadow:
+
+        0 0 0 0 rgba(37,99,235,.35);
+
+    }
+
+
+    70%{
+
+        box-shadow:
+
+        0 0 0 15px rgba(37,99,235,0);
+
+    }
+
+
+    100%{
+
+        box-shadow:
+
+        0 0 0 0 rgba(37,99,235,0);
+
+    }
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   FEEDBACK SECTION
+========================================================== */
+
+
+
+.feedback-text{
+
+
+    color:#64748b;
+
+
+    font-size:15px;
+
+
+    margin-bottom:20px;
+
+
+}
+
+
+
+.rating{
+
+
+    font-size:35px;
+
+
+    letter-spacing:8px;
+
+
+    color:#f59e0b;
+
+
+    margin-bottom:25px;
+
+
+}
+
+
+
+
+.feedback-card textarea{
+
+
+    width:100%;
+
+
+    min-height:140px;
+
+
+    resize:none;
+
+
+    padding:18px;
+
+
+    border-radius:16px;
+
+
+    border:1px solid #cbd5e1;
+
+
+    font-size:15px;
+
+
+    color:#0f172a;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.feedback-card textarea:focus{
+
+
+    outline:none;
+
+
+    border-color:#2563eb;
+
+
+    box-shadow:
+
+    0 0 0 4px rgba(37,99,235,.12);
+
+
+}
+
+
+
+
+.feedback-button{
+
+
+    margin-top:20px;
+
+
+    padding:14px 32px;
+
+
+    border:none;
+
+
+    border-radius:14px;
+
+
+    background:#2563eb;
+
+
+    color:white;
+
+
+    font-size:15px;
+
+
+    font-weight:600;
+
+
+    cursor:pointer;
+
+
+    transition:.3s;
+
+
+}
+
+
+
+.feedback-button:hover{
+
+
+    background:#1d4ed8;
+
+
+    transform:translateY(-3px);
+
+
+    box-shadow:
+
+    0 15px 30px rgba(37,99,235,.25);
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   TABLET RESPONSIVE
+========================================================== */
+
+
+@media(max-width:992px){
+
+
+    .tracking-page{
+
+
+        padding:80px 20px 50px;
+
+    }
+
+
+
+    .details-grid{
+
+
+        grid-template-columns:
+
+        repeat(2,1fr);
+
+    }
+
+
+
+    .card{
+
+
+        padding:25px;
+
+    }
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   MOBILE RESPONSIVE
+========================================================== */
+
+
+@media(max-width:768px){
+
+
+    .tracking-page{
+
+
+        padding:60px 15px 40px;
+
+    }
+
+
+
+    .tracking-header h1{
+
+
+        font-size:28px;
+
+    }
+
+
+
+    .tracking-header p{
+
+
+        font-size:14px;
+
+    }
+
+
+
+    .search-box{
+
+
+        flex-direction:column;
+
+    }
+
+
+
+    .search-box button{
+
+
+        height:55px;
+
+    }
+
+
+
+    .details-grid{
+
+
+        grid-template-columns:1fr;
+
+    }
+
+
+
+    .card-title{
+
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+
+
+    .status-progress{
+
+
+        overflow-x:auto;
+
+
+        min-width:750px;
+
+    }
+
+
+
+    .history-container{
+
+
+        padding-left:25px;
+
+    }
+
+
+
+    .history-box{
+
+
+        padding:18px;
+
+    }
+
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   SMALL MOBILE
+========================================================== */
+
+
+@media(max-width:480px){
+
+
+    .tracking-header h1{
+
+
+        font-size:24px;
+
+    }
+
+
+
+    .card{
+
+
+        padding:20px;
+
+        border-radius:18px;
+
+    }
+
+
+
+    .card-title h2{
+
+
+        font-size:20px;
+
+    }
+
+
+
+    .history-box h4{
+
+
+        font-size:16px;
+
+    }
+
+
+
+    .rating{
+
+
+        font-size:28px;
+
+    }
+
 
 }

@@ -1,0 +1,1418 @@
+/* ==========================================================
+   ENGINEER WORK DETAILS PAGE
+   PART 1
+   Layout • Header • Cards • Details
+========================================================== */
+
+
+/* ==========================================================
+   ROOT PAGE
+========================================================== */
+
+.engineer-work-page {
+
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+  background: #f4f7fc;
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  box-sizing: border-box;
+
+}
+
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.work-header {
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+}
+
+
+.work-header h1 {
+
+  margin: 0;
+
+  font-size: 2rem;
+
+  font-weight: 700;
+
+  color: #1e293b;
+
+}
+
+
+
+.work-header p {
+
+  margin-top: 8px;
+
+  color: #64748b;
+
+  font-size: 0.95rem;
+
+  line-height: 1.6;
+
+}
+
+
+
+/* ==========================================================
+   COMMON CARD
+========================================================== */
+
+
+.work-card {
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 25px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+  0 10px 25px rgba(15,23,42,0.05);
+
+  transition: 0.3s ease;
+
+}
+
+
+
+.work-card:hover {
+
+  box-shadow:
+  0 15px 35px rgba(15,23,42,0.08);
+
+}
+
+
+
+/* ==========================================================
+   CARD TITLE
+========================================================== */
+
+
+.card-title {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  font-size: 1.2rem;
+
+  font-weight: 700;
+
+  color: #1e293b;
+
+  padding-bottom: 18px;
+
+  margin-bottom: 20px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+
+.card-title svg {
+
+  color: #2563eb;
+
+  font-size: 20px;
+
+}
+
+
+
+
+
+/* ==========================================================
+   DETAILS GRID
+========================================================== */
+
+
+.details-grid {
+
+  display: grid;
+
+  grid-template-columns:
+  repeat(3,1fr);
+
+  gap: 18px;
+
+}
+
+
+
+/* ==========================================================
+   DETAIL BOX
+========================================================== */
+
+
+.detail-box {
+
+  background: #f8fafc;
+
+  border:1px solid #e2e8f0;
+
+  border-radius: 14px;
+
+  padding:18px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+  transition:.25s ease;
+
+}
+
+
+
+.detail-box:hover {
+
+  background:#eff6ff;
+
+  border-color:#bfdbfe;
+
+}
+
+
+
+.detail-box label {
+
+  font-size:.82rem;
+
+  color:#64748b;
+
+  font-weight:600;
+
+}
+
+
+
+.detail-box span {
+
+  color:#1e293b;
+
+  font-size:.95rem;
+
+  font-weight:600;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+}
+
+
+
+.detail-box span svg {
+
+  color:#2563eb;
+
+  font-size:15px;
+
+}
+
+
+
+
+/* ==========================================================
+   PRIORITY BADGE
+========================================================== */
+
+
+.priority {
+
+  width:max-content;
+
+  padding:7px 16px;
+
+  border-radius:50px;
+
+  font-size:.82rem;
+
+  font-weight:700;
+
+}
+
+
+
+.priority.high {
+
+  background:#fee2e2;
+
+  color:#dc2626;
+
+}
+
+
+
+.priority.medium {
+
+  background:#fef3c7;
+
+  color:#d97706;
+
+}
+
+
+
+.priority.low {
+
+  background:#dcfce7;
+
+  color:#15803d;
+
+}
+
+
+
+
+/* ==========================================================
+   DESCRIPTION
+========================================================== */
+
+
+.description-box {
+
+  margin-top:22px;
+
+  background:#f8fafc;
+
+  border-radius:14px;
+
+  padding:20px;
+
+  border:1px solid #e2e8f0;
+
+}
+
+
+
+.description-box label {
+
+  display:block;
+
+  font-size:.85rem;
+
+  font-weight:700;
+
+  color:#475569;
+
+  margin-bottom:10px;
+
+}
+
+
+
+.description-box p {
+
+  margin:0;
+
+  color:#334155;
+
+  line-height:1.7;
+
+  font-size:.95rem;
+
+}
+
+
+
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+
+@media(max-width:1100px){
+
+
+  .details-grid {
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+  }
+
+
+}
+
+
+
+@media(max-width:768px){
+
+
+  .engineer-work-page {
+
+    padding:20px;
+
+  }
+
+
+  .work-header h1 {
+
+    font-size:1.6rem;
+
+  }
+
+
+
+  .details-grid {
+
+    grid-template-columns:1fr;
+
+  }
+
+
+
+  .work-card {
+
+    padding:20px;
+
+  }
+
+
+}
+/* ==========================================================
+   ENGINEER WORK DETAILS PAGE
+   PART 2
+   Location • Map • Upload • Image Preview
+========================================================== */
+
+
+/* ==========================================================
+   LOCATION SECTION
+========================================================== */
+
+
+.location-container {
+
+  display:grid;
+
+  grid-template-columns:
+  1fr 1.5fr;
+
+  gap:20px;
+
+}
+
+
+
+.address-content {
+
+  background:#f8fafc;
+
+  border:1px solid #e2e8f0;
+
+  border-radius:16px;
+
+  padding:22px;
+
+}
+
+
+
+.address-content h3 {
+
+  margin:0 0 12px;
+
+  font-size:1rem;
+
+  color:#2563eb;
+
+}
+
+
+
+.address-content p {
+
+  margin:0;
+
+  color:#334155;
+
+  line-height:1.7;
+
+  font-weight:500;
+
+}
+
+
+
+
+
+/* ==========================================================
+   MAP BOX
+========================================================== */
+
+
+.map-box {
+
+  min-height:240px;
+
+  background:#f8fafc;
+
+  border:2px dashed #cbd5e1;
+
+  border-radius:16px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+
+  align-items:center;
+
+  text-align:center;
+
+  padding:25px;
+
+  transition:.3s ease;
+
+}
+
+
+
+.map-box:hover {
+
+  background:#eff6ff;
+
+  border-color:#60a5fa;
+
+}
+
+
+
+.map-box svg {
+
+  font-size:45px;
+
+  color:#2563eb;
+
+  margin-bottom:12px;
+
+}
+
+
+
+.map-box h3 {
+
+  margin:0;
+
+  color:#1e293b;
+
+}
+
+
+
+.map-box p {
+
+  color:#64748b;
+
+  margin-top:8px;
+
+}
+
+
+
+
+
+/* ==========================================================
+   SECTION DESCRIPTION
+========================================================== */
+
+
+.section-description {
+
+  color:#64748b;
+
+  font-size:.92rem;
+
+  margin-top:-10px;
+
+  margin-bottom:20px;
+
+}
+
+
+
+
+/* ==========================================================
+   IMAGE UPLOAD AREA
+========================================================== */
+
+
+.upload-area {
+
+  width:100%;
+
+}
+
+
+
+.upload-area input {
+
+  display:none;
+
+}
+
+
+
+.upload-area label {
+
+  min-height:180px;
+
+  border:2px dashed #93c5fd;
+
+  border-radius:18px;
+
+  background:#f8fbff;
+
+  display:flex;
+
+  flex-direction:column;
+
+  justify-content:center;
+
+  align-items:center;
+
+  cursor:pointer;
+
+  transition:.3s ease;
+
+}
+
+
+
+.upload-area label:hover {
+
+  background:#eff6ff;
+
+  border-color:#2563eb;
+
+  transform:translateY(-3px);
+
+}
+
+
+
+.upload-area svg {
+
+  font-size:40px;
+
+  color:#2563eb;
+
+  margin-bottom:15px;
+
+}
+
+
+
+.upload-area span {
+
+  font-size:1rem;
+
+  font-weight:700;
+
+  color:#1e293b;
+
+}
+
+
+
+.upload-area small {
+
+  margin-top:8px;
+
+  color:#64748b;
+
+}
+
+
+
+
+
+/* ==========================================================
+   IMAGE PREVIEW
+========================================================== */
+
+
+.image-preview {
+
+  margin-top:25px;
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fill,minmax(180px,1fr));
+
+  gap:20px;
+
+}
+
+
+
+
+
+.image-card {
+
+  background:#ffffff;
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+  border:1px solid #e2e8f0;
+
+  box-shadow:
+  0 5px 15px rgba(15,23,42,.05);
+
+  transition:.3s ease;
+
+}
+
+
+
+.image-card:hover {
+
+  transform:translateY(-5px);
+
+  box-shadow:
+  0 12px 25px rgba(15,23,42,.1);
+
+}
+
+
+
+.image-card img {
+
+  width:100%;
+
+  height:150px;
+
+  object-fit:cover;
+
+  display:block;
+
+}
+
+
+
+.image-card p {
+
+  margin:0;
+
+  padding:12px;
+
+  text-align:center;
+
+  font-size:.9rem;
+
+  font-weight:700;
+
+  color:#475569;
+
+  background:#f8fafc;
+
+}
+
+
+
+
+/* ==========================================================
+   LEAFLET MAP SUPPORT
+========================================================== */
+
+
+.leaflet-container {
+
+  width:100%;
+
+  height:350px;
+
+  border-radius:18px;
+
+}
+
+
+
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+
+@media(max-width:1000px){
+
+
+  .location-container {
+
+    grid-template-columns:1fr;
+
+  }
+
+
+}
+
+
+
+@media(max-width:768px){
+
+
+  .map-box {
+
+    min-height:200px;
+
+  }
+
+
+
+  .image-preview {
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+  }
+
+
+}
+
+
+
+@media(max-width:480px){
+
+
+  .image-preview {
+
+    grid-template-columns:1fr;
+
+  }
+
+
+
+  .upload-area label {
+
+    min-height:150px;
+
+  }
+
+
+
+}
+/* ==========================================================
+   ENGINEER WORK DETAILS PAGE
+   PART 3
+   Status • Notes • Summary • Actions
+========================================================== */
+
+
+/* ==========================================================
+   STATUS SELECTOR
+========================================================== */
+
+
+.status-selector {
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:18px;
+
+  flex-wrap:wrap;
+
+}
+
+
+
+.status-selector button {
+
+  min-width:140px;
+
+  padding:14px 22px;
+
+  border-radius:50px;
+
+  border:1px solid #dbe3ee;
+
+  background:#ffffff;
+
+  color:#475569;
+
+  font-size:.95rem;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:.3s ease;
+
+}
+
+
+
+.status-selector button:hover {
+
+  border-color:#2563eb;
+
+  color:#2563eb;
+
+  transform:translateY(-2px);
+
+}
+
+
+
+.status-selector span {
+
+  font-size:25px;
+
+  color:#94a3b8;
+
+  font-weight:700;
+
+}
+
+
+
+.status-selector .active-status {
+
+  background:#2563eb;
+
+  color:#ffffff;
+
+  border-color:#2563eb;
+
+  box-shadow:
+  0 10px 25px rgba(37,99,235,.25);
+
+}
+
+
+
+
+
+/* ==========================================================
+   NOTES SECTION
+========================================================== */
+
+
+.notes-container {
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:12px;
+
+}
+
+
+
+.notes-container label {
+
+  font-size:.9rem;
+
+  font-weight:700;
+
+  color:#475569;
+
+}
+
+
+
+.notes-container textarea {
+
+  width:100%;
+
+  min-height:150px;
+
+  resize:vertical;
+
+  padding:18px;
+
+  border-radius:15px;
+
+  border:1px solid #dbe3ee;
+
+  background:#f8fafc;
+
+  font-size:.95rem;
+
+  color:#1e293b;
+
+  outline:none;
+
+  transition:.3s ease;
+
+  box-sizing:border-box;
+
+}
+
+
+
+.notes-container textarea:focus {
+
+  background:#ffffff;
+
+  border-color:#2563eb;
+
+  box-shadow:
+  0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+
+
+
+/* ==========================================================
+   SUMMARY GRID
+========================================================== */
+
+
+.summary-grid {
+
+  display:grid;
+
+  grid-template-columns:
+  repeat(4,1fr);
+
+  gap:18px;
+
+}
+
+
+
+.summary-box {
+
+  background:#f8fafc;
+
+  border:1px solid #e2e8f0;
+
+  border-radius:15px;
+
+  padding:20px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+
+  transition:.3s ease;
+
+}
+
+
+
+.summary-box:hover {
+
+  background:#eff6ff;
+
+  border-color:#bfdbfe;
+
+}
+
+
+
+.summary-box label {
+
+  font-size:.82rem;
+
+  color:#64748b;
+
+  font-weight:600;
+
+}
+
+
+
+.summary-box strong {
+
+  color:#1e293b;
+
+  font-size:1.15rem;
+
+}
+
+
+
+
+/* ==========================================================
+   ACTION BUTTONS
+========================================================== */
+
+
+.work-actions {
+
+  display:flex;
+
+  justify-content:flex-end;
+
+  align-items:center;
+
+  gap:18px;
+
+  padding:10px 0 30px;
+
+}
+
+
+
+.work-actions button {
+
+  height:52px;
+
+  padding:0 28px;
+
+  border-radius:14px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:10px;
+
+  font-size:.95rem;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:.3s ease;
+
+}
+
+
+
+
+
+/* SAVE BUTTON */
+
+.save-btn {
+
+  background:#ffffff;
+
+  color:#2563eb;
+
+  border:1px solid #2563eb;
+
+}
+
+
+
+.save-btn:hover {
+
+  background:#eff6ff;
+
+  transform:translateY(-2px);
+
+}
+
+
+
+
+
+/* COMPLETE BUTTON */
+
+.complete-btn {
+
+  background:#16a34a;
+
+  color:#ffffff;
+
+  border:none;
+
+}
+
+
+
+.complete-btn:hover {
+
+  background:#15803d;
+
+  transform:translateY(-2px);
+
+  box-shadow:
+  0 10px 25px rgba(22,163,74,.25);
+
+}
+
+
+
+.complete-btn svg {
+
+  font-size:17px;
+
+}
+
+
+
+
+
+/* ==========================================================
+   PAGE ANIMATION
+========================================================== */
+
+
+.engineer-work-page {
+
+  animation:
+  fadePage .35s ease;
+
+}
+
+
+
+@keyframes fadePage {
+
+
+  from {
+
+    opacity:0;
+
+    transform:translateY(15px);
+
+  }
+
+
+  to {
+
+    opacity:1;
+
+    transform:translateY(0);
+
+  }
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+
+@media(max-width:1100px){
+
+
+  .summary-grid {
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+  }
+
+
+}
+
+
+
+
+@media(max-width:768px){
+
+
+  .status-selector {
+
+    flex-direction:column;
+
+  }
+
+
+  .status-selector span {
+
+    transform:rotate(90deg);
+
+  }
+
+
+
+  .status-selector button {
+
+    width:100%;
+
+  }
+
+
+
+  .summary-grid {
+
+    grid-template-columns:1fr;
+
+  }
+
+
+
+  .work-actions {
+
+    flex-direction:column;
+
+    align-items:stretch;
+
+  }
+
+
+
+  .work-actions button {
+
+    width:100%;
+
+  }
+
+
+}
+
+
+
+
+
+/* ==========================================================
+   PRINT SUPPORT
+========================================================== */
+
+
+@media print {
+
+
+  .work-actions,
+  .upload-area {
+
+    display:none;
+
+  }
+
+
+
+  .engineer-work-page {
+
+    background:#ffffff;
+
+    padding:0;
+
+  }
+
+
+
+  .work-card {
+
+    box-shadow:none;
+
+    border:1px solid #ddd;
+
+  }
+
+
+}
+.upload-submit-btn{
+
+margin-top:20px;
+
+padding:12px 25px;
+
+border:none;
+
+background:#2563eb;
+
+color:white;
+
+border-radius:8px;
+
+cursor:pointer;
+
+font-size:15px;
+
+}
+
+
+
+.upload-submit-btn:hover{
+
+background:#1d4ed8;
+
+}
+
+
+
+.image-card video{
+
+width:180px;
+
+height:140px;
+
+object-fit:cover;
+
+border-radius:10px;
+
+}
+
+
+
+.pdf-preview{
+
+width:180px;
+
+height:140px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:#f1f5f9;
+
+border-radius:10px;
+
+font-weight:600;
+
+}
+
+
+
+.remove-file{
+
+margin-top:10px;
+
+background:#dc2626;
+
+color:white;
+
+border:none;
+
+padding:6px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
