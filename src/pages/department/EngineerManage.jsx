@@ -1,7 +1,6 @@
-
-
 import "../engineer/ComplaintsHistory.css";
 import "../department/EngineerManage.css"
+
 import { useMemo, useState } from "react";
 
 import {
@@ -17,7 +16,7 @@ function DepartmentManagement() {
      DUMMY ENGINEER DATA
   ========================================================== */
 
-  const engineerData = [
+  const [engineers, setEngineers] = useState([
     {
       id: "ENG-1001",
       firstName: "Amit",
@@ -117,7 +116,7 @@ function DepartmentManagement() {
       department: "Water Department",
       status: "Active",
     },
-  ];
+  ]);
 
   /* ==========================================================
      STATES
@@ -145,7 +144,7 @@ function DepartmentManagement() {
   ========================================================== */
 
   const filteredEngineers = useMemo(() => {
-    return engineerData.filter((item) => {
+    return engineers.filter((item) => {
       const keyword = search.toLowerCase();
 
       return (
@@ -156,7 +155,7 @@ function DepartmentManagement() {
         item.mobile.includes(keyword)
       );
     });
-  }, [search]);
+  }, [engineers,search]);
 
   /* ==========================================================
      PAGINATION
@@ -201,10 +200,29 @@ function DepartmentManagement() {
     });
   };
 
-  /* ==========================================================
-     SUBMIT
-  ========================================================== */
+  const toggleStatus = (id) => {
 
+  const updatedEngineers = engineers.map((engineer) => {
+
+    if (engineer.id === id) {
+
+      return {
+        ...engineer,
+        status:
+          engineer.status === "Active"
+            ? "Inactive"
+            : "Active",
+      };
+
+    }
+
+    return engineer;
+
+  });
+
+  setEngineers(updatedEngineers);
+
+};
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -316,6 +334,8 @@ function DepartmentManagement() {
 
                 <th>Status</th>
 
+                <th>Action</th>
+
               </tr>
 
             </thead>
@@ -327,7 +347,7 @@ function DepartmentManagement() {
                 <tr>
 
                   <td
-                    colSpan="6"
+                    colSpan="7"
                     className="empty-row"
                   >
                     No engineer found.
@@ -357,18 +377,25 @@ function DepartmentManagement() {
 
                     <td>{item.department}</td>
 
-                    <td>
+                     <td>
+        <span
+            className={`status ${item.status
+                .toLowerCase()
+                .replace(/\s/g, "-")}`}
+        >
+            {item.status}
+        </span>
+    </td>
 
-                      <span
-                        className={`status ${item.status
-                          .toLowerCase()
-                          .replace(/\s/g, "-")}`}
-                      >
-                        {item.status}
-                      </span>
-
-                    </td>
-
+    <td>
+        <button
+            onClick={() => toggleStatus(item.id)}
+        >
+            {item.status === "Active"
+                ? "Deactivate"
+                : "Activate"}
+        </button>
+    </td>
                   </tr>
 
                 ))

@@ -152,6 +152,7 @@
   border-radius: 18px;
   padding: 22px;
   box-shadow: 0 10px 25px rgba(0,0,0,.07);
+  max-width: 1050px;
 }
 
 .card-header {
