@@ -1,12 +1,9 @@
 import { useState } from "react";
-import "../styles/ReportComplaint.css";
-import "../styles/LocationPicker.css";
-import LocationPicker from "../pages/LocationPicker";
-import EmailOtpModal from "./EmailOtpModal";
-import "../styles/EmailOtpModel.css";
+import "../../styles/ReportComplaint.css";
+import "../../styles/LocationPicker.css";
+import LocationPicker from "../../pages/LocationPicker";
 
 function ReportComplaint() {
-  const [showOtpModal, setShowOtpModal] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
@@ -83,24 +80,12 @@ function ReportComplaint() {
     e.preventDefault();
 
     // Validation if required
-
+    alert("success...");
     // Call API to send OTP
 
-    // await sendOtp(formData.email);
-
-    setShowOtpModal(true);
-};
-const handleVerified = async () => {
-
-    setShowOtpModal(false);
-
-    // Save Complaint API
-
-    console.log(formData);
-
-    alert("Complaint Submitted Successfully!");
 
 };
+
   return (
     <div className="complaint-page">
       <div className="complaint-card">
@@ -343,21 +328,7 @@ const handleVerified = async () => {
         </form>
 
       </div>
-      {
-showOtpModal && (
-
-<EmailOtpModal
-
-    email={formData.email}
-
-    onClose={() => setShowOtpModal(false)}
-
-    onVerify={handleVerified}
-
-/>
-
-)
-}
+    
     </div>
   );
 }

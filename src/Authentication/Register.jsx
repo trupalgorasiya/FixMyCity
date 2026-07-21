@@ -83,9 +83,9 @@ function Register() {
             <FaCity />
           </div>
 
-          <h1>FixMyCity</h1>
+          {/* <h1>FixMyCity</h1>
 
-          <p>Report. Track. Resolve.</p>
+          <p>Report. Track. Resolve.</p> */}
         </div>
 
         {/* Title */}

@@ -19,16 +19,31 @@ function Navbar() {
     const openDashboard = () => {
 
         if (role === "citizen") {
-            navigate("/dashboard/citizen");
+            navigate("/user/dashboard");
         }
         else if (role === "engineer") {
-            navigate("/dashboard/engineer");
+            navigate("/engineer/dashboard");
         }
         else if (role === "department") {
-            navigate("/dashboard/department");
+            navigate("/department/dashboard");
         }
         else if (role === "admin") {
-            navigate("/dashboard/admin");
+            navigate("/admin/dashboard");
+        }
+    };
+    const openNotification = () => {
+
+        if (role === "citizen") {
+            navigate("/user/notification");
+        }
+        else if (role === "engineer") {
+            navigate("/engineer/notification");
+        }
+        else if (role === "department") {
+            navigate("/department/notification");
+        }
+        else if (role === "admin") {
+            navigate("/admin/notification");
         }
     };
     return (
@@ -47,10 +62,15 @@ function Navbar() {
             {
                 isLoggedIn ?
                     <div className="nav-user">
-                        <button className="icon-btn">
+                    
+                        <button 
+                            className="icon-btn" 
+                            onClick={openNotification}
+                        >
                             <FaBell />
                             <span className="notification-dot"></span>
                         </button>
+                        
 
                         <button
                             className="icon-btn"

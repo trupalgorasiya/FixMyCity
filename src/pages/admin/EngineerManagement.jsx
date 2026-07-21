@@ -1,338 +1,11 @@
-// import  { useState } from "react";
-// import "./EngineerManagement.css";
-
-// function EngineerManagement() {
-
-//   const [engineers, setEngineers] = useState([
-//     {
-//       id: "E001",
-//       name: "Rahul Sharma",
-//       email: "rahul@gmail.com",
-//       mobile: "9876543210",
-//       department: "Road Department",
-//       role: "Engineer",
-//       assigned: 20,
-//       completed: 18
-//     },
-//     {
-//       id: "E002",
-//       name: "Amit Patel",
-//       email: "amit@gmail.com",
-//       mobile: "9876543211",
-//       department: "Water Department",
-//       role: "Senior Engineer",
-//       assigned: 15,
-//       completed: 12
-//     }
-//   ]);
-
-//   const [search, setSearch] = useState("");
-//   const [showModal, setShowModal] = useState(false);
-
-//   const [formData, setFormData] = useState({
-//     id: "",
-//     name: "",
-//     email: "",
-//     mobile: "",
-//     department: "Road Department",
-//     role: "Engineer"
-//   });
-
-//   const handleChange = (e) => {
-//     setFormData({
-//       ...formData,
-//       [e.target.name]: e.target.value
-//     });
-//   };
-
-//   const openAddModal = () => {
-//     setFormData({
-//       id: "",
-//       name: "",
-//       email: "",
-//       mobile: "",
-//       department: "Road Department",
-//       role: "Engineer"
-//     });
-//     setShowModal(true);
-//   };
-
-//   const handleEdit = (eng) => {
-//     setFormData(eng);
-//     setShowModal(true);
-//   };
-
-//   const handleSave = () => {
-
-//     if (formData.id) {
-
-//       setEngineers(
-//         engineers.map((eng) =>
-//           eng.id === formData.id ? formData : eng
-//         )
-//       );
-
-//     } else {
-
-//       const newEngineer = {
-//         ...formData,
-//         id: `E00${engineers.length + 1}`,
-//         assigned: 0,
-//         completed: 0
-//       };
-
-//       setEngineers([...engineers, newEngineer]);
-//     }
-
-//     setShowModal(false);
-//   };
-
-//   const handleDelete = (id) => {
-
-//     if (
-//       window.confirm(
-//         "Delete this engineer?"
-//       )
-//     ) {
-//       setEngineers(
-//         engineers.filter(
-//           (eng) => eng.id !== id
-//         )
-//       );
-//     }
-//   };
-
-//   const filteredEngineers =
-//     engineers.filter((eng) =>
-//       eng.name
-//         .toLowerCase()
-//         .includes(search.toLowerCase())
-//     );
-
-//   return (
-//     <div className="engineer-page">
-
-//       <div className="page-header">
-//         <h1>Engineer Management</h1>
-//         <p>
-//           Manage engineers, roles and departments
-//         </p>
-//       </div>
-
-//       <div className="stats-grid">
-
-//         <div className="stat-card">
-//           <h2>{engineers.length}</h2>
-//           <p>Total Engineers</p>
-//         </div>
-
-//         <div className="stat-card">
-//           <h2>30</h2>
-//           <p>Active Engineers</p>
-//         </div>
-
-//         <div className="stat-card">
-//           <h2>250</h2>
-//           <p>Assigned Works</p>
-//         </div>
-
-//         <div className="stat-card">
-//           <h2>220</h2>
-//           <p>Completed Works</p>
-//         </div>
-
-//       </div>
-
-//       <div className="top-bar">
-
-//         <input
-//           type="text"
-//           placeholder="Search Engineer..."
-//           value={search}
-//           onChange={(e) =>
-//             setSearch(e.target.value)
-//           }
-//         />
-
-//         <button
-//           className="add-btn"
-//           onClick={openAddModal}
-//         >
-//           + Add Engineer
-//         </button>
-
-//       </div>
-
-//       <div className="table-container">
-
-//         <table>
-
-//           <thead>
-//             <tr>
-//               <th>ID</th>
-//               <th>Name</th>
-//               <th>Email</th>
-//               <th>Mobile</th>
-//               <th>Department</th>
-//               <th>Role</th>
-//               <th>Assigned</th>
-//               <th>Completed</th>
-//               <th>Actions</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-
-//             {filteredEngineers.map(
-//               (eng) => (
-
-//                 <tr key={eng.id}>
-
-//                   <td>{eng.id}</td>
-//                   <td>{eng.name}</td>
-//                   <td>{eng.email}</td>
-//                   <td>{eng.mobile}</td>
-//                   <td>{eng.department}</td>
-//                   <td>{eng.role}</td>
-//                   <td>{eng.assigned}</td>
-//                   <td>{eng.completed}</td>
-
-//                   <td>
-
-//                     <button
-//                       className="edit-btn"
-//                       onClick={() =>
-//                         handleEdit(eng)
-//                       }
-//                     >
-//                       Edit
-//                     </button>
-
-//                     <button
-//                       className="delete-btn"
-//                       onClick={() =>
-//                         handleDelete(
-//                           eng.id
-//                         )
-//                       }
-//                     >
-//                       Delete
-//                     </button>
-
-//                   </td>
-
-//                 </tr>
-
-//               )
-//             )}
-
-//           </tbody>
-
-//         </table>
-
-//       </div>
-
-//       {showModal && (
-
-//         <div className="modal-overlay">
-
-//           <div className="modal">
-
-//             <h2>
-//               {formData.id
-//                 ? "Update Engineer"
-//                 : "Add Engineer"}
-//             </h2>
-
-//             <input
-//               name="name"
-//               placeholder="Name"
-//               value={formData.name}
-//               onChange={handleChange}
-//             />
-
-//             <input
-//               name="email"
-//               placeholder="Email"
-//               value={formData.email}
-//               onChange={handleChange}
-//             />
-
-//             <input
-//               name="mobile"
-//               placeholder="Mobile"
-//               value={formData.mobile}
-//               onChange={handleChange}
-//             />
-
-//             <select
-//               name="department"
-//               value={formData.department}
-//               onChange={handleChange}
-//             >
-//               <option>
-//                 Road Department
-//               </option>
-//               <option>
-//                 Water Department
-//               </option>
-//               <option>
-//                 Garbage Department
-//               </option>
-//               <option>
-//                 Street Light Department
-//               </option>
-//             </select>
-
-//             <select
-//               name="role"
-//               value={formData.role}
-//               onChange={handleChange}
-//             >
-//               <option>Engineer</option>
-//               <option>
-//                 Senior Engineer
-//               </option>
-//               <option>Team Lead</option>
-//               <option>Supervisor</option>
-//             </select>
-
-//             <div className="modal-buttons">
-
-//               <button
-//                 className="cancel-btn"
-//                 onClick={() =>
-//                   setShowModal(false)
-//                 }
-//               >
-//                 Cancel
-//               </button>
-
-//               <button
-//                 className="save-btn"
-//                 onClick={handleSave}
-//               >
-//                 Save
-//               </button>
-
-//             </div>
-
-//           </div>
-
-//         </div>
-
-//       )}
-
-//     </div>
-//   );
-// }
-
-// export default EngineerManagement;
-
-
 import { useState } from "react";
 import "./EngineerManagement.css";
-
+import {
+  FaUserCog,
+  FaUserCheck,
+  FaBuilding,
+  FaClipboardList
+} from "react-icons/fa";
 function EngineerManagement() {
 
   const [departments, setDepartments] = useState([
@@ -511,42 +184,66 @@ function EngineerManagement() {
       {/* Header */}
 
       <div className="page-header">
-
+        <div>
         <h1>
           Engineer Management
         </h1>
-
+        
         <p>
           Manage engineers, departments and roles
         </p>
-
+    </div>
       </div>
 
       {/* Stats */}
 
-      <div className="stats-grid">
+      <div className="summary-grid">
 
-        <div className="stat-card">
-          <h2>{engineers.length}</h2>
-          <p>Total Engineers</p>
-        </div>
+  <div className="summary-card">
+    <div className="summary-info">
+      <h4>Total Engineers</h4>
+      <h2>{engineers.length}</h2>
+    </div>
 
-        <div className="stat-card">
-          <h2>{engineers.length}</h2>
-          <p>Active Engineers</p>
-        </div>
+    <div className="summary-icon">
+      <FaUserCog />
+    </div>
+  </div>
 
-        <div className="stat-card">
-          <h2>{departments.length}</h2>
-          <p>Departments</p>
-        </div>
+  <div className="summary-card">
+    <div className="summary-info">
+      <h4>Active Engineers</h4>
+      <h2>18</h2>
+    </div>
 
-        <div className="stat-card">
-          <h2>100%</h2>
-          <p>System Active</p>
-        </div>
+    <div className="summary-icon">
+      <FaUserCheck />
+    </div>
+  </div>
 
-      </div>
+  <div className="summary-card">
+    <div className="summary-info">
+      <h4>Total Departments</h4>
+      <h2>{departments.length}</h2>
+    </div>
+
+    <div className="summary-icon">
+      <FaBuilding />
+    </div>
+  </div>
+
+  <div className="summary-card">
+    <div className="summary-info">
+      <h4>Assigned Complaints</h4>
+      <h2>245</h2>
+    </div>
+
+    <div className="summary-icon">
+      <FaClipboardList />
+    </div>
+  </div>
+
+</div>
 
       {/* Top Bar */}
 
@@ -570,35 +267,7 @@ function EngineerManagement() {
 
       </div>
 
-      {/* Add Department */}
-
-      <div className="department-section">
-
-        <h3>
-          Add New Department
-        </h3>
-
-        <div className="department-box">
-
-          <input
-            type="text"
-            placeholder="Department Name"
-            value={newDepartment}
-            onChange={(e) =>
-              setNewDepartment(e.target.value)
-            }
-          />
-
-          <button
-    type="button"
-    onClick={handleAddDepartment}
->
-    Add Department
-</button>
-
-        </div>
-
-      </div>
+     
 
       {/* Table */}
 
@@ -614,7 +283,6 @@ function EngineerManagement() {
               <th>Email</th>
               <th>Mobile</th>
               <th>Department</th>
-              <th>Role</th>
               <th>Actions</th>
             </tr>
 
@@ -631,7 +299,6 @@ function EngineerManagement() {
                 <td>{eng.email}</td>
                 <td>{eng.mobile}</td>
                 <td>{eng.department}</td>
-                <td>{eng.role}</td>
 
                 <td className="action-buttons">
 

@@ -2,9 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
     FaHome,
     FaTasks,
-    FaCalendarCheck,
     FaHistory,
-    FaCamera,
     FaUser,
     FaSignOutAlt
 } from "react-icons/fa";
@@ -33,9 +31,7 @@ function EngineerSidebar() {
 
                         <li><NavLink to="/engineer/complents"><FaTasks /><span>Assigned Work</span></NavLink></li>
 
-
                         <li><NavLink to="/engineer/history"><FaHistory /><span>Work History</span></NavLink></li>
-
 
                         <li><NavLink to="/engineer/profile"><FaUser /><span>Profile</span></NavLink></li>
 

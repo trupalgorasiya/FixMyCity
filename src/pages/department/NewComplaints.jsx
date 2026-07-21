@@ -1,7 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./NewComplaints.css";
 
+import {
+  FaSearch,
+  FaFilter,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
+
 function NewComplaints() {
+  const [assignedPriority, setAssignedPriority] = useState("");
+
+  /* ==========================================================
+     DUMMY COMPLAINT DATA
+  ========================================================== */
 
   const [complaints, setComplaints] = useState([
     {
@@ -9,289 +21,678 @@ function NewComplaints() {
       citizen: "Jeel Bhalani",
       category: "Garbage Collection",
       location: "Nikol",
-      priority: "High",
+      priority: "",
       date: "16 Jul 2026",
       status: "New",
-      engineer: ""
+      engineer: "",
     },
+
     {
       id: "CMP002",
       citizen: "Rahul Patel",
-      category: "Road Damage",
+      category: "Garbage Collection",
       location: "Bopal",
-      priority: "Medium",
+      priority: "",
       date: "16 Jul 2026",
       status: "New",
-      engineer: ""
+      engineer: "",
     },
+
     {
       id: "CMP003",
       citizen: "Amit Shah",
-      category: "Street Light",
+      category: "Garbage Collection",
       location: "Satellite",
-      priority: "Low",
+      priority: "",
       date: "15 Jul 2026",
       status: "New",
-      engineer: ""
+      engineer: "",
     },
+
     {
       id: "CMP004",
       citizen: "Priya Patel",
-      category: "Water Leakage",
+      category: "Garbage Collection",
       location: "Gota",
-      priority: "High",
+      priority: "",
       date: "15 Jul 2026",
       status: "New",
-      engineer: ""
-    }
+      engineer: "",
+    },
+
+    {
+      id: "CMP005",
+      citizen: "Harsh Patel",
+      category: "Garbage Collection",
+      location: "Naroda",
+      priority: "",
+      date: "14 Jul 2026",
+      status: "New",
+      engineer: "",
+    },
+
+    {
+      id: "CMP006",
+      citizen: "Riya Shah",
+      category: "Garbage Collection",
+      location: "Chandkheda",
+      priority: "",
+      date: "14 Jul 2026",
+      status: "New",
+      engineer: "",
+    },
+
+    {
+      id: "CMP007",
+      citizen: "Vivek Mehta",
+      category: "Garbage Collection",
+      location: "Maninagar",
+      priority: "",
+      date: "13 Jul 2026",
+      status: "New",
+      engineer: "",
+    },
+
+    {
+      id: "CMP008",
+      citizen: "Karan Joshi",
+      category: "Garbage Collection",
+      location: "Vastrapur",
+      priority: "",
+      date: "13 Jul 2026",
+      status: "New",
+      engineer: "",
+    },
   ]);
 
+  /* ==========================================================
+     STATES
+  ========================================================== */
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("All");
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [selectedEngineer, setSelectedEngineer] = useState("");
+
+  const [categoryFilter, setCategoryFilter] =
+    useState("All");
+
+  const [selectedComplaint, setSelectedComplaint] =
+    useState(null);
+
+  const [selectedEngineer, setSelectedEngineer] =
+    useState("");
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  const complaintsPerPage = 5;
+
+  /* ==========================================================
+     ENGINEERS
+  ========================================================== */
 
   const engineers = [
-    "Rahul Sharma",
-    "Karan Patel",
-    "Amit Singh",
-    "Vivek Kumar"
+    {
+      id: 1,
+      name: "Rahul Sharma",
+    },
+
+    {
+      id: 2,
+      name: "Karan Patel",
+    },
+
+    {
+      id: 3,
+      name: "Amit Singh",
+    },
+
+    {
+      id: 4,
+      name: "Vivek Kumar",
+    },
+
+    {
+      id: 5,
+      name: "Jay Mehta",
+    },
   ];
 
-  const filteredComplaints = complaints.filter((item) => {
+  /* ==========================================================
+     SEARCH & FILTER
+  ========================================================== */
 
-    const matchesSearch =
-      item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.citizen.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredComplaints = useMemo(() => {
 
-    const matchesCategory =
-      categoryFilter === "All"
-        ? true
-        : item.category === categoryFilter;
+    return complaints.filter((item) => {
 
-    return matchesSearch && matchesCategory;
-  });
+      const keyword =
+        searchTerm.toLowerCase();
+
+      const matchesSearch =
+        item.id.toLowerCase().includes(keyword) ||
+        item.citizen.toLowerCase().includes(keyword) ||
+        item.category.toLowerCase().includes(keyword);
+
+      const matchesCategory =
+        categoryFilter === "All" ||
+        item.category === categoryFilter;
+
+      return (
+        matchesSearch &&
+        matchesCategory
+      );
+
+    });
+
+  }, [
+    complaints,
+    searchTerm,
+    categoryFilter,
+  ]);
+
+  /* ==========================================================
+     PAGINATION
+  ========================================================== */
+
+  const totalPages = Math.ceil(
+    filteredComplaints.length /
+      complaintsPerPage
+  );
+
+  const indexOfLastComplaint =
+    currentPage * complaintsPerPage;
+
+  const indexOfFirstComplaint =
+    indexOfLastComplaint -
+    complaintsPerPage;
+
+  const currentComplaints =
+    filteredComplaints.slice(
+      indexOfFirstComplaint,
+      indexOfLastComplaint
+    );
+
+  const nextPage = () => {
+
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+
+  };
+
+  const previousPage = () => {
+
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+
+  };
+
+  /* ==========================================================
+     OPEN ASSIGN MODAL
+  ========================================================== */
 
   const openAssignModal = (complaint) => {
+
     setSelectedComplaint(complaint);
-  };
+
+  setSelectedEngineer("");
+
+  setAssignedPriority(complaint.priority);
+
+};
+
+  /* ==========================================================
+     ASSIGN ENGINEER
+  ========================================================== */
 
   const assignEngineer = () => {
 
     if (!selectedEngineer) {
-      alert("Please select engineer");
+      alert("Please select an engineer.");
+      return;
+    }
+    if (!assignedPriority) {
+      alert("Please select a priority.");
       return;
     }
 
-    const updatedComplaints = complaints.map((item) => {
+    const updatedComplaints =
+      complaints.map((item) => {
 
-      if (item.id === selectedComplaint.id) {
-        return {
-          ...item,
-          engineer: selectedEngineer,
-          status: "Assigned"
-        };
-      }
+        if (
+          item.id ===
+          selectedComplaint.id
+        ) {
 
-      return item;
-    });
+          return {
+            ...item,
+            engineer:selectedEngineer,
+            priority: assignedPriority,
+            status: "Assigned",
+          };
+
+        }
+
+        return item;
+
+      });
 
     setComplaints(updatedComplaints);
 
     setSelectedComplaint(null);
-    setSelectedEngineer("");
 
-    alert("Engineer Assigned Successfully");
+    setSelectedEngineer("");
+    setAssignedPriority("");
+
+    alert(
+      "Engineer Assigned Successfully"
+    );
+
   };
 
+  /* ==========================================================
+     JSX START
+  ========================================================== */
+
   return (
-    <div className="new-complaints">
 
-      <div className="page-header">
-        <h1>New Complaints</h1>
-        <p>Manage and assign complaints to engineers</p>
-      </div>
+    <div className="assigned-page">
 
-      {/* Search & Filter */}
+      {/* ==========================================================
+          PAGE HEADER
+      ========================================================== */}
 
-      <div className="top-bar">
+      <div className="assigned-header">
 
-        <input
-          type="text"
-          placeholder="Search by ID or Citizen Name..."
-          value={searchTerm}
-          onChange={(e) =>
-            setSearchTerm(e.target.value)
-          }
-        />
+        <div>
 
-        <select
-          value={categoryFilter}
-          onChange={(e) =>
-            setCategoryFilter(e.target.value)
-          }
-        >
-          <option value="All">All Categories</option>
-          <option value="Garbage Collection">
-            Garbage Collection
-          </option>
-          <option value="Road Damage">
-            Road Damage
-          </option>
-          <option value="Street Light">
-            Street Light
-          </option>
-          <option value="Water Leakage">
-            Water Leakage
-          </option>
-        </select>
+          <h1>
+            New Complaints
+          </h1>
+
+          <p>
+            Review newly submitted
+            complaints and assign
+            them to department
+            engineers.
+          </p>
+
+        </div>
 
       </div>
 
-      {/* Table */}
+      {/* ==========================================================
+          SEARCH & FILTER
+      ========================================================== */}
 
-      <div className="table-wrapper">
+      <div className="complaint-toolbar">
 
-        <table className="complaints-table">
+        <div className="search-box">
 
-          <thead>
+          <FaSearch />
 
-            <tr>
-              <th>ID</th>
-              <th>Citizen</th>
-              <th>Category</th>
-              <th>Location</th>
-              <th>Priority</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Engineer</th>
-              <th>Action</th>
-            </tr>
+          <input
+            type="text"
+            placeholder="Search Complaint ID, Citizen or Category..."
+            value={searchTerm}
+            onChange={(e) => {
 
-          </thead>
+              setSearchTerm(
+                e.target.value
+              );
 
-          <tbody>
+              setCurrentPage(1);
 
-            {filteredComplaints.map((item) => (
+            }}
+          />
 
-              <tr key={item.id}>
+        </div>
 
-                <td>{item.id}</td>
+        <div className="toolbar-right">
 
-                <td>{item.citizen}</td>
+          <div className="filter-box">
 
-                <td>{item.category}</td>
-
-                <td>{item.location}</td>
-
-                <td>
-                  <span className={`priority ${item.priority.toLowerCase()}`}>
-                    {item.priority}
-                  </span>
-                </td>
-
-                <td>{item.date}</td>
-
-                <td>
-                  <span
-                    className={`status ${
-                      item.status === "Assigned"
-                        ? "assigned"
-                        : "new"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                </td>
-
-                <td>
-                  {item.engineer || "-"}
-                </td>
-
-                <td>
-
-                  {item.status === "New" ? (
-
-                    <button
-                      className="assign-btn"
-                      onClick={() =>
-                        openAssignModal(item)
-                      }
-                    >
-                      Assign
-                    </button>
-
-                  ) : (
-
-                    <button
-                      className="assigned-btn"
-                    >
-                      Assigned
-                    </button>
-
-                  )}
-
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-      {/* Modal */}
-
-      {selectedComplaint && (
-
-        <div className="modal-overlay">
-
-          <div className="modal">
-
-            <h2>Assign Engineer</h2>
-
-            <p>
-              Complaint :
-              <strong>
-                {" "}
-                {selectedComplaint.id}
-              </strong>
-            </p>
+            <FaFilter />
 
             <select
-              value={selectedEngineer}
-              onChange={(e) =>
-                setSelectedEngineer(
+              value={categoryFilter}
+              onChange={(e) => {
+
+                setCategoryFilter(
                   e.target.value
-                )
-              }
+                );
+
+                setCurrentPage(1);
+
+              }}
             >
-              <option value="">
-                Select Engineer
+
+              <option>
+                All
               </option>
 
-              {engineers.map((eng, index) => (
-                <option
-                  key={index}
-                  value={eng}
-                >
-                  {eng}
-                </option>
-              ))}
+              <option>
+                Garbage Collection
+              </option>
+
+              <option>
+                Road Damage
+              </option>
+
+              <option>
+                Street Light
+              </option>
+
+              <option>
+                Water Leakage
+              </option>
 
             </select>
 
-            <div className="modal-buttons">
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ==========================================================
+          COMPLAINT TABLE
+      ========================================================== */}
+{/* ==========================================================
+          COMPLAINT TABLE
+      ========================================================== */}
+
+      <div className="assigned-card">
+
+        <div className="card-header">
+
+          <h2>New Complaint List</h2>
+
+        </div>
+
+        <div className="table-wrapper">
+
+          <table className="assigned-table">
+
+            <thead>
+
+              <tr>
+
+                <th>Complaint ID</th>
+
+                <th>Citizen</th>
+
+                <th>Category</th>
+
+                <th>Location</th>
+
+                <th>Priority</th>
+
+                <th>Date</th>
+
+                <th>Engineer</th>
+
+                <th>Action</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {currentComplaints.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan="9"
+                    className="empty-row"
+                  >
+                    No complaints found.
+                  </td>
+
+                </tr>
+
+              ) : (
+
+                currentComplaints.map((item) => (
+
+                  <tr key={item.id}>
+
+                    {/* Complaint ID */}
+
+                    <td className="complaint-id">
+                      {item.id}
+                    </td>
+
+                    {/* Citizen */}
+
+                    <td>
+
+                      <strong>{item.citizen}</strong>
+
+                    </td>
+
+                    {/* Category */}
+
+                    <td>
+
+                      {item.category}
+
+                    </td>
+
+                    {/* Location */}
+
+                    <td>
+
+                      {item.location}
+
+                    </td>
+
+                    {/* Priority */}
+
+                    <td>
+
+                      {item.priority ? (
+
+                      <span
+                        className={`priority ${item.priority.toLowerCase()}`}
+                      >
+                        {item.priority}
+                      </span>
+
+                    ) : (
+
+                      <span>-</span>
+
+                    )}
+
+                    </td>
+
+                    {/* Date */}
+
+                    <td>
+
+                      {item.date}
+
+                    </td>
+
+                    {/* Engineer */}
+
+                    <td>
+
+                      {item.engineer || "-"}
+
+                    </td>
+
+                    {/* Action */}
+
+                    <td>
+
+                      {item.status === "New" ? (
+
+                        <button
+                          className="assign-btn"
+                          onClick={() =>
+                            openAssignModal(item)
+                          }
+                        >
+                          Assign
+                        </button>
+
+                      ) : (
+
+                        <button
+                          className="assigned-btn"
+                          disabled
+                        >
+                          Assigned
+                        </button>
+
+                      )}
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+            {/* ==========================================================
+          ASSIGN ENGINEER MODAL
+      ========================================================== */}
+
+      {selectedComplaint && (
+
+        <div
+          className="modal-overlay"
+          onClick={() => setSelectedComplaint(null)}
+        >
+
+          <div
+            className="assign-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            {/* ======================================================
+                MODAL HEADER
+            ====================================================== */}
+
+            <div className="modal-header">
+
+              <h2>Assign Engineer</h2>
 
               <button
-                className="save-btn"
-                onClick={assignEngineer}
+                className="close-btn"
+                onClick={() => setSelectedComplaint(null)}
               >
-                Assign
+                ✕
               </button>
+
+            </div>
+
+            {/* ======================================================
+    MODAL BODY
+====================================================== */}
+
+<div className="assign-form">
+
+  {/* Complaint ID */}
+
+  <div className="form-group">
+
+    <label>Complaint ID</label>
+
+    <input
+      type="text"
+      value={selectedComplaint.id}
+      readOnly
+    />
+
+  </div>
+
+
+
+  {/* Assign Priority */}
+
+  <div className="form-group">
+
+    <label>Assign Priority</label>
+
+    <select
+  value={assignedPriority}
+  onChange={(e) =>
+    setAssignedPriority(e.target.value)
+  }
+>
+
+  <option value="">
+    Select Priority
+  </option>
+
+  <option value="High">
+    High
+  </option>
+
+  <option value="Medium">
+    Medium
+  </option>
+
+  <option value="Low">
+    Low
+  </option>
+
+</select>
+
+  </div>
+
+  {/* Engineer */}
+
+  <div className="form-group">
+
+    <label>Select Engineer</label>
+
+    <select
+      value={selectedEngineer}
+      onChange={(e) =>
+        setSelectedEngineer(e.target.value)
+      }
+    >
+
+      <option value="">
+        Choose Engineer
+      </option>
+
+      {engineers.map((eng) => (
+
+        <option
+          key={eng.id}
+          value={eng.name}
+        >
+          {eng.name}
+        </option>
+
+      ))}
+
+    </select>
+
+  </div>
+
+</div>
+
+            {/* ======================================================
+                MODAL BUTTONS
+            ====================================================== */}
+
+            <div className="modal-actions">
 
               <button
                 className="cancel-btn"
@@ -302,6 +703,13 @@ function NewComplaints() {
                 Cancel
               </button>
 
+              <button
+                className="save-btn"
+                onClick={assignEngineer}
+              >
+                Assign Engineer
+              </button>
+
             </div>
 
           </div>
@@ -310,8 +718,71 @@ function NewComplaints() {
 
       )}
 
+      {/* ==========================================================
+          PAGINATION
+      ========================================================== */}
+
+      {filteredComplaints.length >
+        complaintsPerPage && (
+
+        <div className="pagination-wrapper">
+
+          <button
+            onClick={previousPage}
+            disabled={currentPage === 1}
+          >
+
+            <FaChevronLeft />
+
+            Previous
+
+          </button>
+
+          <div className="page-numbers">
+
+            {[...Array(totalPages)].map(
+              (_, index) => (
+
+                <button
+                  key={index}
+                  className={
+                    currentPage === index + 1
+                      ? "active-page"
+                      : ""
+                  }
+                  onClick={() =>
+                    setCurrentPage(index + 1)
+                  }
+                >
+                  {index + 1}
+                </button>
+
+              )
+            )}
+
+          </div>
+
+          <button
+            onClick={nextPage}
+            disabled={
+              currentPage === totalPages
+            }
+          >
+
+            Next
+
+            <FaChevronRight />
+
+          </button>
+
+        </div>
+
+      )}
+
     </div>
+
   );
+
 }
 
 export default NewComplaints;

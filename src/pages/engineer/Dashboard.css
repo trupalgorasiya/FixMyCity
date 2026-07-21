@@ -1325,3 +1325,39 @@
     background:#22c55e;
 
 }
+
+
+.action-buttons{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.view-btn,
+.work-btn{
+    border:none;
+    border-radius:10px;
+    padding:9px 16px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.view-btn{
+    background:#2563eb;
+    color:#fff;
+}
+
+.view-btn:hover{
+    background:#1d4ed8;
+}
+
+.work-btn{
+    background:#16a34a;
+    color:#fff;
+}
+
+.work-btn:hover{
+    background:#15803d;
+}

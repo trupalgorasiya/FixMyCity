@@ -1,237 +1,596 @@
 
 
-import { useState } from "react";
-import "./EngineerManage.css";
+import "../engineer/ComplaintsHistory.css";
+import "../department/EngineerManage.css"
+import { useMemo, useState } from "react";
+
+import {
+  FaSearch,
+  FaPlus,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+} from "react-icons/fa";
 
 function DepartmentManagement() {
-  const [departments, setDepartments] = useState([
-    "Road Department",
-    "Water Department",
-    "Electric Department",
-  ]);
+  /* ==========================================================
+     DUMMY ENGINEER DATA
+  ========================================================== */
 
-  const [departmentName, setDepartmentName] = useState("");
-
-  const [engineers, setEngineers] = useState([
+  const engineerData = [
     {
-      id: 1,
-      name: "Jeel Bhalani",
-      email: "jeel@gmail.com",
-      phone: "9876543210",
-      department: "Road Department",
+      id: "ENG-1001",
+      firstName: "Amit",
+      lastName: "Patel",
+      email: "amit@gmail.com",
+      mobile: "9876543210",
+      department: "Water Department",
+      status: "Active",
     },
-  ]);
 
-  const [engineer, setEngineer] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    department: "",
-  });
+    {
+      id: "ENG-1002",
+      firstName: "Jay",
+      lastName: "Mehta",
+      email: "jay@gmail.com",
+      mobile: "9876543211",
+      department: "Water Department",
+      status: "Active",
+    },
+
+    {
+      id: "ENG-1003",
+      firstName: "Priya",
+      lastName: "Shah",
+      email: "priya@gmail.com",
+      mobile: "9876543212",
+      department: "Water Department",
+      status: "Inactive",
+    },
+
+    {
+      id: "ENG-1004",
+      firstName: "Rakesh",
+      lastName: "Patel",
+      email: "rakesh@gmail.com",
+      mobile: "9876543213",
+      department: "Water Department",
+      status: "Active",
+    },
+
+    {
+      id: "ENG-1005",
+      firstName: "Hardik",
+      lastName: "Shah",
+      email: "hardik@gmail.com",
+      mobile: "9876543214",
+      department: "Water Department",
+      status: "Active",
+    },
+
+    {
+      id: "ENG-1006",
+      firstName: "Nilesh",
+      lastName: "Patel",
+      email: "nilesh@gmail.com",
+      mobile: "9876543215",
+      department: "Water Department",
+      status: "Inactive",
+    },
+
+    {
+      id: "ENG-1007",
+      firstName: "Vikas",
+      lastName: "Mehta",
+      email: "vikas@gmail.com",
+      mobile: "9876543216",
+      department: "Water Department",
+      status: "Active",
+    },
+
+    {
+      id: "ENG-1008",
+      firstName: "Raj",
+      lastName: "Shah",
+      email: "raj@gmail.com",
+      mobile: "9876543217",
+      department: "Water Department",
+      status: "Active",
+    },
+
+    {
+      id: "ENG-1009",
+      firstName: "Kunal",
+      lastName: "Patel",
+      email: "kunal@gmail.com",
+      mobile: "9876543218",
+      department: "Water Department",
+      status: "Inactive",
+    },
+
+    {
+      id: "ENG-1010",
+      firstName: "Sanjay",
+      lastName: "Joshi",
+      email: "sanjay@gmail.com",
+      mobile: "9876543219",
+      department: "Water Department",
+      status: "Active",
+    },
+  ];
+
+  /* ==========================================================
+     STATES
+  ========================================================== */
 
   const [search, setSearch] = useState("");
 
-  const addDepartment = () => {
-    if (!departmentName.trim()) return;
+  const [showModal, setShowModal] = useState(false);
 
-    setDepartments([...departments, departmentName]);
-    setDepartmentName("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const engineersPerPage = 5;
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+    department: "Water Department",
+    status: "Active",
+  });
+
+  /* ==========================================================
+     SEARCH
+  ========================================================== */
+
+  const filteredEngineers = useMemo(() => {
+    return engineerData.filter((item) => {
+      const keyword = search.toLowerCase();
+
+      return (
+        item.id.toLowerCase().includes(keyword) ||
+        item.firstName.toLowerCase().includes(keyword) ||
+        item.lastName.toLowerCase().includes(keyword) ||
+        item.email.toLowerCase().includes(keyword) ||
+        item.mobile.includes(keyword)
+      );
+    });
+  }, [search]);
+
+  /* ==========================================================
+     PAGINATION
+  ========================================================== */
+
+  const totalPages = Math.ceil(
+    filteredEngineers.length / engineersPerPage
+  );
+
+  const indexOfLastEngineer =
+    currentPage * engineersPerPage;
+
+  const indexOfFirstEngineer =
+    indexOfLastEngineer - engineersPerPage;
+
+  const currentEngineers =
+    filteredEngineers.slice(
+      indexOfFirstEngineer,
+      indexOfLastEngineer
+    );
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
-  const addEngineer = () => {
-    if (
-      !engineer.name ||
-      !engineer.email ||
-      !engineer.phone ||
-      !engineer.department
-    )
-      return;
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
-    setEngineers([
-      ...engineers,
-      {
-        id: Date.now(),
-        ...engineer,
-      },
-    ]);
+  /* ==========================================================
+     INPUT CHANGE
+  ========================================================== */
 
-    setEngineer({
-      name: "",
-      email: "",
-      phone: "",
-      department: "",
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const deleteEngineer = (id) => {
-    setEngineers(engineers.filter((eng) => eng.id !== id));
+  /* ==========================================================
+     SUBMIT
+  ========================================================== */
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    console.log(formData);
+
+    setShowModal(false);
+
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      mobile: "",
+      department: "Water Department",
+      status: "Active",
+    });
   };
 
-  const filteredEngineers = engineers.filter(
-    (eng) =>
-      eng.name.toLowerCase().includes(search.toLowerCase()) ||
-      eng.department.toLowerCase().includes(search.toLowerCase())
-  );
+  /* ==========================================================
+     JSX START
+  ========================================================== */
 
   return (
-    <div className="department-page">
+    <div className="assigned-page">
 
-      {/* Header */}
+      {/* ==========================================================
+          PAGE HEADER
+      ========================================================== */}
 
-      <div className="page-header">
-        <h1>Engineer Management</h1>
-        <p>Manage Departments and Engineers</p>
-      </div>
+      <div className="assigned-header">
 
-      {/* Forms */}
+        <div>
 
-      <div className="form-section">
+          <h1>Engineer Management</h1>
 
-        <div className="card">
-          <h2>Add Department</h2>
+          <p>
+            Manage engineers assigned to your department.
+            Add new engineers and maintain their records.
+          </p>
 
-          <input
-            type="text"
-            placeholder="Department Name"
-            value={departmentName}
-            onChange={(e) => setDepartmentName(e.target.value)}
-          />
-
-          <button onClick={addDepartment}>
-            Add Department
-          </button>
         </div>
 
-        <div className="card">
-          <h2>Add Engineer</h2>
+      </div>
+
+      {/* ==========================================================
+          TOOLBAR
+      ========================================================== */}
+
+      <div className="complaint-toolbar">
+
+        <div className="search-box">
+
+          <FaSearch />
 
           <input
             type="text"
-            placeholder="Engineer Name"
-            value={engineer.name}
-            onChange={(e) =>
-              setEngineer({
-                ...engineer,
-                name: e.target.value,
-              })
-            }
+            placeholder="Search Engineer ID, Name or Email..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
           />
 
-          <input
-            type="email"
-            placeholder="Email"
-            value={engineer.email}
-            onChange={(e) =>
-              setEngineer({
-                ...engineer,
-                email: e.target.value,
-              })
-            }
-          />
+        </div>
 
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={engineer.phone}
-            onChange={(e) =>
-              setEngineer({
-                ...engineer,
-                phone: e.target.value,
-              })
-            }
-          />
+        <div className="toolbar-right">
 
-          <select
-            value={engineer.department}
-            onChange={(e) =>
-              setEngineer({
-                ...engineer,
-                department: e.target.value,
-              })
-            }
+          <button
+            className="toolbar-btn"
+            onClick={() => setShowModal(true)}
           >
-            <option value="">Select Department</option>
-
-            {departments.map((dept, index) => (
-              <option key={index} value={dept}>
-                {dept}
-              </option>
-            ))}
-          </select>
-
-          <button onClick={addEngineer}>
+            <FaPlus />
             Add Engineer
           </button>
+
         </div>
 
       </div>
 
-      {/* Engineer Table */}
+      {/* ==========================================================
+          ENGINEER TABLE
+      ========================================================== */}
 
-      <div className="table-card">
+      <div className="assigned-card">
 
-        <div className="table-header">
+        <div className="card-header">
+
           <h2>Engineer List</h2>
 
-          <input
-            type="text"
-            placeholder="Search Engineer..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Department</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+        <div className="table-wrapper">
 
-          <tbody>
+          <table className="assigned-table">
 
-            {filteredEngineers.length > 0 ? (
-              filteredEngineers.map((eng) => (
-                <tr key={eng.id}>
-                  <td>{eng.id}</td>
-                  <td>{eng.name}</td>
-                  <td>{eng.email}</td>
-                  <td>{eng.phone}</td>
-                  <td>{eng.department}</td>
+            <thead>
 
-                  <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => deleteEngineer(eng.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
               <tr>
-                <td
-                  colSpan="6"
-                  style={{
-                    textAlign: "center",
-                    padding: "20px",
-                  }}
-                >
-                  No Engineers Found
-                </td>
-              </tr>
-            )}
 
-          </tbody>
-        </table>
+                <th>Engineer ID</th>
+
+                <th>Name</th>
+
+                <th>Email</th>
+
+                <th>Mobile</th>
+
+                <th>Department</th>
+
+                <th>Status</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {currentEngineers.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan="6"
+                    className="empty-row"
+                  >
+                    No engineer found.
+                  </td>
+
+                </tr>
+
+              ) : (
+
+                currentEngineers.map((item) => (
+
+                  <tr key={item.id}>
+
+                    <td className="complaint-id">
+                      {item.id}
+                    </td>
+
+                    <td>
+                      <strong>
+                        {item.firstName} {item.lastName}
+                      </strong>
+                    </td>
+
+                    <td>{item.email}</td>
+
+                    <td>{item.mobile}</td>
+
+                    <td>{item.department}</td>
+
+                    <td>
+
+                      <span
+                        className={`status ${item.status
+                          .toLowerCase()
+                          .replace(/\s/g, "-")}`}
+                      >
+                        {item.status}
+                      </span>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
 
       </div>
+            {/* ==========================================================
+          ADD ENGINEER MODAL
+      ========================================================== */}
+
+      {showModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="engineer-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* ======================================================
+                MODAL HEADER
+            ====================================================== */}
+
+            <div className="modal-header">
+              <h2>Add Engineer</h2>
+
+              <button
+                className="close-btn"
+                onClick={() => setShowModal(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* ======================================================
+                MODAL BODY
+            ====================================================== */}
+
+            <form
+              className="engineer-form"
+              onSubmit={handleSubmit}
+            >
+              <div className="form-grid">
+
+                {/* First Name */}
+
+                <div className="form-group">
+                  <label>First Name</label>
+
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="Enter First Name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {/* Last Name */}
+
+                <div className="form-group">
+                  <label>Last Name</label>
+
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Enter Last Name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {/* Email */}
+
+                <div className="form-group">
+                  <label>Email Address</label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Enter Email Address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {/* Mobile */}
+
+                <div className="form-group">
+                  <label>Mobile Number</label>
+
+                  <input
+                    type="tel"
+                    name="mobile"
+                    placeholder="Enter Mobile Number"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    maxLength={10}
+                    required
+                  />
+                </div>
+
+                {/* Department */}
+
+                <div className="form-group">
+                  <label>Department</label>
+
+                  <input
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    readOnly
+                  />
+                </div>
+
+                {/* Status */}
+
+                <div className="form-group">
+                  <label>Status</label>
+
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <option value="Active">
+                      Active
+                    </option>
+
+                    <option value="Inactive">
+                      Inactive
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              {/* ======================================================
+                  BUTTONS
+              ====================================================== */}
+
+              <div className="modal-actions">
+
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="save-btn"
+                >
+                  Add Engineer
+                </button>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================================
+          PAGINATION
+      ========================================================== */}
+
+      {filteredEngineers.length > engineersPerPage && (
+
+        <div className="pagination-wrapper">
+
+          <button
+            onClick={previousPage}
+            disabled={currentPage === 1}
+          >
+            <FaChevronLeft />
+            Previous
+          </button>
+
+          <div className="page-numbers">
+
+            {[...Array(totalPages)].map((_, index) => (
+
+              <button
+                key={index}
+                className={
+                  currentPage === index + 1
+                    ? "active-page"
+                    : ""
+                }
+                onClick={() =>
+                  setCurrentPage(index + 1)
+                }
+              >
+                {index + 1}
+              </button>
+
+            ))}
+
+          </div>
+
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next
+            <FaChevronRight />
+          </button>
+
+        </div>
+
+      )}
 
     </div>
   );

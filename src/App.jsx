@@ -11,9 +11,10 @@ import Register from "./Authentication/Register";
 import ForgotPassword from "./Authentication/ForgotPassword";
 import ChangePassword from "./Authentication/ChangePassword";
 import ReportComplaint from "./pages/ReportComplaint";
+import ReportComplaints from "./pages/user/ReportComplaints";
 import ComplaintTracking from "./pages/ComplaintTracking";
 
-
+import NotificationPage from "./Authentication/NotificationPage"
 
 import UserLayout from "./layouts/UserLayout";
 import DepartmentLayout from "./layouts/DepartmentLayout";
@@ -32,14 +33,12 @@ import Report from "./pages/admin/Report";
 
 
 import MyComplaints from "./pages/user/MyComplaints";
-import Notification from "./pages/user/Notification";
 
 import 'leaflet/dist/leaflet.css';
 import NewComplaints from "./pages/department/NewComplaints";
 import AllComplaints from "./pages/department/AllComplaints";
 import EngineerManage from "./pages/department/EngineerManage";
 import DepartmentReport from "./pages/department/DepartmentReport";
-import Notify from "./pages/department/Notify";
 
 
 
@@ -77,9 +76,9 @@ function App() {
     <Route path="profile" element={<Profile />} />
     <Route path="edit-profile" element={<EditProfile/>}/>
     <Route path="my-complaints" element={<MyComplaints/>}/>
-    <Route path="notification" element={<Notification/>}/>
     <Route path="track" element={<ComplaintTracking/>}/>
-    <Route path="report" element={<ReportComplaint/>}/>
+    <Route path="report" element={<ReportComplaints/>}/>
+    <Route path="notification" element={<NotificationPage/>} />
 </Route>
 
 {/* Department */}
@@ -92,7 +91,7 @@ function App() {
     <Route path="all-complaints" element={<AllComplaints/>}/>
     <Route path="engineer-manage" element={<EngineerManage/>}/>
     <Route path="department-report" element={<DepartmentReport/>}/>
-    <Route path="department-notification" element={<Notify/>}/>
+    <Route path="notification" element={<NotificationPage/>} />
 </Route>
 
 {/* Engineer */}
@@ -104,7 +103,7 @@ function App() {
     <Route path="complents" element={<AssignedComplaints/>}/>
     <Route path="history" element={<ComplaintsHistory/>}/>
     <Route path="work/:id" element={<EngineerWorkDetails/>}/>
-
+    <Route path="notification" element={<NotificationPage/>} />
 
 </Route>
 
@@ -119,7 +118,7 @@ function App() {
     <Route path="engineer-manage" element={<EngineerManagement/>}></Route>
     <Route path="complaint-manage" element={<ComplaintManagement/>}></Route>
     <Route path="report" element={<Report/>}></Route>
-
+    <Route path="notification" element={<NotificationPage/>} />
 </Route>
         
       </Routes> 

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 
 import {
@@ -9,7 +10,6 @@ import {
   FaSearch,
   FaFilter,
   FaMapMarkerAlt,
-  FaEye,
   FaTimes,
   FaCamera
 } from "react-icons/fa";
@@ -76,7 +76,7 @@ const complaintIcons = {
 
 function Dashboard() {
 
-
+  const navigate = useNavigate();
   // ===============================
   // CURRENT LOGIN ENGINEER
   // ===============================
@@ -248,7 +248,35 @@ function Dashboard() {
 
 
 
+const complaints = [
+  {
+    id: "CMP001",
+    username: "Rahul Patel",
+    email: "rahul@gmail.com",
+    phone: "9876543210",
 
+    category: "Road Damage",
+
+    priority: "High",
+
+    status: "Assigned",
+
+    address: "Satellite, Ahmedabad",
+
+    pincode: "380015",
+
+    latitude: 23.0225,
+
+    longitude: 72.5714,
+
+    description:
+      "Large pothole causing traffic problems.",
+
+    engineer: "Amit Patel",
+
+    date: "20-07-2026"
+  }
+];
   // ===============================
   // TABLE FILTER
   // ===============================
@@ -730,32 +758,28 @@ item.status
 
 <td>
 
+<div className="action-buttons">
+
+{/* <button
+className="view-btn"
+onClick={() => setSelectedComplaint(item)}
+>
+<FaEye />
+View
+</button> */}
 
 <button
-
-
-className="view-btn"
-
-
-onClick={()=>
-
-
-setSelectedComplaint(item)
-
-
+className="work-btn"
+onClick={() =>
+navigate(`/engineer/work/${item.id}`, {
+state: item,
+})
 }
-
-
 >
-
-
-<FaEye/>
-
-View
-
-
+🛠 Open Work
 </button>
 
+</div>
 
 </td>
 </tr>

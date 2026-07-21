@@ -7,7 +7,6 @@ import {
   FaBuilding,
   FaUserCog,
   FaChartLine,
-  FaFileAlt,
   FaMapMarkerAlt
 } from "react-icons/fa";
 import {
@@ -104,13 +103,6 @@ longitude:72.6030
 
 
 ];
-  const recentComplaints = [
-    { id: "CMP-1001", category: "Road Damage", status: "Pending" },
-    { id: "CMP-1002", category: "Garbage", status: "Assigned" },
-    { id: "CMP-1003", category: "Water Leakage", status: "Resolved" },
-    { id: "CMP-1004", category: "Street Light", status: "Pending" }
-  ];
-
   const dashboardStats = [
   {
     title: "Total Complaints",
@@ -141,6 +133,41 @@ longitude:72.6030
     bg: "#fff7ed"
   }
 ];
+
+  const department_name = [
+    {
+      name: "Solid Waste Management",
+      value:50
+    },
+     {
+      name: "Water Project & Water Operation",
+      value:85
+    },
+     {
+      name: "Drainage",
+      value:78
+    },
+     {
+      name: "Light & Traffic",
+      value:45
+    },
+     {
+      name: "Ahmedabad Municipal Transport Service (AMTS)",
+      value:12
+    },
+     {
+      name: "Bus Rapid Transit System (BRTS / Ahmedabad Janmarg Ltd)",
+      value:78
+    },
+     {
+      name: "Fire & Emergency Services",
+      value:95
+    },
+     {
+      name: "Parks and Gardens",
+      value:73
+    },
+  ];
 
   return (
 
@@ -400,102 +427,31 @@ Resolved
 
           <div className="dashboard-box">
 
-            <h2>Department Performance</h2>
+            <h3>Department Performance</h3>
+            <br></br>
+            {department_name.map((dept,index)=>
+              <div className="department-progress" key={index}>
 
-            <div className="department-progress">
+                <div className="progress-header">
+                  <span>{dept.name}</span>
+                  <span>{dept.value}%</span>
+                </div>
+                
 
-              <div className="progress-header">
-                <span>Road Department</span>
-                <span>95%</span>
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${dept.value}%`,
+                   backgroundColor: dept.value < 25 ? "#ef4444" : dept.value >= 70 ? "#22c55e" : "#f59e0b"
+                  }}
+                  ></div>
+                </div>
+
               </div>
-              
+            )}
+           
 
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "95%" }}
-                ></div>
-              </div>
-
-            </div>
-
-            <div className="department-progress">
-
-              <div className="progress-header">
-                <span>Sanitation Department</span>
-                <span>82%</span>
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "82%" }}
-                ></div>
-              </div>
-
-            </div>
-            <div className="department-progress">
-
-              <div className="progress-header">
-                <span>Water Department</span>
-                <span>20%</span>
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "20%" }}
-                ></div>
-              </div>
-
-            </div>
-            <div className="department-progress">
-
-              <div className="progress-header">
-                <span>Garden Department</span>
-                <span>60%</span>
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "60%" }}
-                ></div>
-              </div>
-
-            </div>
-
-            <div className="department-progress">
-
-              <div className="progress-header">
-                <span>Electric Department</span>
-                <span>69%</span>
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "69%" }}
-                ></div>
-              </div>
-
-            </div>
-
-            <div className="department-progress">
-
-              <div className="progress-header">
-                <span>Garbage Department</span>
-                <span>91%</span>
-              </div>
-
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: "91%" }}
-                ></div>
-              </div>
-
-            </div>
+            
 
           </div>
 

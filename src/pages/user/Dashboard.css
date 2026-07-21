@@ -2139,138 +2139,67 @@
 .location-card h4{
 
 
-    font-size:17px;
-
+    font-size:1px;
     color:#111827;
-
     margin-bottom:8px;
-
 }
 
 
 
 .location-card p{
-
-
     color:#64748b;
-
     font-size:14px;
-
     margin:4px 0;
-
 }
 
 
-
-
-
-/* ==========================================================
-   MAP AREA
-========================================================== */
-
-
 .map-container{
-
-
     width:100%;
-
     height:450px;
-
     overflow:hidden;
-
     border-radius:20px;
-
 }
 
 
 
 .map-placeholder{
-
-
     width:100%;
-
     height:100%;
-
     background:#f0f9ff;
-
     border:2px dashed #93c5fd;
-
     display:flex;
-
     justify-content:center;
-
     align-items:center;
-
     flex-direction:column;
-
     text-align:center;
-
 }
 
 
 
 .map-icon{
-
-
     font-size:55px;
-
     color:#2563eb;
-
     margin-bottom:15px;
-
 }
 
 
 
 .map-placeholder h3{
-
-
     color:#1e3a8a;
-
     font-size:22px;
-
     margin-bottom:8px;
-
 }
-
-
 
 .map-placeholder p{
-
-
     color:#64748b;
-
     font-size:15px;
-
 }
-
-
-
-
-
-/* ==========================================================
-   RESPONSIVE
-========================================================== */
-
-
 @media(max-width:768px){
-
-
     .map-container{
-
         height:300px;
-
     }
-
-
-
     .location-card{
-
         flex-direction:column;
-
         align-items:flex-start;
-
     }
-
-
 }

@@ -1,27 +1,20 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import "./Dashboard.css";
 
 import {
   FaClipboardList,
-  FaUsers,
   FaUserCog,
   FaCheckCircle,
   FaClock,
-  FaSearch,
-  FaFilter,
-  FaEye,
+  FaUsers,
   FaMapMarkerAlt,
   FaBuilding,
-  FaFileAlt,
-  FaUserPlus,
-  FaTimes,
-  FaCamera,
 } from "react-icons/fa";
 
 import {
   MapContainer,
   TileLayer,
- Marker,
+  Marker,
   Popup,
 } from "react-leaflet";
 
@@ -29,7 +22,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 /* ==========================================================
-   Custom Complaint Marker
+   CUSTOM MAP MARKER
 ========================================================== */
 
 const createMarkerIcon = (color) =>
@@ -41,169 +34,150 @@ const createMarkerIcon = (color) =>
 const complaintIcons = {
   Pending: createMarkerIcon("#ef4444"),
   Assigned: createMarkerIcon("#f59e0b"),
-  "In Progress": createMarkerIcon("#9333ea"),
+  "In Progress": createMarkerIcon("#8b5cf6"),
   Resolved: createMarkerIcon("#22c55e"),
 };
 
 function Dashboard() {
+
   /* ==========================================================
-      Logged Department
+     LOGGED DEPARTMENT
   ========================================================== */
 
   const loggedDepartment = "Road Department";
 
   /* ==========================================================
-      Complaint Data
+     DUMMY COMPLAINT DATA
   ========================================================== */
 
   const complaintData = [
     {
-      id: "CMP-1001",
+      id: "CMP001",
       citizen: "Rahul Patel",
       category: "Road Damage",
       department: "Road Department",
       engineer: "Amit Patel",
       priority: "High",
       status: "Pending",
-      date: "18 Jul 2026",
-      address: "Satellite, Ahmedabad",
+      address: "Satellite",
       latitude: 23.0225,
       longitude: 72.5714,
-      description:
-        "Large potholes causing accidents near the overbridge.",
     },
 
     {
-      id: "CMP-1002",
-      citizen: "Amit Shah",
+      id: "CMP002",
+      citizen: "Jeel Bhalani",
       category: "Road Crack",
       department: "Road Department",
       engineer: "Jay Shah",
       priority: "Medium",
       status: "Assigned",
-      date: "18 Jul 2026",
-      address: "Navrangpura",
-      latitude: 23.0358,
-      longitude: 72.5618,
-      description:
-        "Major cracks visible across the main road.",
+      address: "Nikol",
+      latitude: 23.0488,
+      longitude: 72.6726,
     },
 
     {
-      id: "CMP-1003",
-      citizen: "Priya Desai",
-      category: "Road Damage",
-      department: "Road Department",
-      engineer: "Amit Patel",
-      priority: "High",
-      status: "In Progress",
-      date: "17 Jul 2026",
-      address: "Maninagar",
-      latitude: 22.995,
-      longitude: 72.603,
-      description:
-        "Road sinking after heavy rainfall causing traffic issues.",
-    },
-
-    {
-      id: "CMP-1004",
-      citizen: "Neha Joshi",
+      id: "CMP003",
+      citizen: "Priya Shah",
       category: "Road Damage",
       department: "Road Department",
       engineer: "Ravi Kumar",
-      priority: "Low",
+      priority: "High",
       status: "Resolved",
-      date: "17 Jul 2026",
       address: "Bopal",
       latitude: 23.0396,
       longitude: 72.4651,
-      description:
-        "Broken divider repaired successfully.",
     },
 
     {
-      id: "CMP-1005",
-      citizen: "Karan Mehta",
+      id: "CMP004",
+      citizen: "Harsh Patel",
       category: "Road Damage",
       department: "Road Department",
       engineer: "",
-      priority: "High",
+      priority: "Low",
       status: "Pending",
-      date: "16 Jul 2026",
       address: "Gota",
       latitude: 23.0911,
       longitude: 72.5304,
-      description:
-        "Huge pothole near the traffic signal.",
+    },
+
+    {
+      id: "CMP005",
+      citizen: "Amit Shah",
+      category: "Road Crack",
+      department: "Road Department",
+      engineer: "Karan Patel",
+      priority: "Medium",
+      status: "In Progress",
+      address: "Navrangpura",
+      latitude: 23.0375,
+      longitude: 72.566,
     },
   ];
 
   /* ==========================================================
-      Engineers
+     ENGINEERS
   ========================================================== */
 
   const engineers = [
     {
       id: 1,
       name: "Amit Patel",
-      assigned: 7,
-      performance: 92,
+      assigned: 8,
+      performance: 94,
     },
+
     {
       id: 2,
       name: "Jay Shah",
-      assigned: 5,
+      assigned: 6,
       performance: 88,
     },
+
     {
       id: 3,
       name: "Ravi Kumar",
-      assigned: 4,
-      performance: 84,
+      assigned: 5,
+      performance: 81,
     },
+
     {
       id: 4,
-      name: "Nilesh Patel",
-      assigned: 6,
-      performance: 90,
+      name: "Karan Patel",
+      assigned: 7,
+      performance: 91,
     },
+
     {
       id: 5,
-      name: "Hardik Joshi",
-      assigned: 3,
-      performance: 79,
+      name: "Nilesh Joshi",
+      assigned: 4,
+      performance: 78,
     },
   ];
 
   /* ==========================================================
-      React States
-  ========================================================== */
-
-  const [search, setSearch] = useState("");
-
-  const [statusFilter, setStatusFilter] = useState("All");
-
-  const [priorityFilter, setPriorityFilter] = useState("All");
-
-  const [selectedComplaint, setSelectedComplaint] =
-    useState(null);
-
-  /* ==========================================================
-      Department Complaints
+     DEPARTMENT COMPLAINTS
   ========================================================== */
 
   const departmentComplaints = useMemo(() => {
+
     return complaintData.filter(
       (item) => item.department === loggedDepartment
     );
+
   }, []);
 
   /* ==========================================================
-      Dashboard Statistics
+     DASHBOARD STATS
   ========================================================== */
 
   const dashboardStats = useMemo(() => {
+
     return [
+
       {
         title: "Total Complaints",
         value: departmentComplaints.length,
@@ -215,81 +189,55 @@ function Dashboard() {
       {
         title: "Pending",
         value: departmentComplaints.filter(
-          (c) => c.status === "Pending"
+          (item) => item.status === "Pending"
         ).length,
         icon: <FaClock />,
-        color: "#d97706",
+        color: "#f59e0b",
         bg: "#fff7ed",
       },
 
       {
         title: "Assigned",
         value: departmentComplaints.filter(
-          (c) => c.status === "Assigned"
+          (item) => item.status === "Assigned"
         ).length,
         icon: <FaUserCog />,
-        color: "#9333ea",
+        color: "#8b5cf6",
         bg: "#f3e8ff",
       },
 
       {
         title: "Resolved",
         value: departmentComplaints.filter(
-          (c) => c.status === "Resolved"
+          (item) => item.status === "Resolved"
         ).length,
         icon: <FaCheckCircle />,
         color: "#16a34a",
         bg: "#ecfdf5",
       },
+
     ];
+
   }, [departmentComplaints]);
 
   /* ==========================================================
-      Filter Complaints
-  ========================================================== */
-
-  const filteredComplaints = useMemo(() => {
-    return departmentComplaints.filter((item) => {
-      const matchesSearch =
-        item.id.toLowerCase().includes(search.toLowerCase()) ||
-        item.citizen.toLowerCase().includes(search.toLowerCase()) ||
-        item.category.toLowerCase().includes(search.toLowerCase());
-
-      const matchesStatus =
-        statusFilter === "All" ||
-        item.status === statusFilter;
-
-      const matchesPriority =
-        priorityFilter === "All" ||
-        item.priority === priorityFilter;
-
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesPriority
-      );
-    });
-  }, [
-    departmentComplaints,
-    search,
-    statusFilter,
-    priorityFilter,
-  ]);
-
-  /* ==========================================================
-      Complaint Map Data
+     MAP DATA
   ========================================================== */
 
   const mapComplaints = useMemo(() => {
+
     return departmentComplaints.filter(
       (item) => item.latitude && item.longitude
     );
+
   }, [departmentComplaints]);
 
   return (
+
     <div className="department-dashboard">
-              {/* ==========================================================
-          Welcome Section
+
+      {/* ==========================================================
+          WELCOME SECTION
       ========================================================== */}
 
       <div className="welcome-card">
@@ -297,13 +245,13 @@ function Dashboard() {
         <div className="welcome-content">
 
           <h1>
-            Welcome Back, Department Officer 👨‍💼
+            Welcome Back Department Officer 👨‍💼
           </h1>
 
           <p>
-            Manage complaints assigned to your department, allocate
-            engineers, monitor ongoing work, and track overall
-            department performance from one centralized dashboard.
+            Monitor your department activities, track complaint
+            locations, view engineer performance and overall
+            department statistics from one dashboard.
           </p>
 
           <div className="system-status">
@@ -326,7 +274,7 @@ function Dashboard() {
       </div>
 
       {/* ==========================================================
-          Statistics
+          STATISTICS
       ========================================================== */}
 
       <div className="stats-grid">
@@ -363,20 +311,17 @@ function Dashboard() {
       </div>
 
       {/* ==========================================================
-          Main Dashboard
+          MAIN GRID START
       ========================================================== */}
 
       <div className="department-dashboard-grid">
 
-        {/* ======================================================
-            LEFT PANEL
-        ======================================================= */}
+        {/* LEFT PANEL START */}
 
         <div className="left-panel">
-
-          {/* ======================================================
-              Complaint Location Map
-          ======================================================= */}
+                  {/* ======================================================
+              COMPLAINT LOCATION MAP
+          ====================================================== */}
 
           <div className="dashboard-box">
 
@@ -386,7 +331,7 @@ function Dashboard() {
 
                 <FaMapMarkerAlt />
 
-                {" "}Department Complaint Locations
+                {" "}Complaint Locations
 
               </h2>
 
@@ -399,7 +344,7 @@ function Dashboard() {
                 zoom={12}
                 scrollWheelZoom={false}
                 style={{
-                  height: "400px",
+                  height: "450px",
                   width: "100%",
                   borderRadius: "16px",
                 }}
@@ -423,32 +368,59 @@ function Dashboard() {
 
                     <Popup>
 
-                      <h3>{item.id}</h3>
+                      <div className="popup-content">
 
-                      <p>
-                        <strong>Citizen :</strong>{" "}
-                        {item.citizen}
-                      </p>
+                        <h3>{item.id}</h3>
 
-                      <p>
-                        <strong>Category :</strong>{" "}
-                        {item.category}
-                      </p>
+                        <p>
 
-                      <p>
-                        <strong>Status :</strong>{" "}
-                        {item.status}
-                      </p>
+                          <strong>Citizen :</strong>{" "}
 
-                      <p>
-                        <strong>Engineer :</strong>{" "}
-                        {item.engineer || "Not Assigned"}
-                      </p>
+                          {item.citizen}
 
-                      <p>
-                        <strong>Address :</strong>{" "}
-                        {item.address}
-                      </p>
+                        </p>
+
+                        <p>
+
+                          <strong>Category :</strong>{" "}
+
+                          {item.category}
+
+                        </p>
+
+                        <p>
+
+                          <strong>Priority :</strong>{" "}
+
+                          {item.priority}
+
+                        </p>
+
+                        <p>
+
+                          <strong>Status :</strong>{" "}
+
+                          {item.status}
+
+                        </p>
+
+                        <p>
+
+                          <strong>Engineer :</strong>{" "}
+
+                          {item.engineer || "Not Assigned"}
+
+                        </p>
+
+                        <p>
+
+                          <strong>Location :</strong>{" "}
+
+                          {item.address}
+
+                        </p>
+
+                      </div>
 
                     </Popup>
 
@@ -461,8 +433,8 @@ function Dashboard() {
             </div>
 
             {/* ======================================================
-                Map Legend
-            ======================================================= */}
+                MAP LEGEND
+            ====================================================== */}
 
             <div className="map-legends">
 
@@ -484,7 +456,7 @@ function Dashboard() {
 
               <div>
 
-                <span className="legend-dot in-progress"></span>
+                <span className="legend-dot progress"></span>
 
                 In Progress
 
@@ -492,7 +464,7 @@ function Dashboard() {
 
               <div>
 
-                <span className="legend-dot completed"></span>
+                <span className="legend-dot resolved"></span>
 
                 Resolved
 
@@ -502,101 +474,17 @@ function Dashboard() {
 
           </div>
 
+        </div>
+
+        {/* ======================================================
+            RIGHT PANEL
+        ====================================================== */}
+
+        <div className="right-panel">
+
           {/* ======================================================
-              Search & Filters
-          ======================================================= */}
-
-          <div className="complaint-toolbar">
-
-            <div className="search-box">
-
-              <FaSearch />
-
-              <input
-                type="text"
-                placeholder="Search by Complaint ID, Citizen or Category..."
-                value={search}
-                onChange={(e) =>
-                  setSearch(e.target.value)
-                }
-              />
-
-            </div>
-
-            <div className="toolbar-right">
-
-              <div className="filter-box">
-
-                <FaFilter />
-
-                <select
-                  value={statusFilter}
-                  onChange={(e) =>
-                    setStatusFilter(e.target.value)
-                  }
-                >
-
-                  <option value="All">
-                    All Status
-                  </option>
-
-                  <option value="Pending">
-                    Pending
-                  </option>
-
-                  <option value="Assigned">
-                    Assigned
-                  </option>
-
-                  <option value="In Progress">
-                    In Progress
-                  </option>
-
-                  <option value="Resolved">
-                    Resolved
-                  </option>
-
-                </select>
-
-              </div>
-
-              <div className="filter-box">
-
-                <FaFilter />
-
-                <select
-                  value={priorityFilter}
-                  onChange={(e) =>
-                    setPriorityFilter(e.target.value)
-                  }
-                >
-
-                  <option value="All">
-                    All Priority
-                  </option>
-
-                  <option value="High">
-                    High
-                  </option>
-
-                  <option value="Medium">
-                    Medium
-                  </option>
-
-                  <option value="Low">
-                    Low
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-          </div>
-                    {/* ======================================================
-              Department Complaints Table
-          ======================================================= */}
+              DEPARTMENT SUMMARY
+          ====================================================== */}
 
           <div className="dashboard-box">
 
@@ -604,203 +492,94 @@ function Dashboard() {
 
               <h2>
 
-                <FaClipboardList />
+                <FaBuilding />
 
-                {" "}Department Complaints
+                {" "}Department Summary
 
               </h2>
 
-              <button className="view-all-btn">
-                View All
-              </button>
-
             </div>
 
-            <div className="table-wrapper">
+            <div className="summary-list">
 
-              <table className="dashboard-table">
+              <div className="summary-item">
 
-                <thead>
+                <span>Total Engineers</span>
 
-                  <tr>
+                <strong>{engineers.length}</strong>
 
-                    <th>ID</th>
+              </div>
 
-                    <th>Citizen</th>
+              <div className="summary-item">
 
-                    <th>Category</th>
+                <span>Available Engineers</span>
 
-                    <th>Priority</th>
+                <strong>3</strong>
 
-                    <th>Status</th>
+              </div>
 
-                    <th>Engineer</th>
+              <div className="summary-item">
 
-                    <th>Action</th>
+                <span>Busy Engineers</span>
 
-                  </tr>
+                <strong>2</strong>
 
-                </thead>
+              </div>
 
-                <tbody>
+              <div className="summary-item">
 
-                  {filteredComplaints.length === 0 ? (
+                <span>Pending Complaints</span>
 
-                    <tr>
+                <strong>
 
-                      <td
-                        colSpan="7"
-                        className="empty-row"
-                      >
+                  {
+                    departmentComplaints.filter(
+                      (item) => item.status === "Pending"
+                    ).length
+                  }
 
-                        No complaints found.
+                </strong>
 
-                      </td>
+              </div>
 
-                    </tr>
+              <div className="summary-item">
 
-                  ) : (
+                <span>Assigned Complaints</span>
 
-                    filteredComplaints.map((item) => (
+                <strong>
 
-                      <tr key={item.id}>
+                  {
+                    departmentComplaints.filter(
+                      (item) => item.status === "Assigned"
+                    ).length
+                  }
 
-                        <td className="complaint-id">
+                </strong>
 
-                          {item.id}
+              </div>
 
-                        </td>
+              <div className="summary-item">
 
-                        <td>
+                <span>Resolved Complaints</span>
 
-                          <div className="citizen-info">
+                <strong>
 
-                            <div className="citizen-avatar">
+                  {
+                    departmentComplaints.filter(
+                      (item) => item.status === "Resolved"
+                    ).length
+                  }
 
-                              {item.citizen.charAt(0)}
+                </strong>
 
-                            </div>
-
-                            <span>
-
-                              {item.citizen}
-
-                            </span>
-
-                          </div>
-
-                        </td>
-
-                        <td>
-
-                          {item.category}
-
-                        </td>
-
-                        <td>
-
-                          <span
-                            className={`priority-badge ${item.priority
-                              .toLowerCase()}`}
-                          >
-
-                            {item.priority}
-
-                          </span>
-
-                        </td>
-
-                        <td>
-
-                          <span
-                            className={`status-badge ${item.status
-                              .replace(/\s+/g, "-")
-                              .toLowerCase()}`}
-                          >
-
-                            {item.status}
-
-                          </span>
-
-                        </td>
-
-                        <td>
-
-                          {item.engineer ? (
-
-                            <div className="assigned-engineer">
-
-                              <FaUsers />
-
-                              <span>
-
-                                {item.engineer}
-
-                              </span>
-
-                            </div>
-
-                          ) : (
-
-                            <button
-                              className="assign-btn"
-                            >
-
-                              <FaUserPlus />
-
-                              Assign
-
-                            </button>
-
-                          )}
-
-                        </td>
-
-                        <td>
-
-                          <button
-                            className="view-btn"
-                            onClick={() =>
-                              setSelectedComplaint(item)
-                            }
-                          >
-
-                            <FaEye />
-
-                            <span>
-
-                              View
-
-                            </span>
-
-                          </button>
-
-                        </td>
-
-                      </tr>
-
-                    ))
-
-                  )}
-
-                </tbody>
-
-              </table>
+              </div>
 
             </div>
 
           </div>
-
-        </div>
-                {/* ======================================================
-            RIGHT PANEL
-        ======================================================= */}
-
-        <div className="right-panel">
-
-          {/* ======================================================
-              Engineer Performance
-          ======================================================= */}
+                    {/* ======================================================
+              ENGINEER PERFORMANCE
+          ====================================================== */}
 
           <div className="dashboard-box">
 
@@ -860,7 +639,7 @@ function Dashboard() {
 
                     </div>
 
-                    <span>
+                    <span className="performance-score">
 
                       {engineer.performance}%
 
@@ -877,8 +656,8 @@ function Dashboard() {
           </div>
 
           {/* ======================================================
-              Department Summary
-          ======================================================= */}
+              QUICK DEPARTMENT INFO (Optional)
+          ====================================================== */}
 
           <div className="dashboard-box">
 
@@ -886,9 +665,9 @@ function Dashboard() {
 
               <h2>
 
-                <FaBuilding />
+                <FaClipboardList />
 
-                {" "}Department Summary
+                {" "}Quick Overview
 
               </h2>
 
@@ -898,320 +677,50 @@ function Dashboard() {
 
               <div className="summary-item">
 
-                <span>Total Engineers</span>
+                <span>Today's New Complaints</span>
 
-                <strong>{engineers.length}</strong>
-
-              </div>
-
-              <div className="summary-item">
-
-                <span>Available Engineers</span>
-
-                <strong>3</strong>
+                <strong>4</strong>
 
               </div>
 
               <div className="summary-item">
 
-                <span>Busy Engineers</span>
-
-                <strong>2</strong>
-
-              </div>
-
-              <div className="summary-item">
-
-                <span>Pending Complaints</span>
+                <span>Complaints In Progress</span>
 
                 <strong>
+
                   {
                     departmentComplaints.filter(
-                      (item) => item.status === "Pending"
+                      (item) =>
+                        item.status === "In Progress"
                     ).length
                   }
+
                 </strong>
 
               </div>
 
               <div className="summary-item">
 
-                <span>Assigned Complaints</span>
+                <span>Average Resolution</span>
 
-                <strong>
-                  {
-                    departmentComplaints.filter(
-                      (item) => item.status === "Assigned"
-                    ).length
-                  }
-                </strong>
+                <strong>2.8 Days</strong>
 
               </div>
-
-              <div className="summary-item">
-
-                <span>Resolved Complaints</span>
-
-                <strong>
-                  {
-                    departmentComplaints.filter(
-                      (item) => item.status === "Resolved"
-                    ).length
-                  }
-                </strong>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* ======================================================
-              Quick Actions
-          ======================================================= */}
-
-          <div className="dashboard-box">
-
-            <div className="card-header">
-
-              <h2>
-
-                Quick Actions
-
-              </h2>
-
-            </div>
-
-            <div className="quick-actions">
-
-              <button className="quick-action-btn">
-
-                <FaClipboardList />
-
-                Complaint Report
-
-              </button>
-
-              <button className="quick-action-btn">
-
-                <FaUsers />
-
-                Manage Engineers
-
-              </button>
-
-              <button className="quick-action-btn">
-
-                <FaBuilding />
-
-                Department Overview
-
-              </button>
-
-              <button className="quick-action-btn">
-
-                <FaMapMarkerAlt />
-
-                View Complaint Map
-
-              </button>
 
             </div>
 
           </div>
 
         </div>
+
+        {/* RIGHT PANEL END */}
 
       </div>
-            {/* ==========================================================
-          Complaint Details Modal
+
+      {/* ==========================================================
+          MAIN GRID END
       ========================================================== */}
-
-      {selectedComplaint && (
-
-        <div className="modal-overlay">
-
-          <div className="complaint-modal">
-
-            {/* ================= Header ================= */}
-
-            <div className="modal-header">
-
-              <div>
-
-                <h2>Complaint Details</h2>
-
-                <p>
-                  View complete information about the selected complaint.
-                </p>
-
-              </div>
-
-              <button
-                className="close-btn"
-                onClick={() => setSelectedComplaint(null)}
-              >
-                <FaTimes />
-              </button>
-
-            </div>
-
-            {/* ================= Summary ================= */}
-
-            <div className="detail-grid">
-
-              <div className="detail-card">
-
-                <span>Complaint ID</span>
-
-                <h4>{selectedComplaint.id}</h4>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Citizen</span>
-
-                <h4>{selectedComplaint.citizen}</h4>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Category</span>
-
-                <h4>{selectedComplaint.category}</h4>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Date</span>
-
-                <h4>{selectedComplaint.date}</h4>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Priority</span>
-
-                <span
-                  className={`priority-badge ${selectedComplaint.priority
-                    .toLowerCase()}`}
-                >
-                  {selectedComplaint.priority}
-                </span>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Status</span>
-
-                <span
-                  className={`status-badge ${selectedComplaint.status
-                    .replace(/\s+/g, "-")
-                    .toLowerCase()}`}
-                >
-                  {selectedComplaint.status}
-                </span>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Assigned Engineer</span>
-
-                <h4>
-                  {selectedComplaint.engineer || "Not Assigned"}
-                </h4>
-
-              </div>
-
-              <div className="detail-card">
-
-                <span>Department</span>
-
-                <h4>{selectedComplaint.department}</h4>
-
-              </div>
-
-            </div>
-
-            {/* ================= Address ================= */}
-
-            <div className="info-section">
-
-              <h3>
-
-                <FaMapMarkerAlt />
-
-                {" "}Complaint Address
-
-              </h3>
-
-              <p>{selectedComplaint.address}</p>
-
-            </div>
-
-            {/* ================= Description ================= */}
-
-            <div className="info-section">
-
-              <h3>
-
-                <FaFileAlt />
-
-                {" "}Description
-
-              </h3>
-
-              <p>{selectedComplaint.description}</p>
-
-            </div>
-
-            {/* ================= Image ================= */}
-
-            <div className="info-section">
-
-              <h3>
-
-                <FaCamera />
-
-                {" "}Complaint Image
-
-              </h3>
-
-              <div className="complaint-image">
-
-                <img
-                  src="https://placehold.co/900x400?text=Complaint+Image"
-                  alt="Complaint"
-                />
-
-              </div>
-
-            </div>
-
-            {/* ================= Footer ================= */}
-
-            <div className="modal-footer">
-
-              <button
-                className="dashboard-btn"
-                onClick={() => setSelectedComplaint(null)}
-              >
-                Close
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
 
