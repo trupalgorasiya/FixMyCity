@@ -16,7 +16,7 @@ import ComplaintManagement from "./pages/admin/ComplaintManagement";
 import Report from "./pages/admin/Report";
 import ReportComplaints from "./pages/user/ReportComplaints";
 import MyComplaints from "./pages/user/MyComplaints";
-import ComplaintTracking from "./pages/ComplaintTracking";
+// import ComplaintTracking from "./pages/ComplaintTracking";
 import Profile from "./Authentication/Profile";
 import EditProfile from "./Authentication/EditProfile"
 import NotificationPage from "./Authentication/NotificationPage";
@@ -27,6 +27,8 @@ import DepartmentReport from "./pages/department/DepartmentReport";
 import AssignedComplaints from "./pages/engineer/AssignedComplaints";
 import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
 import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
+// import TrackComplaints from "./pages/user/TrackComplaints";
+import ComplaintTracking from "./pages/ComplaintTracking";
 
 function AppRoutes() {
 

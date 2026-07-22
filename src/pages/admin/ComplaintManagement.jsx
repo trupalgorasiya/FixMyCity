@@ -9,10 +9,15 @@ import {
   FaExclamationTriangle,
   FaUserCog,
   FaSearch,
-  FaFilter
+  FaFilter,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 
 function ComplaintManagement() {
+  const [currentPage, setCurrentPage] = useState(1);
+
+const complaintsPerPage = 5;
 
   const [complaints] = useState([
 
@@ -92,7 +97,34 @@ function ComplaintManagement() {
     );
 
   });
+  const totalPages = Math.ceil(
+  filteredComplaints.length / complaintsPerPage
+);
 
+const indexOfLast =
+  currentPage * complaintsPerPage;
+
+const indexOfFirst =
+  indexOfLast - complaintsPerPage;
+
+const currentComplaints =
+  filteredComplaints.slice(
+    indexOfFirst,
+    indexOfLast
+  );
+
+const paginate = (page) =>
+  setCurrentPage(page);
+
+const previousPage = () => {
+  if (currentPage > 1)
+    setCurrentPage((prev) => prev - 1);
+};
+
+const nextPage = () => {
+  if (currentPage < totalPages)
+    setCurrentPage((prev) => prev + 1);
+};
   return (
 
     <div className="complaint-page">
@@ -250,18 +282,20 @@ function ComplaintManagement() {
             type="text"
             placeholder="Search complaint..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => {
+  setSearch(e.target.value);
+  setCurrentPage(1);
+}}
           />
 
         </div>
 
         <select
           value={department}
-          onChange={(e) =>
-            setDepartment(e.target.value)
-          }
+          onChange={(e) => {
+  setDepartment(e.target.value);
+  setCurrentPage(1);
+}}
         >
 
           <option>All</option>
@@ -274,9 +308,10 @@ function ComplaintManagement() {
 
         <select
           value={status}
-          onChange={(e) =>
-            setStatus(e.target.value)
-          }
+          onChange={(e) => {
+  setStatus(e.target.value);
+  setCurrentPage(1);
+}}
         >
 
           <option>All</option>
@@ -290,9 +325,10 @@ function ComplaintManagement() {
 
         <select
           value={priority}
-          onChange={(e) =>
-            setPriority(e.target.value)
-          }
+          onChange={(e) => {
+  setPriority(e.target.value);
+  setCurrentPage(1);
+}}
         >
 
           <option>All</option>
@@ -445,18 +481,6 @@ function ComplaintManagement() {
                           Assign
                         </button>
 
-                        <button
-                          className="edit-btn"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          className="delete-btn"
-                        >
-                          Delete
-                        </button>
-
                       </div>
 
                     </td>
@@ -491,60 +515,51 @@ function ComplaintManagement() {
                     PAGINATION
       ========================================== */}
 
-      <div className="pagination-wrapper">
-
-        <div className="pagination-info">
-
-          Showing
-
-          <strong>
-
-            {" "}
-            {filteredComplaints.length}
-
-          </strong>
-
-          {" "}complaints
-
-        </div>
-
-        <div className="pagination">
-
-          <button>
-
-            Previous
-
-          </button>
-
-          <button className="active">
-
-            1
-
-          </button>
-
-          <button>
-
-            2
-
-          </button>
-
-          <button>
-
-            3
-
-          </button>
-
-          <button>
-
-            Next
-
-          </button>
-
-        </div>
-
+     
       </div>
-      </div>
+ {filteredComplaints.length > complaintsPerPage && (
 
+  <div className="pagination-wrapper">
+
+    <button
+      onClick={previousPage}
+      disabled={currentPage === 1}
+    >
+      <FaChevronLeft />
+      Previous
+    </button>
+
+    <div className="page-numbers">
+
+      {[...Array(totalPages)].map((_, index) => (
+
+        <button
+          key={index}
+          onClick={() => paginate(index + 1)}
+          className={
+            currentPage === index + 1
+              ? "active-page"
+              : ""
+          }
+        >
+          {index + 1}
+        </button>
+
+      ))}
+
+    </div>
+
+    <button
+      onClick={nextPage}
+      disabled={currentPage === totalPages}
+    >
+      Next
+      <FaChevronRight />
+    </button>
+
+  </div>
+
+)}
      
             {/* ==========================================
               VIEW COMPLAINT MODAL

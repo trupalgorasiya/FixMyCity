@@ -4,9 +4,14 @@ import {
   FaUserCog,
   FaUserCheck,
   FaBuilding,
-  FaClipboardList
+  FaClipboardList,
+  FaChevronLeft,
+  FaChevronRight
 } from "react-icons/fa";
 function EngineerManagement() {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const engineersPerPage = 5;
 
   const [departments, setDepartments] = useState([
     "Road Department",
@@ -33,6 +38,70 @@ function EngineerManagement() {
       mobile: "9876543211",
       department: "Water Department",
       role: "Senior Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
+    },
+     {
+      id: "ENG001",
+      name: "Rahul Sharma",
+      email: "rahul@gmail.com",
+      mobile: "9876543210",
+      department: "Road Department",
+      role: "Engineer"
     }
   ]);
 
@@ -51,7 +120,6 @@ function EngineerManagement() {
     role: "Engineer"
   });
 
-  // Add Department
 
   const handleAddDepartment = () => {
   const dept = newDepartment.trim();
@@ -170,12 +238,45 @@ function EngineerManagement() {
     }
   };
 
-  const filteredEngineers =
-    engineers.filter((eng) =>
-      eng.name
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
+  const filteredEngineers = engineers.filter((eng) => {
+  const value = search.toLowerCase();
+
+  return (
+    eng.id.toLowerCase().includes(value) ||
+    eng.name.toLowerCase().includes(value) ||
+    eng.email.toLowerCase().includes(value) ||
+    eng.mobile.includes(value) ||
+    eng.department.toLowerCase().includes(value)
+  );
+});
+const totalPages = Math.ceil(
+  filteredEngineers.length / engineersPerPage
+);
+
+const indexOfLast =
+  currentPage * engineersPerPage;
+
+const indexOfFirst =
+  indexOfLast - engineersPerPage;
+
+const currentEngineers =
+  filteredEngineers.slice(
+    indexOfFirst,
+    indexOfLast
+  );
+
+const paginate = (page) =>
+  setCurrentPage(page);
+
+const previousPage = () => {
+  if (currentPage > 1)
+    setCurrentPage((prev) => prev - 1);
+};
+
+const nextPage = () => {
+  if (currentPage < totalPages)
+    setCurrentPage((prev) => prev + 1);
+};
 
   return (
 
@@ -253,9 +354,10 @@ function EngineerManagement() {
           type="text"
           placeholder="Search Engineer..."
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
         />
 
         <button
@@ -290,7 +392,9 @@ function EngineerManagement() {
 
           <tbody>
 
-            {filteredEngineers.map((eng) => (
+           {currentEngineers.length > 0 ? (
+
+    currentEngineers.map((eng) => (
 
               <tr key={eng.id}>
 
@@ -324,13 +428,69 @@ function EngineerManagement() {
 
               </tr>
 
-            ))}
+            ))
+            ) : (
+
+    <tr>
+      <td
+        colSpan="6"
+        className="empty-row"
+      >
+        No engineers found.
+      </td>
+    </tr>
+
+  )}
 
           </tbody>
 
         </table>
+       
 
       </div>
+       {filteredEngineers.length > engineersPerPage && (
+
+  <div className="pagination-wrapper">
+
+    <button
+      onClick={previousPage}
+      disabled={currentPage === 1}
+    >
+      <FaChevronLeft />
+      Previous
+    </button>
+
+    <div className="page-numbers">
+
+      {[...Array(totalPages)].map((_, index) => (
+
+        <button
+          key={index}
+          onClick={() => paginate(index + 1)}
+          className={
+            currentPage === index + 1
+              ? "active-page"
+              : ""
+          }
+        >
+          {index + 1}
+        </button>
+
+      ))}
+
+    </div>
+
+    <button
+      onClick={nextPage}
+      disabled={currentPage === totalPages}
+    >
+      Next
+      <FaChevronRight />
+    </button>
+
+  </div>
+
+)}
 
       {/* Modal */}
 
@@ -412,7 +572,7 @@ function EngineerManagement() {
                 Engineer
               </option>
 
-              <option>
+              {/* <option>
                 Senior Engineer
               </option>
 
@@ -422,7 +582,7 @@ function EngineerManagement() {
 
               <option>
                 Supervisor
-              </option>
+              </option> */}
 
             </select>
 

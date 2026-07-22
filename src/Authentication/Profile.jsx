@@ -1,9 +1,9 @@
 import "../styles/dashbord.css"
 import "../styles/Profile.css";
-import imgs from "../assets/default-profile.jpeg"
+// import imgs from "../assets/default-profile.jpeg"
 import {FaUser,FaEnvelope,FaPhoneAlt,FaUserEdit,FaLock} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import profile from "../assets/default-profile.jpeg"
 function Profile(){
 
 const user={
@@ -12,7 +12,7 @@ lastName:"Doe",
 email:"john.doe@gmail.com",
 mobile:"9876543210",
 role:"Administrator",
-profileImage:"https://via.placeholder.com/150"
+profileImage:""
 };
 const navigate = useNavigate();
 return(
@@ -22,7 +22,7 @@ return(
 
             <div className="profile-header">
                 <img
-                    src={user.profileImage || {imgs}}
+                    src={user.profileImage || profile}
                     alt="Profile"
                     className="profile-image"
                 />

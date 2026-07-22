@@ -22,10 +22,6 @@ import {
   FaEye,
 } from "react-icons/fa";
 
-/* ==========================================================
-    Logged In Role
-========================================================== */
-
 // Replace with your login role later
 const currentRole = "admin";
 
@@ -39,10 +35,6 @@ engineer
 citizen
 
 */
-
-/* ==========================================================
-    Dummy Notifications
-========================================================== */
 
 const notificationData = [
   {
@@ -172,10 +164,6 @@ const notificationData = [
   },
 ];
 
-/* ==========================================================
-    Icons
-========================================================== */
-
 const notificationIcons = {
   assignment: <FaClipboardList />,
   completed: <FaCheckCircle />,
@@ -188,9 +176,6 @@ const notificationIcons = {
   info: <FaInfoCircle />,
 };
 
-/* ==========================================================
-    Component
-========================================================== */
 
 const NotificationPage = () => {
   const [notifications, setNotifications] =
@@ -201,10 +186,6 @@ const NotificationPage = () => {
   const [filter, setFilter] = useState("All");
 
   const [sort, setSort] = useState("Newest");
-
-  /* =======================================================
-        Statistics
-  ======================================================= */
 
   const roleNotifications = useMemo(() => {
     return notifications.filter(
@@ -221,10 +202,6 @@ const NotificationPage = () => {
   const highPriority = roleNotifications.filter(
     (item) => item.priority === "High"
   ).length;
-
-  /* =======================================================
-        Search + Filter
-  ======================================================= */
 
   const filteredNotifications = roleNotifications
     .filter((item) => {

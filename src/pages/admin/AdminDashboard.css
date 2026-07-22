@@ -49,6 +49,7 @@
 .welcome-card h1{
     font-size:34px;
     font-weight:700;
+    color: white;
     margin-bottom:12px;
 }
 
@@ -63,12 +64,14 @@
     display:inline-flex;
     align-items:center;
     gap:10px;
+    color: white;
     margin-top:22px;
     padding:10px 18px;
     background:rgba(255,255,255,.15);
     border-radius:40px;
     backdrop-filter:blur(10px);
     font-size:14px;
+    background-color: white;
 }
 
 .status-dot{
@@ -698,6 +701,7 @@
     font-weight:600;
     cursor:pointer;
     transition:all .3s ease;
+    color: black;
 }
 
 .dashboard-btn:hover{

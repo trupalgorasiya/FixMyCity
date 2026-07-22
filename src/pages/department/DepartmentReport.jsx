@@ -177,7 +177,11 @@ function DepartmentReport(){
 
 
 
-
+const COLORS = [
+  "#f59e0b",
+  "#3b82f6",
+  "#16a34a"
+];
 
 
     // ================================
@@ -733,7 +737,12 @@ Complaint Status
 <ResponsiveContainer width="100%" height={300}>
 
 
-<PieChart>
+<PieChart margin={{
+    top:20,
+    right:20,
+    left:20,
+    bottom:20
+}}>
 
 
 <Pie
@@ -745,7 +754,7 @@ dataKey="value"
 nameKey="name"
 
 outerRadius={100}
-
+innerRadius={55}
 label
 
 >
@@ -755,7 +764,7 @@ label
 complaintStatusData.map(
 (item,index)=>(
 
-<Cell key={index}/>
+<Cell key={index} fill={COLORS[index % COLORS.length]}/>
 
 )
 
@@ -815,7 +824,9 @@ Monthly Complaints
 type="monotone"
 
 dataKey="complaints"
-
+stroke="#2563eb"
+strokeWidth={3}
+dot={{ r: 5 }}
 />
 
 
@@ -868,14 +879,14 @@ Engineer Performance
 <Bar
 
 dataKey="Assigned"
-
+fill="#2563eb"
 />
 
 
 <Bar
 
 dataKey="Completed"
-
+fill="#16a34a"
 />
 
 

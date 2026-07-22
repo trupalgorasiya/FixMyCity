@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import "../styles/dashbord.css"
 import "../styles/EditProfile.css";
 import {FaUser,FaEnvelope,FaPhoneAlt,FaCamera,FaSave,FaTimes} from "react-icons/fa";
-
+import updated_imgs from "../assets/default-profile.jpeg"
 function EditProfile(){
 
 const navigate=useNavigate();
@@ -13,7 +13,7 @@ firstName:"John",
 lastName:"Doe",
 email:"john.doe@gmail.com",
 mobile:"9876543210",
-profileImage:"https://via.placeholder.com/150"
+profileImage:""
 });
 
 const handleChange=(e)=>{
@@ -52,7 +52,7 @@ return(
 <div className="profile-image-section">
 
 <img
-src={user.profileImage || "../assets/default-profile.png"}
+src={user.profileImage ||updated_imgs}
 alt="Profile"
 className="edit-profile-image"
 />

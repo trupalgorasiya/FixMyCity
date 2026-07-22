@@ -1,13 +1,15 @@
 import { useState } from "react";
-import "../styles/ComplaintTracking.css";
-import { useNavigate } from "react-router-dom";
-function ComplaintTracking() {
-  const navigate = useNavigate();
-  const [complaintId, setComplaintId] = useState("");
-  const [showComplaint, setShowComplaint] = useState(false);
+import "../../styles/ComplaintTracking.css";
 
-  const [complaint, setComplaint] = useState({
-    id: "ABC-123",
+import { useNavigate, useParams } from "react-router-dom";
+function TrackComplaints() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [complaintId, setComplaintId] = useState(id || "");
+
+  const complaint = {
+    id: complaintId,
     status: "In Progress",
     category: "Road Damage",
     priority: "High",
@@ -16,12 +18,12 @@ function ComplaintTracking() {
     location: "Navrangpura, Ahmedabad",
 
     officer: {
-        name: "Rahul Sharma",
-        department: "Road Maintenance",
-        contact: "+91 9876543210",
-        email: "officer@fixmycity.com",
+      name: "Rahul Sharma",
+      department: "Road Maintenance",
+      contact: "+91 9876543210",
+      email: "officer@fixmycity.com",
     },
-});
+  };
 
   const handleTrack = () => {
 
@@ -30,7 +32,7 @@ function ComplaintTracking() {
       return;
     }
 
-     setShowComplaint(true);
+    navigate(`/user/complaint-tracking/${complaintId}`);
   };
 
   return (
@@ -54,7 +56,7 @@ function ComplaintTracking() {
         </div>
 
         {/* ================= SEARCH ================= */}
-
+{!id && (
         <div className="search-card">
 
           <div className="search-box">
@@ -73,11 +75,11 @@ function ComplaintTracking() {
           </div>
 
         </div>
-
+)}
         {/* ================= DETAILS ================= */}
 
-     
-          {showComplaint && (
+        {id && (
+
           <div className="tracking-content">
 
             {/* ================================================= */}
@@ -465,79 +467,45 @@ function ComplaintTracking() {
 
             </div>
 
-
-
-
-
-
-
-            {/* ================================================= */}
-            {/* CITIZEN FEEDBACK */}
-            {/* ================================================= */}
-
-
             <div className="card feedback-card">
 
 
               <div className="card-title">
-
                 <h2>
                   Citizen Feedback
                 </h2>
-
               </div>
 
 
               <p className="feedback-text">
-
                 After your complaint is resolved, you can share your
                 experience and feedback.
-
               </p>
 
 
 
               <div className="rating">
-
                 ★ ★ ★ ★ ★
-
               </div>
 
 
 
               <textarea
-
                 placeholder="Write your feedback here..."
-
               ></textarea>
 
 
 
               <button className="feedback-button">
-
                 Submit Feedback
-
               </button>
-
-
             </div>
-
-
-
-
           </div>
-          )}
-
-       
-
+        )}
       </div>
-
-
     </div>
-
   );
-
 }
 
 
-export default ComplaintTracking;
+export default TrackComplaints;

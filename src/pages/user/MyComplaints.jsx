@@ -7,46 +7,48 @@ import {
   FaSearch
 } from "react-icons/fa";
 import "./MyComplaints.css";
-function MyComplaints() {
+import { useNavigate } from "react-router-dom";
 
+function MyComplaints() {
+  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
   const complaints = [
     {
       id: "CMP001",
-      category: "Garbage Collection",
       department: "Sanitation",
       date: "15 Jul 2026",
+      res_date:"17 Jul 2026",
       status: "Pending"
     },
     {
       id: "CMP002",
-      category: "Road Damage",
       department: "Road Department",
       date: "13 Jul 2026",
+      res_date:"17 Jul 2026",
       status: "In Progress"
     },
     {
       id: "CMP003",
-      category: "Street Light Issue",
       department: "Electrical",
+      res_date:"17 Jul 2026",
       date: "10 Jul 2026",
       status: "Resolved"
     },
     {
       id: "CMP004",
-      category: "Water Leakage",
       department: "Water Department",
+      res_date:"17 Jul 2026",
       date: "08 Jul 2026",
       status: "Pending"
     },
     {
       id: "CMP005",
-      category: "Drainage Problem",
       department: "Drainage",
       date: "05 Jul 2026",
-      status: "Resolved"
+      status: "Resolved",
+      res_date:"17 Jul 2026"
     }
   ];
 
@@ -85,7 +87,7 @@ function MyComplaints() {
     ).length;
 
   const handleTrack = (id) => {
-    alert(`Tracking Complaint : ${id}`);
+    navigate(`/user/complaint-tracking/${id}`);
   };
 
   return (
@@ -239,9 +241,9 @@ function MyComplaints() {
 
               <tr>
                 <th>Complaint ID</th>
-                <th>Category</th>
                 <th>Department</th>
-                <th>Date</th>
+                <th>Complaint Date</th>
+                <th>Resolve Date</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -260,9 +262,6 @@ function MyComplaints() {
                       {complaint.id}
                     </td>
 
-                    <td>
-                      {complaint.category}
-                    </td>
 
                     <td>
                       {complaint.department}
@@ -270,6 +269,9 @@ function MyComplaints() {
 
                     <td>
                       {complaint.date}
+                    </td>
+                    <td>
+                      {complaint.res_date}
                     </td>
 
                     <td>

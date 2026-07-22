@@ -1,6 +1,5 @@
-import "../engineer/ComplaintsHistory.css";
+// import "../engineer/ComplaintsHistory.css";
 import "../department/EngineerManage.css"
-
 import { useMemo, useState } from "react";
 
 import {
@@ -387,15 +386,20 @@ function DepartmentManagement() {
         </span>
     </td>
 
-    <td>
-        <button
-            onClick={() => toggleStatus(item.id)}
-        >
-            {item.status === "Active"
-                ? "Deactivate"
-                : "Activate"}
-        </button>
-    </td>
+   <td>
+  <button
+    className={
+      item.status === "Active"
+        ? "deactivate-btn"
+        : "activate-btn"
+    }
+    onClick={() => toggleStatus(item.id)}
+  >
+    {item.status === "Active"
+      ? "Deactivate"
+      : "Activate"}
+  </button>
+</td>
                   </tr>
 
                 ))

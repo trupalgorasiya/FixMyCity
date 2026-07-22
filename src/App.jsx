@@ -48,6 +48,7 @@ import MultiPointLocation from "./pages/MultiPointLocation";
 import AssignedComplaints from "./pages/engineer/AssignedComplaints";
 import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
 import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
+import TrackComplaints from "./pages/user/TrackComplaints";
 
 function App() {
   return (
@@ -79,6 +80,8 @@ function App() {
     <Route path="track" element={<ComplaintTracking/>}/>
     <Route path="report" element={<ReportComplaints/>}/>
     <Route path="notification" element={<NotificationPage/>} />
+    <Route path="complaint-tracking/:id" element={<TrackComplaints />}
+/>
 </Route>
 
 {/* Department */}

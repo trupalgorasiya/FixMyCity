@@ -218,3 +218,60 @@
   transform: none;
   box-shadow: none;
 }
+/* ==========================================================
+   ACTIVATE / DEACTIVATE BUTTON
+========================================================== */
+
+.activate-btn,
+.deactivate-btn {
+  min-width: 110px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+}
+
+/* Activate Button */
+
+.activate-btn {
+  background: #16a34a;
+}
+
+.activate-btn:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(22, 163, 74, 0.25);
+}
+
+/* Deactivate Button */
+
+.deactivate-btn {
+  background: #dc2626;
+}
+
+.deactivate-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(220, 38, 38, 0.25);
+}
+
+/* Click Effect */
+
+.activate-btn:active,
+.deactivate-btn:active {
+  transform: scale(0.96);
+}
+
+/* Disabled */
+
+.activate-btn:disabled,
+.deactivate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

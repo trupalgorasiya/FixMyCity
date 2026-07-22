@@ -1571,7 +1571,9 @@ select:focus-visible{
 
 
 
-
+.recharts-legend-wrapper{
+    padding-top:15px;
+}
 
 /* ==========================================================
    CHART CARD
@@ -1580,7 +1582,9 @@ select:focus-visible{
 
 .chart-card{
 
-
+min-height:420px;
+    display:flex;
+    flex-direction:column;
     background:#ffffff;
 
     border:1px solid #e5e7eb;

@@ -308,31 +308,37 @@
 .complaints-table th:nth-child(1),
 .complaints-table td:nth-child(1){
     width:140px;
+    text-align: center;
 }
 
 .complaints-table th:nth-child(2),
 .complaints-table td:nth-child(2){
     width:220px;
+    text-align: center;
 }
 
 .complaints-table th:nth-child(3),
 .complaints-table td:nth-child(3){
     width:190px;
+    text-align: center;
 }
 
 .complaints-table th:nth-child(4),
 .complaints-table td:nth-child(4){
     width:130px;
+    text-align: center; 
 }
 
 .complaints-table th:nth-child(5),
 .complaints-table td:nth-child(5){
     width:160px;
+    text-align: center;
 }
 
 .complaints-table th:nth-child(6),
 .complaints-table td:nth-child(6){
     width:140px;
+    text-align: center;
 }
 
 /* ==========================================

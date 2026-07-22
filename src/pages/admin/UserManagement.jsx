@@ -23,8 +23,7 @@ function UserInformation() {
       city: "Ahmedabad",
       registered: "10-Jul-2026",
       complaints: 12,
-      resolved: 10,
-      status: "Active",
+      resolved: 10
     },
     {
       id: "U002",
@@ -34,8 +33,7 @@ function UserInformation() {
       city: "Surat",
       registered: "12-Jul-2026",
       complaints: 8,
-      resolved: 6,
-      status: "Active",
+      resolved: 6
     },
     {
       id: "U003",
@@ -45,8 +43,7 @@ function UserInformation() {
       city: "Rajkot",
       registered: "15-Jul-2026",
       complaints: 5,
-      resolved: 4,
-      status: "Inactive",
+      resolved: 4
     },
     {
       id: "U004",
@@ -56,8 +53,7 @@ function UserInformation() {
       city: "Vadodara",
       registered: "17-Jul-2026",
       complaints: 18,
-      resolved: 15,
-      status: "Active",
+      resolved: 15
     },
     {
       id: "U005",
@@ -67,8 +63,7 @@ function UserInformation() {
       city: "Bhavnagar",
       registered: "18-Jul-2026",
       complaints: 3,
-      resolved: 2,
-      status: "Inactive",
+      resolved: 2
     },
     {
       id: "U006",
@@ -78,8 +73,7 @@ function UserInformation() {
       city: "Jamnagar",
       registered: "19-Jul-2026",
       complaints: 7,
-      resolved: 6,
-      status: "Active",
+      resolved: 6
     },
   ];
 
@@ -222,7 +216,6 @@ function UserInformation() {
                 <th>Registered On</th>
                 <th>Total Complaints</th>
                 <th>Resolved</th>
-                <th>Status</th>
               </tr>
             </thead>
 
@@ -248,18 +241,6 @@ function UserInformation() {
 
                     <td>{user.resolved}</td>
 
-                    <td>
-                      <span
-                        className={
-                          user.status === "Active"
-                            ? "status completed"
-                            : "status rejected"
-                        }
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-
                   </tr>
 
                 ))
@@ -283,7 +264,10 @@ function UserInformation() {
 
         </div>
 
-        {/* ===================================================== */}
+       
+
+      </div>
+ {/* ===================================================== */}
         {/* PAGINATION */}
         {/* ===================================================== */}
 
@@ -330,9 +314,6 @@ function UserInformation() {
           </div>
 
         )}
-
-      </div>
-
     </div>
   );
 }

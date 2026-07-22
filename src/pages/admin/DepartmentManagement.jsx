@@ -1,13 +1,11 @@
 import { useMemo, useState } from "react";
 import {
   FaSearch,
-  // FaBuilding,
-  // FaCheckCircle,
-  // FaTimesCircle,
-  // FaClock,
   FaPlus,
   FaEdit,
   FaTrash,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 import "./DepartmentManagement.css";
 
@@ -290,13 +288,7 @@ function DepartmentManagement() {
           </p>
         </div>
 
-        <button
-          className="primary-btn"
-          onClick={openAddModal}
-        >
-          <FaPlus />
-          <span>Add Department</span>
-        </button>
+       
 
       </div>
 
@@ -334,29 +326,29 @@ function DepartmentManagement() {
 
       <div className="toolbar">
 
-        <div className="search-box">
+  <div className="search-box">
+    <FaSearch />
 
-          <FaSearch />
+    <input
+      type="text"
+      placeholder="Search department..."
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        setCurrentPage(1);
+      }}
+    />
+  </div>
 
-          <input
-            type="text"
-            placeholder="Search department..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
-          />
-           <button
-          className="add-btn"
-          onClick={openAddModal}
-        >
-          + Add Engineer
-        </button>
+  <button
+    className="add-btn"
+    onClick={openAddModal}
+  >
+    <FaPlus />
+    <span>Add Department</span>
+  </button>
 
-        </div>
-
-      </div>
+</div>
 
       {/* ==========================================================
             TABLE CARD
@@ -470,75 +462,46 @@ function DepartmentManagement() {
 
       <div className="pagination-wrapper">
 
-        <div className="pagination-info">
+  <button
+    onClick={previousPage}
+    disabled={currentPage === 1}
+  >
+    <FaChevronLeft />
+    Previous
+  </button>
 
-          Showing{" "}
-          <strong>
-            {filteredDepartments.length === 0
-              ? 0
-              : indexOfFirstRow + 1}
-          </strong>
+  <div className="page-numbers">
 
-          {" "}to{" "}
+    {Array.from({ length: totalPages }, (_, index) => (
 
-          <strong>
-            {Math.min(
-              indexOfLastRow,
-              filteredDepartments.length
-            )}
-          </strong>
+      <button
+        key={index}
+        onClick={() => paginate(index + 1)}
+        className={
+          currentPage === index + 1
+            ? "active-page"
+            : ""
+        }
+      >
+        {index + 1}
+      </button>
 
-          {" "}of{" "}
+    ))}
 
-          <strong>{filteredDepartments.length}</strong>
+  </div>
 
-          {" "}Departments
+  <button
+    onClick={nextPage}
+    disabled={
+      currentPage === totalPages ||
+      totalPages === 0
+    }
+  >
+    Next
+    <FaChevronRight />
+  </button>
 
-        </div>
-
-        <div className="pagination">
-
-          <button
-            onClick={previousPage}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-
-          {Array.from(
-            { length: totalPages },
-            (_, index) => (
-
-              <button
-                key={index}
-                className={
-                  currentPage === index + 1
-                    ? "active"
-                    : ""
-                }
-                onClick={() =>
-                  paginate(index + 1)
-                }
-              >
-                {index + 1}
-              </button>
-
-            )
-          )}
-
-          <button
-            onClick={nextPage}
-            disabled={
-              currentPage === totalPages ||
-              totalPages === 0
-            }
-          >
-            Next
-          </button>
-
-        </div>
-
-      </div>
+</div>
        
       {/* ==========================================================
             ADD DEPARTMENT MODAL
@@ -604,20 +567,6 @@ function DepartmentManagement() {
                     required
                   />
                 </div>
-
-                <div className="form-group">
-                  <label>Department Head</label>
-                  <input
-                    type="text"
-                    name="head"
-                    value={formData.head}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-               
-
               </div>
 
               <div className="modal-footer">
