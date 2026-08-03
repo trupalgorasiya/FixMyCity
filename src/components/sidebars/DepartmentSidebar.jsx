@@ -3,6 +3,7 @@ import {
     FaHome,
     FaClipboardCheck,
     FaTasks,
+    FaComments,
     FaUsers,
     FaChartBar,
     FaUser,
@@ -36,6 +37,8 @@ function DepartmentSidebar() {
                         <li><NavLink to="/department/all-complaints"><FaTasks /><span>All Complaints</span></NavLink></li>
 
                         <li><NavLink to="/department/engineer-manage"><FaUsers /><span>Engineers</span></NavLink></li>
+
+                        <li><NavLink to="/department/view-feedback"><FaComments /><span>Feedback</span></NavLink></li>
 
                         <li><NavLink to="/department/department-report"><FaChartBar /><span>Reports</span></NavLink></li>
 

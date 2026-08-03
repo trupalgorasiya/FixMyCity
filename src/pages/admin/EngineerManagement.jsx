@@ -25,7 +25,7 @@ function EngineerManagement() {
   const [engineers, setEngineers] = useState([
     {
       id: "ENG001",
-      name: "Rahul Sharma",
+      name: "Rahul Patel",
       email: "rahul@gmail.com",
       mobile: "9876543210",
       department: "Road Department",
@@ -33,7 +33,7 @@ function EngineerManagement() {
     },
     {
       id: "ENG002",
-      name: "Amit Patel",
+      name: "Amit Sharma",
       email: "amit@gmail.com",
       mobile: "9876543211",
       department: "Water Department",
@@ -113,7 +113,8 @@ function EngineerManagement() {
 
   const [formData, setFormData] = useState({
     id: "",
-    name: "",
+    fname: "",
+    lname:"",
     email: "",
     mobile: "",
     department: "Road Department",
@@ -164,7 +165,8 @@ function EngineerManagement() {
 
     setFormData({
       id: "",
-      name: "",
+      fname: "",
+      lname:"",
       email: "",
       mobile: "",
       department: departments[0],
@@ -511,8 +513,16 @@ const nextPage = () => {
             <input
               type="text"
               name="name"
-              placeholder="Engineer Name"
-              value={formData.name}
+              placeholder="Engineer First Name"
+              value={formData.fname}
+              onChange={handleChange}
+              disabled={isEditMode}
+            />
+            <input
+              type="text"
+              name="name"
+              placeholder="Engineer Last Name"
+              value={formData.lname}
               onChange={handleChange}
               disabled={isEditMode}
             />

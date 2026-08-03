@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 import "./Navbar.css";
-import logo from "../../assets/vite.svg";
+import logo from "../../assets/logo.png"
+
 
 function Navbar() {
 
@@ -50,7 +51,7 @@ function Navbar() {
         <nav className="navbar">
             <div className="nav-logo">
                 <img src={logo} alt="Logo" />
-                <span>FixMyCity</span>
+              
             </div>
 
             <ul className="nav-links">

@@ -1,0 +1,199 @@
+/* ==========================================================
+   RATING STARS
+========================================================== */
+
+.rating-stars{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:3px;
+
+    color:#f59e0b;
+
+    font-size:15px;
+
+}
+
+
+
+.rating-number{
+
+    margin-left:8px;
+
+    color:#475569;
+
+    font-size:.82rem;
+
+    font-weight:600;
+
+}
+
+
+
+/* ==========================================================
+   LARGE RATING
+========================================================== */
+
+.large-stars{
+
+    justify-content:center;
+
+    font-size:30px;
+
+    margin-bottom:12px;
+
+}
+
+
+
+.rating-details{
+
+    background:#f8fafc;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+
+
+.rating-details h2{
+
+    margin:0;
+
+    color:#0f172a;
+
+    font-size:2rem;
+
+    font-weight:700;
+
+}
+
+
+
+/* ==========================================================
+   FEEDBACK MESSAGE
+========================================================== */
+
+.feedback-message{
+
+    max-width:320px;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    white-space:nowrap;
+
+    color:#475569;
+
+}
+
+
+
+/* ==========================================================
+   FEEDBACK BOX
+========================================================== */
+
+.feedback-box{
+
+    background:#f8fafc;
+
+    border:1px solid #e5e7eb;
+
+    border-radius:14px;
+
+    padding:20px;
+
+}
+
+
+
+.feedback-box p{
+
+    margin:0;
+
+    color:#334155;
+
+    line-height:1.8;
+
+    font-size:.95rem;
+
+}
+
+
+
+/* ==========================================================
+   VIEW BUTTON ICON
+========================================================== */
+
+.view-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+}
+
+
+
+/* ==========================================================
+   TABLE COLUMN WIDTH
+========================================================== */
+
+.table-container table{
+
+    min-width:1250px;
+
+}
+
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:768px){
+
+    .feedback-message{
+
+        max-width:180px;
+
+    }
+
+    .large-stars{
+
+        font-size:24px;
+
+    }
+
+    .rating-details h2{
+
+        font-size:1.6rem;
+
+    }
+
+}
+
+
+
+@media(max-width:480px){
+
+    .feedback-message{
+
+        max-width:120px;
+
+    }
+
+}

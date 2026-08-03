@@ -29,6 +29,8 @@ import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
 import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
 // import TrackComplaints from "./pages/user/TrackComplaints";
 import ComplaintTracking from "./pages/ComplaintTracking";
+import ViewFeedback from "./pages/admin/ViewFeedback";
+import ViewFeedbackDept from "./pages/department/ViewFeedbackDept";
 
 function AppRoutes() {
 
@@ -55,6 +57,7 @@ function AppRoutes() {
              <Route path="engineer-manage" element={<EngineerManage/>}/>
              <Route path="department-report" element={<DepartmentReport/>}/>
             <Route path="notification" element={<NotificationPage/>} />
+            <Route path="view-feedback" element={<ViewFeedbackDept/>}/>
              
              </Route>
 
@@ -78,6 +81,7 @@ function AppRoutes() {
              <Route path="complaint-manage" element={<ComplaintManagement/>}></Route>
              <Route path="report" element={<Report/>}></Route>
              <Route path="notification" element={<NotificationPage/>} />
+             <Route path="viewfeedback" element={<ViewFeedback/>}/>
              </Route>
 
         </Routes>

@@ -543,7 +543,7 @@
 
 .modal input,
 .modal select{
-    width:100%;
+    width:45%;
     height:50px;
     margin-bottom:18px;
     padding:0 16px;
@@ -554,6 +554,7 @@
     font-size:15px;
     outline:none;
     transition:.25s ease;
+    margin-right: 25px;
     box-sizing:border-box;
 }
 

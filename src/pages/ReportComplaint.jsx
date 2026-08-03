@@ -19,6 +19,7 @@ function ReportComplaint() {
     pincode: "",
     latitude: "",
     longitude: "",
+    title:"",
     images: [],
     confirm: false,
   });
@@ -193,7 +194,16 @@ const handleVerified = async () => {
               />
             </div>
           )}
-          
+          <div className="form-group">
+            <label>Enter Title</label>
+
+            <input
+              name="description"
+              placeholder="Write Title ..."
+              value={formData.title}
+              onChange={handleChange}
+            />
+          </div>
 
           <div className="form-group">
             <label>Description</label>
