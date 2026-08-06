@@ -59,6 +59,8 @@ function Navbar() {
                 <li><Link to="/about">About Us</Link></li>
                 <li><Link to="/faqs">FAQs</Link></li>
                 <li><Link to="/contact">Contact Us</Link></li>
+                <li><Link to="/engineerrequest">Career</Link></li>
+
             </ul>
             {
                 isLoggedIn ?
