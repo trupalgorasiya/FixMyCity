@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from "react";
 import {
     FaSearch,
@@ -17,204 +16,120 @@ import {
     FaGraduationCap,
     FaBriefcase,
     FaFileAlt,
-    
-    FaPowerOff
+    FaDownload,
 } from "react-icons/fa";
-import "./EngineerManagement.css";
+import "./EngineerRequests.css";
 
-const EngineerManagement = () => {
+const EngineerRequests = () => {
 
     /* ==========================================================
        ENGINEER APPLICATION DATA
     ========================================================== */
 
-    const [engineers, setEngineers] = useState([
+    const [applications, setApplications] = useState([
         {
-            applicationId: "REQ-1001",
+            id: "REQ-1001",
             engineerId: "ENG-2001",
-
             firstName: "Amit",
             lastName: "Patel",
-
             email: "amit.patel@gmail.com",
             mobile: "9876543210",
-
             branch: "Civil Engineering",
             qualification: "B.E.",
             experience: "3",
-
             department: "Road & Infrastructure Department",
-            role: "Engineer",
-
-            photo: "/documents/amit.jpg",
-            degreeCertificate: "/documents/amit-degree.pdf",
-            experienceCertificate: "/documents/amit-experience.pdf",
-
-            applicationStatus: "Pending",
-            accountStatus: "Inactive",
-
             appliedDate: "07 Aug 2026",
-            reviewedDate: null,
-            reviewedBy: null,
-
-            rejectionReason: ""
+            status: "Pending",
+            photo: "/FixMyCity/public/amit.jpg",
+            degree: "/FixMyCity/public/amit-degree.jpeg",
+            experienceCertificate: "/FixMyCity/public/experienceLatter.png",
         },
-
         {
-            applicationId: "REQ-1002",
+            id: "REQ-1002",
             engineerId: "ENG-2002",
-
             firstName: "Jay",
             lastName: "Mehta",
-
             email: "jay.mehta@gmail.com",
             mobile: "9876543211",
-
             branch: "Mechanical Engineering",
             qualification: "B.Tech",
             experience: "2",
-
             department: "Water Department",
-            role: "Engineer",
-
-            photo: "/documents/jay.jpg",
-            degreeCertificate: "/documents/jay-degree.pdf",
-            experienceCertificate: "",
-
-            applicationStatus: "Pending",
-            accountStatus: "Inactive",
-
             appliedDate: "06 Aug 2026",
-            reviewedDate: null,
-            reviewedBy: null,
-
-            rejectionReason: ""
+            status: "Pending",
+            photo: "jay.jpg",
+            degree: "jay-degree.pdf",
+            experienceCertificate: null,
         },
-
         {
-            applicationId: "REQ-1003",
+            id: "REQ-1003",
             engineerId: "ENG-2003",
-
             firstName: "Priya",
             lastName: "Shah",
-
             email: "priya.shah@gmail.com",
             mobile: "9876543212",
-
             branch: "Electrical Engineering",
             qualification: "M.Tech",
             experience: "4",
-
             department: "Electricity Department",
-            role: "Engineer",
-
-            photo: "/documents/priya.jpg",
-            degreeCertificate: "/documents/priya-degree.pdf",
-            experienceCertificate: "/documents/priya-experience.pdf",
-
-            applicationStatus: "Approved",
-            accountStatus: "Active",
-
             appliedDate: "05 Aug 2026",
-            reviewedDate: "05 Aug 2026",
-            reviewedBy: "Super Admin",
-
-            rejectionReason: ""
+            status: "Approved",
+            photo: "priya.jpg",
+            degree: "priya-degree.pdf",
+            experienceCertificate: "priya-experience.pdf",
         },
-
         {
-            applicationId: "REQ-1004",
+            id: "REQ-1004",
             engineerId: "ENG-2004",
-
             firstName: "Rakesh",
             lastName: "Patel",
-
             email: "rakesh.patel@gmail.com",
             mobile: "9876543213",
-
             branch: "Environmental Engineering",
             qualification: "M.E.",
             experience: "5",
-
             department: "Environment Department",
-            role: "Engineer",
-
-            photo: "/documents/rakesh.jpg",
-            degreeCertificate: "/documents/rakesh-degree.pdf",
-            experienceCertificate: "/documents/rakesh-experience.pdf",
-
-            applicationStatus: "Rejected",
-            accountStatus: "Inactive",
-
             appliedDate: "04 Aug 2026",
-            reviewedDate: "04 Aug 2026",
-            reviewedBy: "Super Admin",
-
-            rejectionReason:
-                "Experience certificate could not be verified."
+            status: "Rejected",
+            photo: "rakesh.jpg",
+            degree: "rakesh-degree.pdf",
+            experienceCertificate: "rakesh-experience.pdf",
+            rejectionReason: "Experience certificate could not be verified.",
         },
-
         {
-            applicationId: "REQ-1005",
+            id: "REQ-1005",
             engineerId: "ENG-2005",
-
             firstName: "Hardik",
             lastName: "Shah",
-
             email: "hardik.shah@gmail.com",
             mobile: "9876543214",
-
             branch: "Computer Engineering",
             qualification: "B.Tech",
             experience: "1",
-
             department: "IT & Smart City Department",
-            role: "Engineer",
-
-            photo: "/documents/hardik.jpg",
-            degreeCertificate: "/documents/hardik-degree.pdf",
-            experienceCertificate: "",
-
-            applicationStatus: "Pending",
-            accountStatus: "Inactive",
-
             appliedDate: "03 Aug 2026",
-            reviewedDate: null,
-            reviewedBy: null,
-
-            rejectionReason: ""
+            status: "Pending",
+            photo: "hardik.jpg",
+            degree: "hardik-degree.pdf",
+            experienceCertificate: null,
         },
-
         {
-            applicationId: "REQ-1006",
+            id: "REQ-1006",
             engineerId: "ENG-2006",
-
             firstName: "Nilesh",
             lastName: "Patel",
-
             email: "nilesh.patel@gmail.com",
             mobile: "9876543215",
-
             branch: "Civil Engineering",
             qualification: "Diploma",
             experience: "6",
-
             department: "Road & Infrastructure Department",
-            role: "Engineer",
-
-            photo: "/documents/nilesh.jpg",
-            degreeCertificate: "/documents/nilesh-degree.pdf",
-            experienceCertificate: "/documents/nilesh-experience.pdf",
-
-            applicationStatus: "Approved",
-            accountStatus: "Active",
-
             appliedDate: "02 Aug 2026",
-            reviewedDate: "02 Aug 2026",
-            reviewedBy: "Super Admin",
-
-            rejectionReason: ""
-        }
+            status: "Approved",
+            photo: "nilesh.jpg",
+            degree: "nilesh-degree.pdf",
+            experienceCertificate: "nilesh-experience.pdf",
+        },
     ]);
 
     /* ==========================================================
@@ -222,224 +137,129 @@ const EngineerManagement = () => {
     ========================================================== */
 
     const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [departmentFilter, setDepartmentFilter] = useState("All");
 
-    const [statusFilter, setStatusFilter] =
-        useState("All");
-
-    const [departmentFilter, setDepartmentFilter] =
-        useState("All");
-
-    const [currentPage, setCurrentPage] =
-        useState(1);
-
-    const [selectedEngineer, setSelectedEngineer] =
-        useState(null);
-
-    const [showReviewModal, setShowReviewModal] =
-        useState(false);
-
-    const [showRejectModal, setShowRejectModal] =
-        useState(false);
-
-    const [rejectionReason, setRejectionReason] =
-        useState("");
-
+    const [currentPage, setCurrentPage] = useState(1);
     const applicationsPerPage = 5;
+
+    const [selectedApplication, setSelectedApplication] = useState(null);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+
+    const [showRejectModal, setShowRejectModal] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState("");
 
     /* ==========================================================
        STATISTICS
     ========================================================== */
 
-    const totalApplications =
-        engineers.length;
+    const totalApplications = applications.length;
 
-    const pendingApplications =
-        engineers.filter(
-            (engineer) =>
-                engineer.applicationStatus === "Pending"
-        ).length;
+    const pendingApplications = applications.filter(
+        (item) => item.status === "Pending"
+    ).length;
 
-    const approvedApplications =
-        engineers.filter(
-            (engineer) =>
-                engineer.applicationStatus === "Approved"
-        ).length;
+    const approvedApplications = applications.filter(
+        (item) => item.status === "Approved"
+    ).length;
 
-    const rejectedApplications =
-        engineers.filter(
-            (engineer) =>
-                engineer.applicationStatus === "Rejected"
-        ).length;
-
-    // const activeEngineers =
-    //     engineers.filter(
-    //         (engineer) =>
-    //             engineer.accountStatus === "Active"
-    //     ).length;
+    const rejectedApplications = applications.filter(
+        (item) => item.status === "Rejected"
+    ).length;
 
     /* ==========================================================
-       DEPARTMENTS
+       DEPARTMENT LIST
     ========================================================== */
 
     const departments = [
-        ...new Set(
-            engineers.map(
-                (engineer) =>
-                    engineer.department
-            )
-        )
+        ...new Set(applications.map((item) => item.department)),
     ];
 
     /* ==========================================================
-       SEARCH + FILTER
+       FILTER APPLICATIONS
     ========================================================== */
 
-    const filteredEngineers = useMemo(() => {
+    const filteredApplications = useMemo(() => {
 
-        const keyword =
-            search.toLowerCase().trim();
+        const keyword = search.toLowerCase();
 
-        return engineers.filter(
-            (engineer) => {
+        return applications.filter((item) => {
 
-                const fullName =
-                    `${engineer.firstName} ${engineer.lastName}`
-                        .toLowerCase();
+            const matchesSearch =
+                item.id.toLowerCase().includes(keyword) ||
+                item.engineerId.toLowerCase().includes(keyword) ||
+                `${item.firstName} ${item.lastName}`
+                    .toLowerCase()
+                    .includes(keyword) ||
+                item.email.toLowerCase().includes(keyword) ||
+                item.mobile.includes(keyword);
 
-                const matchesSearch =
-                    engineer.applicationId
-                        .toLowerCase()
-                        .includes(keyword) ||
+            const matchesStatus =
+                statusFilter === "All" ||
+                item.status === statusFilter;
 
-                    engineer.engineerId
-                        .toLowerCase()
-                        .includes(keyword) ||
+            const matchesDepartment =
+                departmentFilter === "All" ||
+                item.department === departmentFilter;
 
-                    fullName.includes(keyword) ||
-
-                    engineer.email
-                        .toLowerCase()
-                        .includes(keyword) ||
-
-                    engineer.mobile
-                        .includes(keyword);
-
-                const matchesStatus =
-                    statusFilter === "All" ||
-                    engineer.applicationStatus ===
-                        statusFilter;
-
-                const matchesDepartment =
-                    departmentFilter === "All" ||
-                    engineer.department ===
-                        departmentFilter;
-
-                return (
-                    matchesSearch &&
-                    matchesStatus &&
-                    matchesDepartment
-                );
-            }
-        );
+            return (
+                matchesSearch &&
+                matchesStatus &&
+                matchesDepartment
+            );
+        });
 
     }, [
-        engineers,
+        applications,
         search,
         statusFilter,
-        departmentFilter
+        departmentFilter,
     ]);
 
     /* ==========================================================
        PAGINATION
     ========================================================== */
 
-    const totalPages =
-        Math.ceil(
-            filteredEngineers.length /
-                applicationsPerPage
+    const totalPages = Math.ceil(
+        filteredApplications.length / applicationsPerPage
+    );
+
+    const indexOfLastApplication =
+        currentPage * applicationsPerPage;
+
+    const indexOfFirstApplication =
+        indexOfLastApplication - applicationsPerPage;
+
+    const currentApplications =
+        filteredApplications.slice(
+            indexOfFirstApplication,
+            indexOfLastApplication
         );
 
-    const lastIndex =
-        currentPage *
-        applicationsPerPage;
-
-    const firstIndex =
-        lastIndex -
-        applicationsPerPage;
-
-    const currentEngineers =
-        filteredEngineers.slice(
-            firstIndex,
-            lastIndex
-        );
-
-    const goToNextPage = () => {
+    const nextPage = () => {
 
         if (currentPage < totalPages) {
-            setCurrentPage(
-                (previous) =>
-                    previous + 1
-            );
+            setCurrentPage((prev) => prev + 1);
         }
 
     };
 
-    const goToPreviousPage = () => {
+    const previousPage = () => {
 
         if (currentPage > 1) {
-            setCurrentPage(
-                (previous) =>
-                    previous - 1
-            );
+            setCurrentPage((prev) => prev - 1);
         }
 
     };
 
     /* ==========================================================
-       RESET PAGE
+       OPEN REVIEW
     ========================================================== */
 
-    const resetPage = () => {
-        setCurrentPage(1);
-    };
+    const openReview = (application) => {
 
-    /* ==========================================================
-       OPEN APPLICATION
-    ========================================================== */
-
-    const openReview = (engineer) => {
-
-        setSelectedEngineer(engineer);
+        setSelectedApplication(application);
         setShowReviewModal(true);
-
-    };
-
-    /* ==========================================================
-       CLOSE REVIEW
-    ========================================================== */
-
-    const closeReview = () => {
-
-        setShowReviewModal(false);
-        setSelectedEngineer(null);
-
-    };
-
-    /* ==========================================================
-       OPEN DOCUMENT
-    ========================================================== */
-
-    const openDocument = (fileUrl) => {
-
-        if (!fileUrl) {
-            return;
-        }
-
-        window.open(
-            fileUrl,
-            "_blank",
-            "noopener,noreferrer"
-        );
 
     };
 
@@ -449,66 +269,25 @@ const EngineerManagement = () => {
 
     const approveApplication = () => {
 
-        if (!selectedEngineer) {
+        if (!selectedApplication) {
             return;
         }
 
-        const reviewedDate =
-            new Date().toLocaleDateString(
-                "en-GB",
-                {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric"
-                }
-            );
-
-        setEngineers(
-            (previousEngineers) =>
-                previousEngineers.map(
-                    (engineer) =>
-                        engineer.applicationId ===
-                        selectedEngineer.applicationId
-                            ? {
-                                ...engineer,
-
-                                applicationStatus:
-                                    "Approved",
-
-                                accountStatus:
-                                    "Active",
-
-                                reviewedDate,
-
-                                reviewedBy:
-                                    "Super Admin",
-
-                                rejectionReason:
-                                    ""
-                            }
-                            : engineer
-                )
+        setApplications((prev) =>
+            prev.map((application) =>
+                application.id === selectedApplication.id
+                    ? {
+                        ...application,
+                        status: "Approved",
+                    }
+                    : application
+            )
         );
 
-        setSelectedEngineer(
-            (previous) => ({
-                ...previous,
-
-                applicationStatus:
-                    "Approved",
-
-                accountStatus:
-                    "Active",
-
-                reviewedDate,
-
-                reviewedBy:
-                    "Super Admin",
-
-                rejectionReason:
-                    ""
-            })
-        );
+        setSelectedApplication((prev) => ({
+            ...prev,
+            status: "Approved",
+        }));
 
     };
 
@@ -524,139 +303,45 @@ const EngineerManagement = () => {
     };
 
     /* ==========================================================
-       CLOSE REJECT MODAL
-    ========================================================== */
-
-    const closeRejectModal = () => {
-
-        setShowRejectModal(false);
-        setRejectionReason("");
-
-    };
-
-    /* ==========================================================
        REJECT APPLICATION
     ========================================================== */
 
     const rejectApplication = () => {
 
-        if (
-            !selectedEngineer ||
-            !rejectionReason.trim()
-        ) {
+        if (!selectedApplication || !rejectionReason.trim()) {
             return;
         }
 
-        const reviewedDate =
-            new Date().toLocaleDateString(
-                "en-GB",
-                {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric"
-                }
-            );
-
-        const reason =
-            rejectionReason.trim();
-
-        setEngineers(
-            (previousEngineers) =>
-                previousEngineers.map(
-                    (engineer) =>
-                        engineer.applicationId ===
-                        selectedEngineer.applicationId
-                            ? {
-                                ...engineer,
-
-                                applicationStatus:
-                                    "Rejected",
-
-                                accountStatus:
-                                    "Inactive",
-
-                                reviewedDate,
-
-                                reviewedBy:
-                                    "Super Admin",
-
-                                rejectionReason:
-                                    reason
-                            }
-                            : engineer
-                )
+        setApplications((prev) =>
+            prev.map((application) =>
+                application.id === selectedApplication.id
+                    ? {
+                        ...application,
+                        status: "Rejected",
+                        rejectionReason:
+                            rejectionReason.trim(),
+                    }
+                    : application
+            )
         );
 
-        setSelectedEngineer(
-            (previous) => ({
-                ...previous,
+        setSelectedApplication((prev) => ({
+            ...prev,
+            status: "Rejected",
+            rejectionReason:
+                rejectionReason.trim(),
+        }));
 
-                applicationStatus:
-                    "Rejected",
-
-                accountStatus:
-                    "Inactive",
-
-                reviewedDate,
-
-                reviewedBy:
-                    "Super Admin",
-
-                rejectionReason:
-                    reason
-            })
-        );
-
-        closeRejectModal();
+        setShowRejectModal(false);
 
     };
 
     /* ==========================================================
-       ACTIVATE / DEACTIVATE APPROVED ENGINEER
+       RESET PAGE WHEN FILTER CHANGES
     ========================================================== */
 
-    const toggleAccountStatus = () => {
-
-        if (!selectedEngineer) {
-            return;
-        }
-
-        if (
-            selectedEngineer.applicationStatus !==
-            "Approved"
-        ) {
-            return;
-        }
-
-        const newStatus =
-            selectedEngineer.accountStatus ===
-            "Active"
-                ? "Inactive"
-                : "Active";
-
-        setEngineers(
-            (previousEngineers) =>
-                previousEngineers.map(
-                    (engineer) =>
-                        engineer.applicationId ===
-                        selectedEngineer.applicationId
-                            ? {
-                                ...engineer,
-                                accountStatus:
-                                    newStatus
-                            }
-                            : engineer
-                )
-        );
-
-        setSelectedEngineer(
-            (previous) => ({
-                ...previous,
-                accountStatus:
-                    newStatus
-            })
-        );
-
+    const resetPage = () => {
+        setCurrentPage(1);
     };
 
     /* ==========================================================
@@ -664,10 +349,10 @@ const EngineerManagement = () => {
     ========================================================== */
 
     return (
-        <div className="engineer-request-page">
+        <div className="engineer-request-pages">
 
             {/* ==================================================
-               PAGE HEADER
+                PAGE HEADER
             ================================================== */}
 
             <div className="engineer-request-header">
@@ -679,17 +364,12 @@ const EngineerManagement = () => {
                     </div>
 
                     <div>
-
-                        <h1>
-                            Engineer Management
-                        </h1>
+                        <h1>Engineer Applications</h1>
 
                         <p>
-                            Review engineer applications,
-                            manage approvals and control
-                            engineer access.
+                            Review engineer applications submitted
+                            for department assignment.
                         </p>
-
                     </div>
 
                 </div>
@@ -697,7 +377,7 @@ const EngineerManagement = () => {
             </div>
 
             {/* ==================================================
-               STATISTICS
+                STATISTICS
             ================================================== */}
 
             <div className="request-stat-grid">
@@ -709,15 +389,8 @@ const EngineerManagement = () => {
                     </div>
 
                     <div>
-
-                        <span>
-                            Total Applications
-                        </span>
-
-                        <strong>
-                            {totalApplications}
-                        </strong>
-
+                        <span>Total Applications</span>
+                        <strong>{totalApplications}</strong>
                     </div>
 
                 </div>
@@ -729,15 +402,8 @@ const EngineerManagement = () => {
                     </div>
 
                     <div>
-
-                        <span>
-                            Pending Review
-                        </span>
-
-                        <strong>
-                            {pendingApplications}
-                        </strong>
-
+                        <span>Pending Review</span>
+                        <strong>{pendingApplications}</strong>
                     </div>
 
                 </div>
@@ -749,15 +415,8 @@ const EngineerManagement = () => {
                     </div>
 
                     <div>
-
-                        <span>
-                            Approved
-                        </span>
-
-                        <strong>
-                            {approvedApplications}
-                        </strong>
-
+                        <span>Approved</span>
+                        <strong>{approvedApplications}</strong>
                     </div>
 
                 </div>
@@ -769,15 +428,8 @@ const EngineerManagement = () => {
                     </div>
 
                     <div>
-
-                        <span>
-                            Rejected
-                        </span>
-
-                        <strong>
-                            {rejectedApplications}
-                        </strong>
-
+                        <span>Rejected</span>
+                        <strong>{rejectedApplications}</strong>
                     </div>
 
                 </div>
@@ -785,38 +437,7 @@ const EngineerManagement = () => {
             </div>
 
             {/* ==================================================
-               ACTIVE ENGINEER SUMMARY
-            ================================================== */}
-
-            {/* <div className="active-engineer-summary">
-
-                <div>
-
-                    <div className="active-summary-icon">
-                        <FaCheckCircle />
-                    </div>
-
-                    <div>
-
-                       
-                        <strong>
-                            {activeEngineers}
-                        </strong>
-
-                    </div>
-
-                </div>
-
-                <p>
-                    Approved engineers can receive
-                    department complaints and work
-                    assignments.
-                </p>
-
-            </div> */}
-
-            {/* ==================================================
-               SEARCH + FILTER
+                TOOLBAR
             ================================================== */}
 
             <div className="request-toolbar">
@@ -827,16 +448,11 @@ const EngineerManagement = () => {
 
                     <input
                         type="text"
-                        placeholder="Search request ID, engineer name, email or mobile..."
+                        placeholder="Search ID, name, email or mobile..."
                         value={search}
-                        onChange={(event) => {
-
-                            setSearch(
-                                event.target.value
-                            );
-
+                        onChange={(e) => {
+                            setSearch(e.target.value);
                             resetPage();
-
                         }}
                     />
 
@@ -846,17 +462,11 @@ const EngineerManagement = () => {
 
                     <select
                         value={statusFilter}
-                        onChange={(event) => {
-
-                            setStatusFilter(
-                                event.target.value
-                            );
-
+                        onChange={(e) => {
+                            setStatusFilter(e.target.value);
                             resetPage();
-
                         }}
                     >
-
                         <option value="All">
                             All Status
                         </option>
@@ -877,14 +487,9 @@ const EngineerManagement = () => {
 
                     <select
                         value={departmentFilter}
-                        onChange={(event) => {
-
-                            setDepartmentFilter(
-                                event.target.value
-                            );
-
+                        onChange={(e) => {
+                            setDepartmentFilter(e.target.value);
                             resetPage();
-
                         }}
                     >
 
@@ -892,18 +497,14 @@ const EngineerManagement = () => {
                             All Departments
                         </option>
 
-                        {departments.map(
-                            (department) => (
-
-                                <option
-                                    key={department}
-                                    value={department}
-                                >
-                                    {department}
-                                </option>
-
-                            )
-                        )}
+                        {departments.map((department) => (
+                            <option
+                                key={department}
+                                value={department}
+                            >
+                                {department}
+                            </option>
+                        ))}
 
                     </select>
 
@@ -912,7 +513,7 @@ const EngineerManagement = () => {
             </div>
 
             {/* ==================================================
-               APPLICATION TABLE
+                APPLICATION TABLE
             ================================================== */}
 
             <div className="request-card">
@@ -920,21 +521,16 @@ const EngineerManagement = () => {
                 <div className="request-card-header">
 
                     <div>
-
-                        <h2>
-                            Engineer Applications
-                        </h2>
+                        <h2>Engineer Request List</h2>
 
                         <p>
-                            Review submitted applications
-                            before assigning engineers
-                            to departments.
+                            Review and manage submitted engineer
+                            applications.
                         </p>
-
                     </div>
 
                     <span className="result-count">
-                        {filteredEngineers.length} Applications
+                        {filteredApplications.length} Applications
                     </span>
 
                 </div>
@@ -947,41 +543,21 @@ const EngineerManagement = () => {
 
                             <tr>
 
-                                <th>
-                                    Request ID
-                                </th>
+                                <th>Request ID</th>
 
-                                <th>
-                                    Engineer
-                                </th>
+                                <th>Engineer</th>
 
-                                <th>
-                                    Department
-                                </th>
+                                <th>Department</th>
 
-                                <th>
-                                    Qualification
-                                </th>
+                                <th>Qualification</th>
 
-                                <th>
-                                    Experience
-                                </th>
+                                <th>Experience</th>
 
-                                <th>
-                                    Applied Date
-                                </th>
+                                <th>Applied Date</th>
 
-                                <th>
-                                    Application
-                                </th>
+                                <th>Status</th>
 
-                                <th>
-                                    Account
-                                </th>
-
-                                <th>
-                                    Action
-                                </th>
+                                <th>Action</th>
 
                             </tr>
 
@@ -989,13 +565,12 @@ const EngineerManagement = () => {
 
                         <tbody>
 
-                            {currentEngineers.length ===
-                            0 ? (
+                            {currentApplications.length === 0 ? (
 
                                 <tr>
 
                                     <td
-                                        colSpan="9"
+                                        colSpan="8"
                                         className="request-empty"
                                     >
                                         No engineer applications
@@ -1006,12 +581,12 @@ const EngineerManagement = () => {
 
                             ) : (
 
-                                currentEngineers.map(
-                                    (engineer) => (
+                                currentApplications.map(
+                                    (application) => (
 
                                         <tr
                                             key={
-                                                engineer.applicationId
+                                                application.id
                                             }
                                         >
 
@@ -1019,15 +594,9 @@ const EngineerManagement = () => {
 
                                                 <span className="request-id">
                                                     {
-                                                        engineer.applicationId
+                                                        application.id
                                                     }
                                                 </span>
-
-                                                <small className="table-secondary-id">
-                                                    {
-                                                        engineer.engineerId
-                                                    }
-                                                </small>
 
                                             </td>
 
@@ -1036,35 +605,32 @@ const EngineerManagement = () => {
                                                 <div className="engineer-name-cell">
 
                                                     <div className="engineer-avatar">
-
                                                         {
-                                                            engineer.firstName.charAt(
+                                                            application.firstName.charAt(
                                                                 0
                                                             )
                                                         }
-
                                                         {
-                                                            engineer.lastName.charAt(
+                                                            application.lastName.charAt(
                                                                 0
                                                             )
                                                         }
-
                                                     </div>
 
                                                     <div>
 
                                                         <strong>
                                                             {
-                                                                engineer.firstName
+                                                                application.firstName
                                                             }{" "}
                                                             {
-                                                                engineer.lastName
+                                                                application.lastName
                                                             }
                                                         </strong>
 
                                                         <small>
                                                             {
-                                                                engineer.email
+                                                                application.engineerId
                                                             }
                                                         </small>
 
@@ -1082,7 +648,7 @@ const EngineerManagement = () => {
 
                                                     <span>
                                                         {
-                                                            engineer.department
+                                                            application.department
                                                         }
                                                     </span>
 
@@ -1092,55 +658,30 @@ const EngineerManagement = () => {
 
                                             <td>
                                                 {
-                                                    engineer.qualification
+                                                    application.qualification
                                                 }
                                             </td>
 
                                             <td>
                                                 {
-                                                    engineer.experience
+                                                    application.experience
                                                 }{" "}
                                                 Years
                                             </td>
 
                                             <td>
                                                 {
-                                                    engineer.appliedDate
+                                                    application.appliedDate
                                                 }
                                             </td>
 
                                             <td>
 
                                                 <span
-                                                    className={`request-status ${engineer.applicationStatus.toLowerCase()}`}
+                                                    className={`request-status ${application.status.toLowerCase()}`}
                                                 >
-                                                    {
-                                                        engineer.applicationStatus
-                                                    }
+                                                    {application.status}
                                                 </span>
-
-                                            </td>
-
-                                            <td>
-
-                                                {engineer.applicationStatus ===
-                                                    "Approved" ? (
-
-                                                    <span
-                                                        className={`account-status ${engineer.accountStatus.toLowerCase()}`}
-                                                    >
-                                                        {
-                                                            engineer.accountStatus
-                                                        }
-                                                    </span>
-
-                                                ) : (
-
-                                                    <span className="account-status inactive">
-                                                        Inactive
-                                                    </span>
-
-                                                )}
 
                                             </td>
 
@@ -1150,18 +691,12 @@ const EngineerManagement = () => {
                                                     className="review-btn"
                                                     onClick={() =>
                                                         openReview(
-                                                            engineer
+                                                            application
                                                         )
                                                     }
                                                 >
-
                                                     <FaEye />
-
-                                                    {engineer.applicationStatus ===
-                                                    "Pending"
-                                                        ? "Review"
-                                                        : "View"}
-
+                                                    Review
                                                 </button>
 
                                             </td>
@@ -1182,26 +717,19 @@ const EngineerManagement = () => {
             </div>
 
             {/* ==================================================
-               PAGINATION
+                PAGINATION
             ================================================== */}
-          <div className="pagination-wrapper">
+
             {totalPages > 1 && (
 
-                <div className="pagination">
+                <div className="request-pagination">
 
                     <button
-                        onClick={
-                            goToPreviousPage
-                        }
-                        disabled={
-                            currentPage === 1
-                        }
+                        onClick={previousPage}
+                        disabled={currentPage === 1}
                     >
-
                         <FaChevronLeft />
-
                         Previous
-
                     </button>
 
                     <div>
@@ -1232,43 +760,37 @@ const EngineerManagement = () => {
                     </div>
 
                     <button
-                        onClick={
-                            goToNextPage
-                        }
+                        onClick={nextPage}
                         disabled={
-                            currentPage ===
-                            totalPages
+                            currentPage === totalPages
                         }
                     >
-
                         Next
-
                         <FaChevronRight />
-
                     </button>
 
                 </div>
 
             )}
-</div>
+
             {/* ==================================================
-               REVIEW MODAL
+                REVIEW APPLICATION MODAL
             ================================================== */}
 
             {showReviewModal &&
-                selectedEngineer && (
+                selectedApplication && (
 
                     <div
                         className="review-overlay"
-                        onClick={
-                            closeReview
+                        onClick={() =>
+                            setShowReviewModal(false)
                         }
                     >
 
                         <div
                             className="review-modal"
-                            onClick={(event) =>
-                                event.stopPropagation()
+                            onClick={(e) =>
+                                e.stopPropagation()
                             }
                         >
 
@@ -1283,15 +805,17 @@ const EngineerManagement = () => {
                                     </span>
 
                                     <h2>
-                                        Application Review
+                                        Review Application
                                     </h2>
 
                                 </div>
 
                                 <button
                                     className="review-close"
-                                    onClick={
-                                        closeReview
+                                    onClick={() =>
+                                        setShowReviewModal(
+                                            false
+                                        )
                                     }
                                 >
                                     <FaTimes />
@@ -1306,79 +830,65 @@ const EngineerManagement = () => {
                                 {/* APPLICATION STATUS */}
 
                                 <div
-                                    className={`application-status-banner ${selectedEngineer.applicationStatus.toLowerCase()}`}
+                                    className={`application-status-banner ${selectedApplication.status.toLowerCase()}`}
                                 >
 
-                                    {selectedEngineer.applicationStatus ===
+                                    {selectedApplication.status ===
                                         "Pending" && (
                                         <>
                                             <FaClock />
-
                                             <div>
-
                                                 <strong>
                                                     Application
                                                     Pending
                                                 </strong>
-
                                                 <span>
                                                     This application
                                                     is waiting for
-                                                    administrator
-                                                    review.
+                                                    admin review.
                                                 </span>
-
                                             </div>
                                         </>
                                     )}
 
-                                    {selectedEngineer.applicationStatus ===
+                                    {selectedApplication.status ===
                                         "Approved" && (
                                         <>
                                             <FaCheckCircle />
-
                                             <div>
-
                                                 <strong>
                                                     Application
                                                     Approved
                                                 </strong>
-
                                                 <span>
-                                                    This engineer has
-                                                    been approved for
-                                                    department work.
+                                                    This engineer
+                                                    has been approved.
                                                 </span>
-
                                             </div>
                                         </>
                                     )}
 
-                                    {selectedEngineer.applicationStatus ===
+                                    {selectedApplication.status ===
                                         "Rejected" && (
                                         <>
                                             <FaTimesCircle />
-
                                             <div>
-
                                                 <strong>
                                                     Application
                                                     Rejected
                                                 </strong>
-
                                                 <span>
-                                                    This application
-                                                    was rejected by
-                                                    the administrator.
+                                                    This engineer
+                                                    application was
+                                                    rejected.
                                                 </span>
-
                                             </div>
                                         </>
                                     )}
 
                                 </div>
 
-                                {/* PERSONAL INFORMATION */}
+                                {/* BASIC INFORMATION */}
 
                                 <div className="review-section">
 
@@ -1387,16 +897,14 @@ const EngineerManagement = () => {
                                         <FaUserTie />
 
                                         <div>
-
                                             <h3>
                                                 Personal Information
                                             </h3>
 
                                             <p>
-                                                Applicant identity
-                                                and contact details
+                                                Engineer's basic
+                                                application details
                                             </p>
-
                                         </div>
 
                                     </div>
@@ -1405,42 +913,30 @@ const EngineerManagement = () => {
 
                                         <div className="profile-photo">
 
-                                            {
-                                                selectedEngineer.firstName.charAt(
-                                                    0
-                                                )
-                                            }
-
-                                            {
-                                                selectedEngineer.lastName.charAt(
-                                                    0
-                                                )
-                                            }
+                                            {selectedApplication.firstName.charAt(
+                                                0
+                                            )}
+                                            {selectedApplication.lastName.charAt(
+                                                0
+                                            )}
 
                                         </div>
 
                                         <div className="profile-name">
 
                                             <h2>
-
                                                 {
-                                                    selectedEngineer.firstName
+                                                    selectedApplication.firstName
                                                 }{" "}
-
                                                 {
-                                                    selectedEngineer.lastName
+                                                    selectedApplication.lastName
                                                 }
-
                                             </h2>
 
                                             <span>
-
-                                                Engineer ID:{" "}
-
                                                 {
-                                                    selectedEngineer.engineerId
+                                                    selectedApplication.engineerId
                                                 }
-
                                             </span>
 
                                         </div>
@@ -1454,17 +950,15 @@ const EngineerManagement = () => {
                                             <FaEnvelope />
 
                                             <div>
-
                                                 <label>
                                                     Email Address
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.email
+                                                        selectedApplication.email
                                                     }
                                                 </strong>
-
                                             </div>
 
                                         </div>
@@ -1474,17 +968,15 @@ const EngineerManagement = () => {
                                             <FaPhone />
 
                                             <div>
-
                                                 <label>
                                                     Mobile Number
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.mobile
+                                                        selectedApplication.mobile
                                                     }
                                                 </strong>
-
                                             </div>
 
                                         </div>
@@ -1502,18 +994,15 @@ const EngineerManagement = () => {
                                         <FaGraduationCap />
 
                                         <div>
-
                                             <h3>
                                                 Professional
                                                 Information
                                             </h3>
 
                                             <p>
-                                                Engineering,
-                                                qualification and
-                                                department details
+                                                Engineering and
+                                                qualification details
                                             </p>
-
                                         </div>
 
                                     </div>
@@ -1525,17 +1014,15 @@ const EngineerManagement = () => {
                                             <FaGraduationCap />
 
                                             <div>
-
                                                 <label>
                                                     Engineering Branch
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.branch
+                                                        selectedApplication.branch
                                                     }
                                                 </strong>
-
                                             </div>
 
                                         </div>
@@ -1545,17 +1032,15 @@ const EngineerManagement = () => {
                                             <FaGraduationCap />
 
                                             <div>
-
                                                 <label>
-                                                    Qualification
+                                                    Highest Qualification
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.qualification
+                                                        selectedApplication.qualification
                                                     }
                                                 </strong>
-
                                             </div>
 
                                         </div>
@@ -1565,18 +1050,16 @@ const EngineerManagement = () => {
                                             <FaBriefcase />
 
                                             <div>
-
                                                 <label>
                                                     Experience
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.experience
+                                                        selectedApplication.experience
                                                     }{" "}
                                                     Years
                                                 </strong>
-
                                             </div>
 
                                         </div>
@@ -1586,57 +1069,15 @@ const EngineerManagement = () => {
                                             <FaBuilding />
 
                                             <div>
-
                                                 <label>
                                                     Requested Department
                                                 </label>
 
                                                 <strong>
                                                     {
-                                                        selectedEngineer.department
+                                                        selectedApplication.department
                                                     }
                                                 </strong>
-
-                                            </div>
-
-                                        </div>
-
-                                        <div className="detail-item">
-
-                                            <FaUserTie />
-
-                                            <div>
-
-                                                <label>
-                                                    Requested Role
-                                                </label>
-
-                                                <strong>
-                                                    {
-                                                        selectedEngineer.role
-                                                    }
-                                                </strong>
-
-                                            </div>
-
-                                        </div>
-
-                                        <div className="detail-item">
-
-                                            <FaClock />
-
-                                            <div>
-
-                                                <label>
-                                                    Applied Date
-                                                </label>
-
-                                                <strong>
-                                                    {
-                                                        selectedEngineer.appliedDate
-                                                    }
-                                                </strong>
-
                                             </div>
 
                                         </div>
@@ -1654,81 +1095,55 @@ const EngineerManagement = () => {
                                         <FaFileAlt />
 
                                         <div>
-
                                             <h3>
                                                 Submitted Documents
                                             </h3>
 
                                             <p>
-                                                Verify all uploaded
-                                                documents before
-                                                approving the
-                                                application.
+                                                Review documents
+                                                submitted by the
+                                                engineer.
                                             </p>
-
                                         </div>
 
                                     </div>
 
                                     <div className="documents-grid">
 
-                                        {/* PHOTO */}
-
                                         <div className="document-card">
 
                                             <div className="document-icon">
-
                                                 <FaUserTie />
-
                                             </div>
 
                                             <div className="document-info">
 
                                                 <strong>
-                                                    Profile Photo
+                                                    Passport Photo
                                                 </strong>
 
                                                 <span>
-
                                                     {
-                                                        selectedEngineer.photo ||
-                                                        "Not Provided"
+                                                        selectedApplication.photo
                                                     }
-
                                                 </span>
 
                                             </div>
 
-                                            {selectedEngineer.photo && (
-
-                                                <button
-                                                    className="document-btn"
-                                                    type="button"
-                                                    onClick={() =>
-                                                        openDocument(
-                                                            selectedEngineer.photo
-                                                        )
-                                                    }
-                                                >
-
-                                                    <FaEye />
-
-                                                    View
-
-                                                </button>
-
-                                            )}
+                                            <button
+                                                className="document-btn"
+                                                type="button"
+                                            >
+                                                <FaEye />
+                                                View
+                                            </button>
 
                                         </div>
-
-                                        {/* DEGREE */}
 
                                         <div className="document-card">
 
                                             <div className="document-icon">
-
-                                                <FaGraduationCap />
-
+                                                <FaFileAlt />
                                             </div>
 
                                             <div className="document-info">
@@ -1738,46 +1153,27 @@ const EngineerManagement = () => {
                                                 </strong>
 
                                                 <span>
-
                                                     {
-                                                        selectedEngineer.degreeCertificate ||
-                                                        "Not Provided"
+                                                        selectedApplication.degree
                                                     }
-
                                                 </span>
 
                                             </div>
 
-                                            {selectedEngineer.degreeCertificate && (
-
-                                                <button
-                                                    className="document-btn"
-                                                    type="button"
-                                                    onClick={() =>
-                                                        openDocument(
-                                                            selectedEngineer.degreeCertificate
-                                                        )
-                                                    }
-                                                >
-
-                                                    <FaEye />
-
-                                                    View
-
-                                                </button>
-
-                                            )}
+                                            <button
+                                                className="document-btn"
+                                                type="button"
+                                            >
+                                                <FaDownload />
+                                                View
+                                            </button>
 
                                         </div>
-
-                                        {/* EXPERIENCE */}
 
                                         <div className="document-card">
 
                                             <div className="document-icon">
-
                                                 <FaBriefcase />
-
                                             </div>
 
                                             <div className="document-info">
@@ -1788,34 +1184,22 @@ const EngineerManagement = () => {
                                                 </strong>
 
                                                 <span>
-
                                                     {
-                                                        selectedEngineer.experienceCertificate ||
+                                                        selectedApplication.experienceCertificate ||
                                                         "Not Provided"
                                                     }
-
                                                 </span>
 
                                             </div>
 
-                                            {selectedEngineer.experienceCertificate && (
-
+                                            {selectedApplication.experienceCertificate && (
                                                 <button
                                                     className="document-btn"
                                                     type="button"
-                                                    onClick={() =>
-                                                        openDocument(
-                                                            selectedEngineer.experienceCertificate
-                                                        )
-                                                    }
                                                 >
-
-                                                    <FaEye />
-
+                                                    <FaDownload />
                                                     View
-
                                                 </button>
-
                                             )}
 
                                         </div>
@@ -1824,84 +1208,11 @@ const EngineerManagement = () => {
 
                                 </div>
 
-                                {/* REVIEW INFORMATION */}
-
-                                {selectedEngineer.reviewedDate && (
-
-                                    <div className="review-section">
-
-                                        <div className="section-title">
-
-                                            <FaCheckCircle />
-
-                                            <div>
-
-                                                <h3>
-                                                    Review Information
-                                                </h3>
-
-                                                <p>
-                                                    Administrator
-                                                    decision details
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-
-                                        <div className="detail-grid">
-
-                                            <div className="detail-item">
-
-                                                <FaClock />
-
-                                                <div>
-
-                                                    <label>
-                                                        Reviewed Date
-                                                    </label>
-
-                                                    <strong>
-                                                        {
-                                                            selectedEngineer.reviewedDate
-                                                        }
-                                                    </strong>
-
-                                                </div>
-
-                                            </div>
-
-                                            <div className="detail-item">
-
-                                                <FaUserTie />
-
-                                                <div>
-
-                                                    <label>
-                                                        Reviewed By
-                                                    </label>
-
-                                                    <strong>
-                                                        {
-                                                            selectedEngineer.reviewedBy
-                                                        }
-                                                    </strong>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                )}
-
                                 {/* REJECTION REASON */}
 
-                                {selectedEngineer.applicationStatus ===
+                                {selectedApplication.status ===
                                     "Rejected" &&
-                                    selectedEngineer.rejectionReason && (
+                                    selectedApplication.rejectionReason && (
 
                                         <div className="rejection-display">
 
@@ -1915,7 +1226,7 @@ const EngineerManagement = () => {
 
                                                 <p>
                                                     {
-                                                        selectedEngineer.rejectionReason
+                                                        selectedApplication.rejectionReason
                                                     }
                                                 </p>
 
@@ -1925,52 +1236,6 @@ const EngineerManagement = () => {
 
                                     )}
 
-                                {/* ACTIVE ACCOUNT */}
-
-                                {selectedEngineer.applicationStatus ===
-                                    "Approved" && (
-
-                                    <div className="account-control-section">
-
-                                        <div>
-
-                                            <strong>
-                                                Engineer Account
-                                            </strong>
-
-                                            <span>
-                                                Control whether this
-                                                approved engineer can
-                                                access the system.
-                                            </span>
-
-                                        </div>
-
-                                        <button
-                                            className={
-                                                selectedEngineer.accountStatus ===
-                                                "Active"
-                                                    ? "deactivate-btn"
-                                                    : "activate-btn"
-                                            }
-                                            onClick={
-                                                toggleAccountStatus
-                                            }
-                                        >
-
-                                            <FaPowerOff />
-
-                                            {selectedEngineer.accountStatus ===
-                                            "Active"
-                                                ? "Deactivate"
-                                                : "Activate"}
-
-                                        </button>
-
-                                    </div>
-
-                                )}
-
                             </div>
 
                             {/* MODAL FOOTER */}
@@ -1979,14 +1244,16 @@ const EngineerManagement = () => {
 
                                 <button
                                     className="close-review-btn"
-                                    onClick={
-                                        closeReview
+                                    onClick={() =>
+                                        setShowReviewModal(
+                                            false
+                                        )
                                     }
                                 >
                                     Close
                                 </button>
 
-                                {selectedEngineer.applicationStatus ===
+                                {selectedApplication.status ===
                                     "Pending" && (
 
                                     <div className="review-actions">
@@ -1997,11 +1264,8 @@ const EngineerManagement = () => {
                                                 openRejectModal
                                             }
                                         >
-
                                             <FaTimes />
-
                                             Reject Application
-
                                         </button>
 
                                         <button
@@ -2010,11 +1274,8 @@ const EngineerManagement = () => {
                                                 approveApplication
                                             }
                                         >
-
                                             <FaCheck />
-
                                             Approve Application
-
                                         </button>
 
                                     </div>
@@ -2030,30 +1291,28 @@ const EngineerManagement = () => {
                 )}
 
             {/* ==================================================
-               REJECT MODAL
+                REJECT MODAL
             ================================================== */}
 
             {showRejectModal &&
-                selectedEngineer && (
+                selectedApplication && (
 
                     <div
                         className="reject-overlay"
-                        onClick={
-                            closeRejectModal
+                        onClick={() =>
+                            setShowRejectModal(false)
                         }
                     >
 
                         <div
                             className="reject-modal"
-                            onClick={(event) =>
-                                event.stopPropagation()
+                            onClick={(e) =>
+                                e.stopPropagation()
                             }
                         >
 
                             <div className="reject-icon">
-
                                 <FaTimesCircle />
-
                             </div>
 
                             <h2>
@@ -2061,20 +1320,16 @@ const EngineerManagement = () => {
                             </h2>
 
                             <p>
-
-                                Please provide a clear reason
-                                for rejecting this engineer
+                                Please provide a reason for
+                                rejecting this engineer
                                 application.
-
                             </p>
 
                             <textarea
-                                value={
-                                    rejectionReason
-                                }
-                                onChange={(event) =>
+                                value={rejectionReason}
+                                onChange={(e) =>
                                     setRejectionReason(
-                                        event.target.value
+                                        e.target.value
                                     )
                                 }
                                 placeholder="Enter rejection reason..."
@@ -2085,8 +1340,10 @@ const EngineerManagement = () => {
 
                                 <button
                                     className="cancel-reject-btn"
-                                    onClick={
-                                        closeRejectModal
+                                    onClick={() =>
+                                        setShowRejectModal(
+                                            false
+                                        )
                                     }
                                 >
                                     Cancel
@@ -2101,11 +1358,8 @@ const EngineerManagement = () => {
                                         !rejectionReason.trim()
                                     }
                                 >
-
                                     <FaTimes />
-
                                     Reject Application
-
                                 </button>
 
                             </div>
@@ -2120,5 +1374,4 @@ const EngineerManagement = () => {
     );
 };
 
-export default EngineerManagement;
-
+export default EngineerRequests;

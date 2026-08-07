@@ -193,7 +193,7 @@ function ComplaintTracking() {
                 <div className="progress-line"></div>
 
 
-                <div className="progress-step completed">
+                <div className="progress-step completed-ok">
 
                   <div className="progress-circle">
                     ✓
@@ -211,7 +211,7 @@ function ComplaintTracking() {
 
 
 
-                <div className="progress-step completed">
+                <div className="progress-step completed-ok">
 
                   <div className="progress-circle">
                     ✓
@@ -229,7 +229,7 @@ function ComplaintTracking() {
 
 
 
-                <div className="progress-step completed">
+                <div className="progress-step completed-ok">
 
                   <div className="progress-circle">
                     ✓
@@ -316,7 +316,7 @@ function ComplaintTracking() {
                 <div className="history-item">
 
 
-                  <div className="history-icon completed">
+                  <div className="history-icon completed-ok">
                     ✓
                   </div>
 
@@ -353,7 +353,7 @@ function ComplaintTracking() {
                 <div className="history-item">
 
 
-                  <div className="history-icon completed">
+                  <div className="history-icon completed-ok">
                     ✓
                   </div>
 
@@ -391,7 +391,7 @@ function ComplaintTracking() {
                 <div className="history-item">
 
 
-                  <div className="history-icon completed">
+                  <div className="history-icon completed-ok">
                     ✓
                   </div>
 

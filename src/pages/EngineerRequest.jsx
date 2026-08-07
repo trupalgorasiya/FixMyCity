@@ -4,26 +4,28 @@ import "../styles/EngineerRequest.css";
 const EngineerRequest = () => {
 
     const [formData, setFormData] = useState({
-        fullName: "",
-        mobile: "",
-        email: "",
-        address: "",
-        qualification: "",
-        branch: "",
-        experience: "",
-        department: "",
-        username: "",
-        password: "",
-        confirmPassword: "",
-        photo: null,
-        degree: null,
-        experienceCertificate: null,
-        declaration: false
-    });
+    firstName: "",
+    lastName: "",
+    mobile: "",
+    email: "",
+    address: "",
+    qualification: "",
+    otherQualification: "",
+    branch: "",
+    experience: "",
+    department: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+    photo: null,
+    degree: null,
+    experienceCertificate: null,
+    declaration: false
+});
 
     const handleChange = (e) => {
 
-        const { name, value, type, checked, files } = e.target;
+        const { name, value, type, checked, files} = e.target;
 
         setFormData({
             ...formData,
@@ -57,7 +59,8 @@ const EngineerRequest = () => {
 
     const handleReset = () => {
         setFormData({
-            fullName: "",
+            firstName: "",
+            lastName:"",
             mobile: "",
             email: "",
             address: "",
@@ -67,6 +70,7 @@ const EngineerRequest = () => {
             department: "",
             username: "",
             password: "",
+            otherQualification: "",
             confirmPassword: "",
             photo: null,
             degree: null,
@@ -103,12 +107,26 @@ const EngineerRequest = () => {
 
                         <div className="form-group">
 
-                            <label>Full Name</label>
+                            <label>First Name</label>
 
                             <input
                                 type="text"
-                                name="fullName"
-                                value={formData.fullName}
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                placeholder="Enter Full Name"
+                                required
+                            />
+
+                        </div>
+                        <div className="form-group">
+
+                            <label>Last Name</label>
+
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={formData.lastName}
                                 onChange={handleChange}
                                 placeholder="Enter Full Name"
                                 required
@@ -201,30 +219,60 @@ const EngineerRequest = () => {
 
                         <div className="form-group">
 
-                            <label>Highest Qualification</label>
+    <label>Highest Qualification</label>
 
-                            <select
-                                name="qualification"
-                                value={formData.qualification}
-                                onChange={handleChange}
-                                required
-                            >
+    <select
+        name="qualification"
+        value={formData.qualification}
+        onChange={handleChange}
+        required
+    >
+        <option value="">
+            Select Qualification
+        </option>
 
-                                <option value="">
-                                    Select Qualification
-                                </option>
+        <option value="B.E.">
+            B.E.
+        </option>
 
-                                <option>B.E.</option>
+        <option value="B.Tech">
+            B.Tech
+        </option>
 
-                                <option>B.Tech</option>
+        <option value="M.E.">
+            M.E.
+        </option>
 
-                                <option>M.E.</option>
+        <option value="M.Tech">
+            M.Tech
+        </option>
 
-                                <option>M.Tech</option>
+        <option value="Diploma">
+            Diploma in Engineering
+        </option>
 
-                            </select>
+        <option value="Ph.D.">
+            Ph.D.
+        </option>
 
-                        </div>
+        <option value="Other">
+            Other
+        </option>
+
+    </select>
+
+    {formData.qualification === "Other" && (
+        <input
+            type="text"
+            name="otherQualification"
+            value={formData.otherQualification}
+            onChange={handleChange}
+            placeholder="Enter your qualification"
+            required
+        />
+    )}
+
+</div>
 
                         <div className="form-group">
 
@@ -326,19 +374,6 @@ const EngineerRequest = () => {
 
                     <div className="form-grid">
 
-                        <div className="form-group">
-
-                            <label>Username</label>
-
-                            <input
-                                type="text"
-                                name="username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required
-                            />
-
-                        </div>
 
                         <div className="form-group">
 

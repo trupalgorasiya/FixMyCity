@@ -575,11 +575,11 @@
 
 
 /* ==========================
-   COMPLETED STEP
+   completed-ok STEP
 ========================== */
 
 
-.progress-step.completed .progress-circle{
+.progress-step.completed-ok .progress-circle{
 
     background:#22c55e;
 
@@ -590,7 +590,7 @@
     box-shadow:none;
 
 }
-.status-completed{
+.status-completed-ok{
     background:#dcfce7;
     color:#15803d;
 }
@@ -632,7 +632,7 @@
 ========================== */
 
 
-.progress-step:not(.completed):not(.current)
+.progress-step:not(.completed-ok):not(.current)
 .progress-circle{
 
 
@@ -932,10 +932,10 @@
 
 
 
-/* Completed */
+/* completed-ok */
 
 
-.history-icon.completed{
+.history-icon.completed-ok{
 
 
     background:#22c55e;

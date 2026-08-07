@@ -31,6 +31,7 @@ import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
 import ComplaintTracking from "./pages/ComplaintTracking";
 import ViewFeedback from "./pages/admin/ViewFeedback";
 import ViewFeedbackDept from "./pages/department/ViewFeedbackDept";
+import EngineerRequests from "./pages/department/EngineerRequests";
 
 function AppRoutes() {
 
@@ -58,6 +59,7 @@ function AppRoutes() {
              <Route path="department-report" element={<DepartmentReport/>}/>
             <Route path="notification" element={<NotificationPage/>} />
             <Route path="view-feedback" element={<ViewFeedbackDept/>}/>
+            <Route path="view-enginner-request" element={<EngineerRequests/>}/>
              
              </Route>
 

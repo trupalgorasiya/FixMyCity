@@ -134,8 +134,15 @@ function DepartmentManagement() {
     lastName: "",
     email: "",
     mobile: "",
+    branch: "",
+    qualification: "",
+    otherQualification: "",
+    experience: "",
     department: "Water Department",
     status: "Active",
+    photo: null,
+    degree: null,
+    experienceCertificate: null
   });
 
   /* ==========================================================
@@ -193,9 +200,10 @@ function DepartmentManagement() {
   ========================================================== */
 
   const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "file" ? files[0] : value
     });
   };
 
@@ -225,19 +233,53 @@ function DepartmentManagement() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log(formData);
+    const data = new FormData();
+
+    data.append("firstName", formData.firstName);
+    data.append("lastName", formData.lastName);
+    data.append("email", formData.email);
+    data.append("mobile", formData.mobile);
+    data.append("branch", formData.branch);
+    data.append(
+        "qualification",
+        formData.qualification === "Other"
+            ? formData.otherQualification
+            : formData.qualification
+    );
+    data.append("experience", formData.experience);
+    data.append("department", formData.department);
+    data.append("status", formData.status);
+
+    data.append("photo", formData.photo);
+    data.append("degree", formData.degree);
+
+    if (formData.experienceCertificate) {
+        data.append(
+            "experienceCertificate",
+            formData.experienceCertificate
+        );
+    }
+
+    console.log("Engineer Data:", formData);
 
     setShowModal(false);
 
     setFormData({
-      firstName: "",
-      lastName: "",
-      email: "",
-      mobile: "",
-      department: "Water Department",
-      status: "Active",
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobile: "",
+        branch: "",
+        qualification: "",
+        otherQualification: "",
+        experience: "",
+        department: "Water Department",
+        status: "Active",
+        photo: null,
+        degree: null,
+        experienceCertificate: null
     });
-  };
+};
 
   /* ==========================================================
      JSX START
@@ -451,101 +493,238 @@ function DepartmentManagement() {
             >
               <div className="form-grid">
 
-                {/* First Name */}
+    {/* First Name */}
+    <div className="form-group">
+        <label>First Name</label>
 
-                <div className="form-group">
-                  <label>First Name</label>
+        <input
+            type="text"
+            name="firstName"
+            placeholder="Enter First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+        />
+    </div>
 
-                  <input
-                    type="text"
-                    name="firstName"
-                    placeholder="Enter First Name"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+    {/* Last Name */}
+    <div className="form-group">
+        <label>Last Name</label>
 
-                {/* Last Name */}
+        <input
+            type="text"
+            name="lastName"
+            placeholder="Enter Last Name"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+        />
+    </div>
 
-                <div className="form-group">
-                  <label>Last Name</label>
+    {/* Email */}
+    <div className="form-group">
+        <label>Email Address</label>
 
-                  <input
-                    type="text"
-                    name="lastName"
-                    placeholder="Enter Last Name"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            required
+        />
+    </div>
 
-                {/* Email */}
+    {/* Mobile */}
+    <div className="form-group">
+        <label>Mobile Number</label>
 
-                <div className="form-group">
-                  <label>Email Address</label>
+        <input
+            type="tel"
+            name="mobile"
+            placeholder="Enter Mobile Number"
+            value={formData.mobile}
+            onChange={handleChange}
+            maxLength={10}
+            required
+        />
+    </div>
 
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter Email Address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
+    {/* Engineering Branch */}
+    <div className="form-group">
+        <label>Engineering Branch</label>
 
-                {/* Mobile */}
+        <select
+            name="branch"
+            value={formData.branch}
+            onChange={handleChange}
+            required
+        >
+            <option value="">
+                Select Branch
+            </option>
 
-                <div className="form-group">
-                  <label>Mobile Number</label>
+            <option value="Civil Engineering">
+                Civil Engineering
+            </option>
 
-                  <input
-                    type="tel"
-                    name="mobile"
-                    placeholder="Enter Mobile Number"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                    maxLength={10}
-                    required
-                  />
-                </div>
+            <option value="Mechanical Engineering">
+                Mechanical Engineering
+            </option>
 
-                {/* Department */}
+            <option value="Electrical Engineering">
+                Electrical Engineering
+            </option>
 
-                <div className="form-group">
-                  <label>Department</label>
+            <option value="Computer Engineering">
+                Computer Engineering
+            </option>
 
-                  <input
-                    type="text"
-                    name="department"
-                    value={formData.department}
-                    readOnly
-                  />
-                </div>
+            <option value="Environmental Engineering">
+                Environmental Engineering
+            </option>
+        </select>
+    </div>
 
-                {/* Status */}
+    {/* Highest Qualification */}
+    <div className="form-group">
+        <label>Highest Qualification</label>
 
-                <div className="form-group">
-                  <label>Status</label>
+        <select
+            name="qualification"
+            value={formData.qualification}
+            onChange={handleChange}
+            required
+        >
+            <option value="">
+                Select Qualification
+            </option>
 
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                  >
-                    <option value="Active">
-                      Active
-                    </option>
+            <option value="B.E.">
+                B.E.
+            </option>
 
-                    <option value="Inactive">
-                      Inactive
-                    </option>
-                  </select>
-                </div>
-              </div>
+            <option value="B.Tech">
+                B.Tech
+            </option>
 
+            <option value="M.E.">
+                M.E.
+            </option>
+
+            <option value="M.Tech">
+                M.Tech
+            </option>
+
+            <option value="Diploma">
+                Diploma in Engineering
+            </option>
+
+            <option value="Ph.D.">
+                Ph.D.
+            </option>
+
+            <option value="Other">
+                Other
+            </option>
+        </select>
+
+        {formData.qualification === "Other" && (
+            <input
+                type="text"
+                name="otherQualification"
+                placeholder="Enter Qualification"
+                value={formData.otherQualification}
+                onChange={handleChange}
+                required
+            />
+        )}
+    </div>
+
+    {/* Experience */}
+    <div className="form-group">
+        <label>Experience (Years)</label>
+
+        <input
+            type="number"
+            name="experience"
+            placeholder="Enter Experience"
+            value={formData.experience}
+            onChange={handleChange}
+            min="0"
+        />
+    </div>
+
+    {/* Department */}
+    <div className="form-group">
+        <label>Department</label>
+
+        <input
+            type="text"
+            name="department"
+            value={formData.department}
+            readOnly
+        />
+    </div>
+
+    {/* Status */}
+    <div className="form-group">
+        <label>Status</label>
+
+        <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+        >
+            <option value="Active">
+                Active
+            </option>
+
+            <option value="Inactive">
+                Inactive
+            </option>
+        </select>
+    </div>
+
+    {/* Photo */}
+    <div className="form-group">
+        <label>Passport Size Photo</label>
+
+        <input
+            type="file"
+            name="photo"
+            onChange={handleChange}
+            accept="image/*"
+            required
+        />
+    </div>
+
+    {/* Degree Certificate */}
+    <div className="form-group">
+        <label>Degree Certificate</label>
+
+        <input
+            type="file"
+            name="degree"
+            onChange={handleChange}
+            accept=".pdf,.jpg,.jpeg,.png"
+            required
+        />
+    </div>
+
+    {/* Experience Certificate */}
+    <div className="form-group ">
+        <label>Experience Certificate (Optional)</label>
+
+        <input
+            type="file"
+            name="experienceCertificate"
+            onChange={handleChange}
+            accept=".pdf,.jpg,.jpeg,.png"
+        />
+    </div>
+
+</div>
               {/* ======================================================
                   BUTTONS
               ====================================================== */}

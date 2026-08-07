@@ -51,6 +51,8 @@ function Navbar() {
         <nav className="navbar">
             <div className="nav-logo">
                 <img src={logo} alt="Logo" />
+                
+                <p className="text-logo">Making city cleaner, safer and smarter</p>
               
             </div>
 
