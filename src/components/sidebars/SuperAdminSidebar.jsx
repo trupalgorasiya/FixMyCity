@@ -6,6 +6,7 @@ import {
     // FaUserTie,
     FaHardHat,
     FaClipboardList,
+    FaUserTie,
     FaFileAlt,
     FaUser,
     FaComments,
@@ -45,6 +46,8 @@ function SuperAdminSidebar() {
                         <li><NavLink to="/admin/complaint-manage"><FaClipboardList /><span>Complaints</span></NavLink></li>
 
                         <li><NavLink to="/admin/viewfeedback"><FaComments /><span>Feedback</span></NavLink></li>
+
+                        <li><NavLink to="/admin/enginner-request"><FaUserTie  /><span>Engineers Applications</span></NavLink></li>
 
                         <li><NavLink to="/admin/report"><FaFileAlt /><span>Reports</span></NavLink></li>
 

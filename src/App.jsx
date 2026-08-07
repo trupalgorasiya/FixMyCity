@@ -53,6 +53,7 @@ import TrackComplaints from "./pages/user/TrackComplaints";
 import ViewFeedback from "./pages/admin/ViewFeedback";
 import ViewFeedbackDept from "./pages/department/ViewFeedbackDept";
 import EngineerRequests from "./pages/department/EngineerRequests";
+import ReviewEngineerRequest from "./pages/admin/ReviewEngineerRequest";
 
 function App() {
   return (
@@ -131,6 +132,7 @@ function App() {
     <Route path="report" element={<Report/>}></Route>
     <Route path="notification" element={<NotificationPage/>} />
     <Route path="viewfeedback" element={<ViewFeedback/>}/>
+    <Route path="enginner-request" element={<ReviewEngineerRequest/>}/>
 </Route>
         
       </Routes> 
