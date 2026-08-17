@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import {
   FaSearch,
-  FaPlus,
+  // FaPlus,
   FaChevronLeft,
   FaChevronRight,
   FaTimes,
@@ -331,13 +331,13 @@ function DepartmentManagement() {
 
         <div className="toolbar-right">
 
-          <button
+          {/* <button
             className="toolbar-btn"
             onClick={() => setShowModal(true)}
           >
             <FaPlus />
             Add Engineer
-          </button>
+          </button> */}
 
         </div>
 
