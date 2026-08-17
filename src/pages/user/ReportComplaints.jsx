@@ -5,64 +5,147 @@ import LocationPicker from "../../pages/LocationPicker";
 
 function ReportComplaint() {
   const [formData, setFormData] = useState({
-    fullName: "",
-    mobile: "",
+    firstName: "",
+    lastName: "",
     email: "",
+    contact: "",
+    title: "",
+    department: "",
     category: "",
-    otherCategory: "",
     description: "",
     address: "",
-    landmark: "",
     pincode: "",
     latitude: "",
     longitude: "",
-    images: [],
+    attachments: [],
     confirm: false,
   });
 
+  // Department-wise complaint categories
+  const departmentCategories = {
+    "Roads & Infrastructure": [
+      "Road Damage",
+      "Pothole",
+      "Broken Footpath",
+      "Road Construction Issue",
+      "Bridge Damage",
+      "Divider Damage",
+    ],
+
+    "Water Supply": [
+      "Water Leakage",
+      "Water Pipeline Damage",
+      "Low Water Pressure",
+      "No Water Supply",
+      "Contaminated Water",
+      "Water Overflow",
+    ],
+
+    "Sanitation & Waste Management": [
+      "Garbage Collection",
+      "Garbage Dump",
+      "Unclean Area",
+      "Open Garbage",
+      "Waste Collection Issue",
+      "Dead Animal Disposal",
+    ],
+
+    "Street Lighting": [
+      "Street Light Not Working",
+      "Broken Street Light",
+      "Flickering Street Light",
+      "Dark Street Area",
+      "Damaged Light Pole",
+    ],
+
+    "Drainage & Sewerage": [
+      "Drainage Blockage",
+      "Sewerage Overflow",
+      "Open Drain",
+      "Drainage Leakage",
+      "Water Logging",
+      "Bad Drainage Smell",
+    ],
+
+    "Traffic Management": [
+      "Traffic Signal Issue",
+      "Damaged Traffic Signal",
+      "Illegal Parking",
+      "Missing Traffic Sign",
+      "Damaged Traffic Sign",
+      "Traffic Congestion",
+    ],
+
+    "Public Safety": [
+      "Dangerous Public Area",
+      "Broken Public Property",
+      "Unsafe Structure",
+      "Open Manhole",
+      "Fallen Tree",
+      "Other Safety Issue",
+    ],
+
+    "Parks & Public Places": [
+      "Park Maintenance",
+      "Damaged Playground",
+      "Broken Public Bench",
+      "Public Toilet Issue",
+      "Garden Maintenance",
+      "Public Place Cleanliness",
+    ],
+  };
+
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked } = e.target;
 
-    // Handle multiple image upload (Max 3)
-    if (type === "file") {
-      const selectedImages = Array.from(files);
-
-      setFormData((prev) => {
-        let updatedImages = [...prev.images];
-
-        for (const image of selectedImages) {
-          if (updatedImages.length < 3) {
-            updatedImages.push(image);
-          }
-        }
-
-        if (updatedImages.length === 3 && selectedImages.length > (3 - prev.images.length)) {
-          alert("Maximum 3 images are allowed.");
-        }
-
-        return {
-          ...prev,
-          images: updatedImages,
-        };
-      });
-
-      // Clear file input so the same image can be selected again if removed
-      e.target.value = "";
+    // When department changes, reset category
+    if (name === "department") {
+      setFormData((prev) => ({
+        ...prev,
+        department: value,
+        category: "",
+      }));
 
       return;
     }
 
-    // Handle other inputs
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const removeImage = (index) => {
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+
+    setFormData((prev) => {
+      const remainingSlots = 3 - prev.attachments.length;
+
+      if (remainingSlots <= 0) {
+        alert("Maximum 3 attachments are allowed.");
+        return prev;
+      }
+
+      const filesToAdd = selectedFiles.slice(0, remainingSlots);
+
+      if (selectedFiles.length > remainingSlots) {
+        alert("You can upload a maximum of 3 attachments.");
+      }
+
+      return {
+        ...prev,
+        attachments: [...prev.attachments, ...filesToAdd],
+      };
+    });
+
+    // Allow selecting the same file again
+    e.target.value = "";
+  };
+
+  const removeAttachment = (index) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      attachments: prev.attachments.filter((_, i) => i !== index),
     }));
   };
 
@@ -76,20 +159,87 @@ function ReportComplaint() {
     }));
   };
 
+  const getFileType = (file) => {
+    if (file.type.startsWith("image/")) {
+      return "image";
+    }
+
+    if (file.type === "application/pdf") {
+      return "pdf";
+    }
+
+    if (file.type.startsWith("video/")) {
+      return "video";
+    }
+
+    return "other";
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation if required
-    alert("success...");
-    // Call API to send OTP
+    if (!formData.firstName.trim()) {
+      alert("Please enter your first name.");
+      return;
+    }
 
+    if (!formData.lastName.trim()) {
+      alert("Please enter your last name.");
+      return;
+    }
 
-};
+    if (!formData.email.trim()) {
+      alert("Please enter your email address.");
+      return;
+    }
+
+    if (!formData.contact.trim()) {
+      alert("Please enter your contact number.");
+      return;
+    }
+
+    if (!formData.department) {
+      alert("Please select a department.");
+      return;
+    }
+
+    if (!formData.category) {
+      alert("Please select a complaint category.");
+      return;
+    }
+
+    if (!formData.title) {
+      alert("Please Enter a Title.");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      alert("Please enter complaint description.");
+      return;
+    }
+
+    if (!formData.address) {
+      alert("Please select complaint location.");
+      return;
+    }
+
+    if (!formData.confirm) {
+      alert("Please confirm that the information provided is correct.");
+      return;
+    }
+
+    console.log("Complaint Data:", formData);
+
+    alert("Complaint submitted successfully!");
+
+    // Later:
+    // Call API here
+    // Send complaint data to Spring Boot backend
+  };
 
   return (
     <div className="complaint-page">
       <div className="complaint-card">
-
         <h1>Report a Complaint</h1>
 
         <p>
@@ -98,37 +248,39 @@ function ReportComplaint() {
         </p>
 
         <form onSubmit={handleSubmit}>
-
           {/* Citizen Information */}
+
+          <h2 className="section-title">
+            Citizen Information
+          </h2>
+
           <div className="grid-2">
             <div className="form-group">
-              <label>Full Name</label>
+              <label>First Name</label>
 
               <input
                 type="text"
-                name="fullName"
-                placeholder="Enter Full Name"
-                value={formData.fullName}
+                name="firstName"
+                placeholder="Enter First Name"
+                value={formData.firstName}
                 onChange={handleChange}
               />
             </div>
+
             <div className="form-group">
-              <label>Mobile Number</label>
+              <label>Last Name</label>
 
               <input
                 type="text"
-                name="mobile"
-                placeholder="Enter Mobile Number"
-                value={formData.mobile}
+                name="lastName"
+                placeholder="Enter Last Name"
+                value={formData.lastName}
                 onChange={handleChange}
               />
             </div>
           </div>
 
           <div className="grid-2">
-
-            
-
             <div className="form-group">
               <label>Email Address</label>
 
@@ -140,53 +292,96 @@ function ReportComplaint() {
                 onChange={handleChange}
               />
             </div>
+
             <div className="form-group">
-            <label>Complaint Category</label>
-
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-            >
-              <option value="">Select Category</option>
-              <option>Road Damage</option>
-              <option>Water Leakage</option>
-              <option>Garbage Collection</option>
-              <option>Street Light Issue</option>
-              <option>Drainage Problem</option>
-              <option>Traffic Signal Issue</option>
-              <option>Illegal Parking</option>
-              <option>Public Safety</option>
-              <option>Other</option>
-            </select>
-          </div>
-
-         
-          </div>
-
-          {/* Complaint Details */}
- {formData.category === "Other" && (
-            <div className="form-group">
-              <label>Specify Complaint Category</label>
+              <label>Contact Number</label>
 
               <input
-                type="text"
-                name="otherCategory"
-                placeholder="Enter Complaint Category"
-                value={formData.otherCategory}
+                type="tel"
+                name="contact"
+                placeholder="Enter Contact Number"
+                value={formData.contact}
                 onChange={handleChange}
               />
             </div>
-          )}
-          
+          </div>
 
+          {/* Complaint Department */}
+
+          <h2 className="section-title">
+            Complaint Details
+          </h2>
+
+          <div className="grid-2">
+            <div className="form-group">
+              <label>Department</label>
+
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+              >
+                <option value="">
+                  Select Department
+                </option>
+
+                {Object.keys(departmentCategories).map(
+                  (department) => (
+                    <option
+                      key={department}
+                      value={department}
+                    >
+                      {department}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Complaint Category</label>
+
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={!formData.department}
+              >
+                <option value="">
+                  {formData.department
+                    ? "Select Category"
+                    : "Select Department First"}
+                </option>
+
+                {formData.department &&
+                  departmentCategories[
+                    formData.department
+                  ]?.map((category) => (
+                    <option
+                      key={category}
+                      value={category}
+                    >
+                      {category}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Title</label>
+            <input type="text" 
+            name="title " 
+            placeholder="Enter Title"
+            value={formData.title}
+            onChange={handleChange}/>
+          </div>
           <div className="form-group">
             <label>Description</label>
 
             <textarea
               rows="5"
               name="description"
-              placeholder="Describe the issue..."
+              placeholder="Describe the issue in detail..."
               value={formData.description}
               onChange={handleChange}
             />
@@ -209,11 +404,11 @@ function ReportComplaint() {
               rows="3"
               value={formData.address}
               readOnly
+              placeholder="Select a location from the map"
             />
           </div>
 
           <div className="grid-3">
-
             <div className="form-group">
               <label>Pincode</label>
 
@@ -223,6 +418,7 @@ function ReportComplaint() {
                 readOnly
               />
             </div>
+
             <div className="form-group">
               <label>Latitude</label>
 
@@ -242,69 +438,104 @@ function ReportComplaint() {
                 readOnly
               />
             </div>
-
-            {/* <div className="form-group">
-              <label>Nearest Landmark</label>
-
-              <input
-                type="text"
-                name="landmark"
-                placeholder="Example: Near D-Mart"
-                value={formData.landmark}
-                onChange={handleChange}
-              />
-            </div> */}
-
           </div>
 
-          
+          {/* Attachments */}
 
-          {/* Upload */}
+          <h2 className="section-title">
+            Complaint Evidence
+          </h2>
 
           <div className="form-group">
+            <label>
+              Upload Images, PDF or Video
+            </label>
 
-    <label>
-        Upload Complaint Images
-    </label>
+            <input
+              type="file"
+              name="attachments"
+              accept="image/*,application/pdf,video/*"
+              multiple
+              onChange={handleFileChange}
+              disabled={formData.attachments.length >= 3}
+            />
 
-    <input
-        type="file"
-        name="images"
-        accept="image/*"
-        multiple
-        onChange={handleChange}
-    />
+            <small className="upload-note">
+              Maximum 3 files total. Supported formats:
+              JPG, PNG, JPEG, PDF and Video.
+            </small>
 
-    <small className="upload-note">
-        Maximum 3 images (JPG, PNG, JPEG)
-    </small>
+            <small className="upload-note">
+              {formData.attachments.length} / 3 files selected
+            </small>
+          </div>
 
-</div>
-<div className="preview-grid">
-  {formData.images.map((image, index) => (
-    <div className="preview-card" key={index}>
+          {/* Attachment Preview */}
 
-      <button
-        type="button"
-        className="remove-image"
-        onClick={() => removeImage(index)}
-      >
-        ×
-      </button>
+          <div className="preview-grid">
+            {formData.attachments.map((file, index) => {
+              const fileType = getFileType(file);
 
-      <img
-        src={URL.createObjectURL(image)}
-        alt={`Preview ${index + 1}`}
-      />
+              return (
+                <div
+                  className="preview-card"
+                  key={`${file.name}-${index}`}
+                >
+                  <button
+                    type="button"
+                    className="remove-image"
+                    onClick={() =>
+                      removeAttachment(index)
+                    }
+                  >
+                    ×
+                  </button>
 
-    </div>
-  ))}
-</div>
+                  {/* Image Preview */}
+
+                  {fileType === "image" && (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Complaint ${index + 1}`}
+                    />
+                  )}
+
+                  {/* Video Preview */}
+
+                  {fileType === "video" && (
+                    <video
+                      src={URL.createObjectURL(file)}
+                      controls
+                    />
+                  )}
+
+                  {/* PDF Preview */}
+
+                  {fileType === "pdf" && (
+                    <div className="file-preview">
+                      <div className="file-icon">
+                        PDF
+                      </div>
+
+                      <p>
+                        {file.name}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* File Name */}
+
+                  <div className="file-name">
+                    {file.name}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           {/* Declaration */}
 
           <div className="checkbox-group">
-
             <input
               type="checkbox"
               name="confirm"
@@ -313,10 +544,12 @@ function ReportComplaint() {
             />
 
             <span>
-              I confirm that the information provided is correct.
+              I confirm that the information provided is
+              correct and the complaint details are accurate.
             </span>
-
           </div>
+
+          {/* Submit */}
 
           <button
             type="submit"
@@ -324,11 +557,8 @@ function ReportComplaint() {
           >
             Submit Complaint
           </button>
-
         </form>
-
       </div>
-    
     </div>
   );
 }

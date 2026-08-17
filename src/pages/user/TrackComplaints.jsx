@@ -1,101 +1,234 @@
 import { useState } from "react";
 import "../../styles/ComplaintTracking.css";
-
 import { useNavigate, useParams } from "react-router-dom";
+
 function TrackComplaints() {
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [complaintId, setComplaintId] = useState(id || "");
 
-  const complaint = {
-    id: complaintId,
-    status: "In Progress",
-    category: "Road Damage",
-    priority: "High",
-    assigneDate: "09 July 2026",
-    expectedDate: "15 July 2026",
-    location: "Navrangpura, Ahmedabad",
+  // ==========================================
+  // COMPLAINT DATA
+  // Later this data will come from Spring Boot API
+  // ==========================================
 
-    officer: {
-      name: "Rahul Sharma",
-      department: "Road Maintenance",
+  const complaint = {
+    id: complaintId || "FXM-2026-001",
+
+    title: "Large Pothole Near Main Road",
+
+    status: "In Progress",
+
+    priority: "High",
+
+    department: "Roads & Infrastructure",
+
+    category: "Pothole",
+
+    description:
+      "A large pothole has developed near the main road. It is causing difficulty for vehicles and can be dangerous for two-wheelers, especially during night time and rainy conditions.",
+
+    submittedDate: "09 July 2026",
+
+    submittedTime: "10:30 AM",
+
+    assignedDate: "11 July 2026",
+
+    expectedDate: "15 July 2026",
+
+    // ========================================
+    // CITIZEN
+    // ========================================
+
+    citizen: {
+      firstName: "Trupal",
+      lastName: "Patel",
+      email: "citizen@example.com",
       contact: "+91 9876543210",
-      email: "officer@fixmycity.com",
+    },
+
+    // ========================================
+    // LOCATION
+    // ========================================
+
+    location: {
+      address:
+        "Near C.G. Road, Navrangpura, Ahmedabad, Gujarat",
+
+      pincode: "380009",
+
+      latitude: "23.0365",
+
+      longitude: "72.5660",
+    },
+
+    // ========================================
+    // ASSIGNED ENGINEER
+    // ========================================
+
+    engineer: {
+      firstName: "Rahul",
+
+      lastName: "Sharma",
+
+      designation: "Civil Engineer",
+
+      department: "Roads & Infrastructure",
+
+      contact: "+91 9876543211",
+
+      email: "rahul.sharma@fixmycity.com",
+    },
+
+    // ========================================
+    // ATTACHMENTS
+    // ========================================
+
+    attachments: [
+      {
+        name: "road-damage.jpg",
+        type: "image",
+      },
+      {
+        name: "pothole-video.mp4",
+        type: "video",
+      },
+      {
+        name: "complaint-details.pdf",
+        type: "pdf",
+      },
+    ],
+
+    // ========================================
+    // LATEST UPDATE
+    // ========================================
+
+    latestUpdate: {
+      title: "Repair Work Started",
+
+      date: "12 July 2026",
+
+      time: "11:00 AM",
+
+      message:
+        "The assigned engineer has inspected the location and repair work has started. The damaged road section is currently being repaired.",
+    },
+
+    // ========================================
+    // RESOLUTION
+    // ========================================
+
+    resolution: {
+      status: "Pending",
+
+      date: null,
+
+      message: null,
     },
   };
 
-  const handleTrack = () => {
+  // ==========================================
+  // TRACK COMPLAINT
+  // ==========================================
 
+  const handleTrack = () => {
     if (!complaintId.trim()) {
       alert("Please enter Complaint ID");
       return;
     }
 
-    navigate(`/user/complaint-tracking/${complaintId}`);
+    navigate(
+      `/user/complaint-tracking/${complaintId}`
+    );
   };
 
   return (
-
     <div className="tracking-page">
 
       <div className="tracking-container">
 
-        {/* ================= HEADER ================= */}
+        {/* =====================================
+            HEADER
+        ====================================== */}
 
         <div className="tracking-header">
 
-          <h1>Track Complaint</h1>
+          <h1>
+            Track Complaint
+          </h1>
 
           <p>
-            Track the real-time progress of your complaint using the Complaint
-            ID provided during registration. Stay informed with every update
-            from submission to final resolution.
+            Track the real-time progress of your
+            complaint using the Complaint ID provided
+            during registration. Stay informed about
+            every update from submission to final
+            resolution.
           </p>
 
         </div>
 
-        {/* ================= SEARCH ================= */}
-{!id && (
-        <div className="search-card">
+        {/* =====================================
+            SEARCH
+        ====================================== */}
 
-          <div className="search-box">
+        {!id && (
+          <div className="search-card">
 
-            <input
-              type="text"
-              placeholder="Enter Complaint ID (Example : FXM-2026-001)"
-              value={complaintId}
-              onChange={(e) => setComplaintId(e.target.value)}
-            />
+            <div className="search-box">
 
-            <button onClick={handleTrack}>
-              🔍 Track Complaint
-            </button>
+              <input
+                type="text"
+                placeholder="Enter Complaint ID (Example : FXM-2026-001)"
+                value={complaintId}
+                onChange={(e) =>
+                  setComplaintId(
+                    e.target.value
+                  )
+                }
+              />
+
+              <button
+                onClick={handleTrack}
+              >
+                🔍 Track Complaint
+              </button>
+
+            </div>
 
           </div>
+        )}
 
-        </div>
-)}
-        {/* ================= DETAILS ================= */}
+        {/* =====================================
+            COMPLAINT DETAILS
+        ====================================== */}
 
         {id && (
 
           <div className="tracking-content">
 
-            {/* ================================================= */}
-            {/* Complaint Information */}
-            {/* ================================================= */}
+            {/* =================================
+                COMPLAINT INFORMATION
+            ================================== */}
 
             <div className="card">
 
               <div className="card-title">
 
-                <h2>Complaint Information</h2>
+                <div>
+
+                  <h2>
+                    Complaint Information
+                  </h2>
+
+                  <p className="card-subtitle">
+                    Complaint #{complaint.id}
+                  </p>
+
+                </div>
 
                 <span className="status progress">
-
                   {complaint.status}
-
                 </span>
 
               </div>
@@ -103,97 +236,389 @@ function TrackComplaints() {
               <div className="details-grid">
 
                 <div className="detail-item">
-                  <label>Complaint ID</label>
-                  <h4>{complaint.id}</h4>
+
+                  <label>
+                    Complaint ID
+                  </label>
+
+                  <h4>
+                    {complaint.id}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Category</label>
-                  <h4>{complaint.category}</h4>
+
+                  <label>
+                    Complaint Title
+                  </label>
+
+                  <h4>
+                    {complaint.title}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Priority</label>
+
+                  <label>
+                    Department
+                  </label>
+
+                  <h4>
+                    {complaint.department}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Category
+                  </label>
+
+                  <h4>
+                    {complaint.category}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Priority
+                  </label>
+
                   <h4 className="priority high">
                     {complaint.priority}
                   </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Assigned On</label>
-                  <h4>{complaint.assigneDate}</h4>
+
+                  <label>
+                    Submitted On
+                  </label>
+
+                  <h4>
+                    {complaint.submittedDate}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Expected Resolution</label>
-                  <h4>{complaint.expectedDate}</h4>
+
+                  <label>
+                    Assigned On
+                  </label>
+
+                  <h4>
+                    {complaint.assignedDate}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Location</label>
-                  <h4>{complaint.location}</h4>
+
+                  <label>
+                    Expected Resolution
+                  </label>
+
+                  <h4>
+                    {complaint.expectedDate}
+                  </h4>
+
                 </div>
 
               </div>
 
             </div>
 
-            {/* ================================================= */}
-            {/* Assigned Officer */}
-            {/* ================================================= */}
+            {/* =================================
+                CITIZEN INFORMATION
+            ================================== */}
 
             <div className="card">
 
               <div className="card-title">
 
-                <h2>Assigned Officer</h2>
+                <h2>
+                  Citizen Information
+                </h2>
 
               </div>
 
               <div className="details-grid">
 
                 <div className="detail-item">
-                  <label>Officer Name</label>
-                  <h4>{complaint.officer.name}</h4>
+
+                  <label>
+                    First Name
+                  </label>
+
+                  <h4>
+                    {complaint.citizen.firstName}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Department</label>
-                  <h4>{complaint.officer.department}</h4>
+
+                  <label>
+                    Last Name
+                  </label>
+
+                  <h4>
+                    {complaint.citizen.lastName}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Contact Number</label>
-                  <h4>{complaint.officer.contact}</h4>
+
+                  <label>
+                    Email Address
+                  </label>
+
+                  <h4>
+                    {complaint.citizen.email}
+                  </h4>
+
                 </div>
 
                 <div className="detail-item">
-                  <label>Email Address</label>
-                  <h4>{complaint.officer.email}</h4>
+
+                  <label>
+                    Contact Number
+                  </label>
+
+                  <h4>
+                    {complaint.citizen.contact}
+                  </h4>
+
                 </div>
 
               </div>
 
             </div>
-            
-            {/* ================================================= */}
-            {/* STATUS PROGRESS */}
-            {/* ================================================= */}
+
+            {/* =================================
+                COMPLAINT DESCRIPTION
+            ================================== */}
 
             <div className="card">
 
               <div className="card-title">
 
-                <h2>Status Progress</h2>
+                <h2>
+                  Complaint Description
+                </h2>
 
               </div>
 
+              <div className="description-box">
+
+                <h3>
+                  {complaint.title}
+                </h3>
+
+                <p>
+                  {complaint.description}
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* =================================
+                COMPLAINT LOCATION
+            ================================== */}
+
+            <div className="card">
+
+              <div className="card-title">
+
+                <h2>
+                  Complaint Location
+                </h2>
+
+              </div>
+
+              <div className="details-grid">
+
+                <div className="detail-item full-width">
+
+                  <label>
+                    Address
+                  </label>
+
+                  <h4>
+                    {complaint.location.address}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Pincode
+                  </label>
+
+                  <h4>
+                    {complaint.location.pincode}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Latitude
+                  </label>
+
+                  <h4>
+                    {complaint.location.latitude}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Longitude
+                  </label>
+
+                  <h4>
+                    {complaint.location.longitude}
+                  </h4>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* =================================
+                ASSIGNED ENGINEER
+            ================================== */}
+
+            <div className="card">
+
+              <div className="card-title">
+
+                <div>
+
+                  <h2>
+                    Assigned Engineer
+                  </h2>
+
+                  <p className="card-subtitle">
+                    Engineer responsible for
+                    resolving this complaint
+                  </p>
+
+                </div>
+
+              </div>
+
+              <div className="details-grid">
+
+                <div className="detail-item">
+
+                  <label>
+                    First Name
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.firstName}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Last Name
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.lastName}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Designation
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.designation}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Department
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.department}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Contact Number
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.contact}
+                  </h4>
+
+                </div>
+
+                <div className="detail-item">
+
+                  <label>
+                    Email Address
+                  </label>
+
+                  <h4>
+                    {complaint.engineer.email}
+                  </h4>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* =================================
+                STATUS PROGRESS
+            ================================== */}
+
+            <div className="card">
+
+              <div className="card-title">
+
+                <h2>
+                  Status Progress
+                </h2>
+
+              </div>
 
               <div className="status-progress">
 
-
                 <div className="progress-line"></div>
 
+                {/* Submitted */}
 
                 <div className="progress-step completed">
 
@@ -211,7 +636,7 @@ function TrackComplaints() {
 
                 </div>
 
-
+                {/* Under Review */}
 
                 <div className="progress-step completed">
 
@@ -229,7 +654,7 @@ function TrackComplaints() {
 
                 </div>
 
-
+                {/* Assigned */}
 
                 <div className="progress-step completed">
 
@@ -247,7 +672,7 @@ function TrackComplaints() {
 
                 </div>
 
-
+                {/* In Progress */}
 
                 <div className="progress-step current">
 
@@ -265,7 +690,7 @@ function TrackComplaints() {
 
                 </div>
 
-
+                {/* Resolved */}
 
                 <div className="progress-step">
 
@@ -283,23 +708,121 @@ function TrackComplaints() {
 
                 </div>
 
-
               </div>
-
 
             </div>
 
-
-
-
-
-            {/* ================================================= */}
-            {/* STATUS HISTORY */}
-            {/* ================================================= */}
-
+            {/* =================================
+                LATEST UPDATE
+            ================================== */}
 
             <div className="card">
 
+              <div className="card-title">
+
+                <h2>
+                  Latest Update
+                </h2>
+
+                <span className="status progress">
+                  Current
+                </span>
+
+              </div>
+
+              <div className="update-box">
+
+                <h3>
+                  {complaint.latestUpdate.title}
+                </h3>
+
+                <p className="update-date">
+                  {complaint.latestUpdate.date}
+                  {" • "}
+                  {complaint.latestUpdate.time}
+                </p>
+
+                <p>
+                  {complaint.latestUpdate.message}
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* =================================
+                COMPLAINT EVIDENCE
+            ================================== */}
+
+            <div className="card">
+
+              <div className="card-title">
+
+                <h2>
+                  Complaint Evidence
+                </h2>
+
+              </div>
+
+              <div className="attachment-list">
+
+                {complaint.attachments.map(
+                  (file, index) => (
+
+                    <div
+                      className="attachment-item"
+                      key={index}
+                    >
+
+                      <div className="attachment-icon">
+
+                        {file.type ===
+                          "image" &&
+                          "🖼️"}
+
+                        {file.type ===
+                          "video" &&
+                          "🎥"}
+
+                        {file.type ===
+                          "pdf" &&
+                          "📄"}
+
+                      </div>
+
+                      <div className="attachment-info">
+
+                        <h4>
+                          {file.name}
+                        </h4>
+
+                        <span>
+                          {file.type.toUpperCase()}
+                        </span>
+
+                      </div>
+
+                      <button
+                        type="button"
+                        className="view-attachment"
+                      >
+                        View
+                      </button>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+            {/* =================================
+                STATUS HISTORY
+            ================================== */}
+
+            <div className="card">
 
               <div className="card-title">
 
@@ -309,203 +832,240 @@ function TrackComplaints() {
 
               </div>
 
-
-
               <div className="history-container">
 
-
+                {/* Submitted */}
 
                 <div className="history-item">
-
 
                   <div className="history-icon completed">
                     ✓
                   </div>
 
-
                   <div className="history-box">
-
 
                     <h4>
                       Complaint Submitted
                     </h4>
 
-
                     <p>
                       09 July 2026 • 10:30 AM
                     </p>
 
-
                     <span>
-                      Your complaint has been successfully submitted and
+                      Your complaint has been
+                      successfully submitted and
                       registered in the system.
                     </span>
 
-
                   </div>
-
 
                 </div>
 
-
-
-
-
+                {/* Under Review */}
 
                 <div className="history-item">
-
 
                   <div className="history-icon completed">
                     ✓
                   </div>
 
-
                   <div className="history-box">
-
 
                     <h4>
                       Complaint Under Review
                     </h4>
 
-
                     <p>
                       10 July 2026 • 09:15 AM
                     </p>
 
-
                     <span>
-                      The Road Maintenance Department verified your complaint
-                      details.
+                      The Roads & Infrastructure
+                      Department verified your
+                      complaint details.
                     </span>
-
 
                   </div>
 
-
                 </div>
 
-
-
-
-
-
+                {/* Engineer Assigned */}
 
                 <div className="history-item">
-
 
                   <div className="history-icon completed">
                     ✓
                   </div>
 
-
                   <div className="history-box">
 
-
                     <h4>
-                      Officer Assigned
+                      Engineer Assigned
                     </h4>
-
 
                     <p>
                       11 July 2026 • 03:20 PM
                     </p>
 
-
                     <span>
-                      Rahul Sharma has been assigned to inspect and resolve
-                      this issue.
+                      Rahul Sharma has been assigned
+                      to inspect and resolve this
+                      issue.
                     </span>
-
 
                   </div>
 
-
                 </div>
 
-
-
-
-
-
+                {/* Repair Started */}
 
                 <div className="history-item active">
-
 
                   <div className="history-icon current">
                     ⏳
                   </div>
 
-
                   <div className="history-box">
-
 
                     <h4>
                       Repair Work Started
                     </h4>
 
-
                     <p>
                       12 July 2026 • 11:00 AM
                     </p>
 
-
                     <span>
-                      Repair work is currently in progress. Further updates
+                      Repair work is currently in
+                      progress. Further updates
                       will appear here automatically.
                     </span>
 
-
                   </div>
-
 
                 </div>
 
+              </div>
 
+            </div>
+
+            {/* =================================
+                RESOLUTION DETAILS
+            ================================== */}
+
+            <div className="card">
+
+              <div className="card-title">
+
+                <h2>
+                  Resolution Details
+                </h2>
+
+                <span className="status progress">
+                  {complaint.resolution.status}
+                </span>
 
               </div>
 
+              {complaint.resolution.status ===
+                "Pending" ? (
+
+                <div className="resolution-pending">
+
+                  <p>
+                    Your complaint has not been
+                    resolved yet. The assigned
+                    engineer is currently working
+                    on the issue.
+                  </p>
+
+                </div>
+
+              ) : (
+
+                <div className="resolution-complete">
+
+                  <p>
+                    {complaint.resolution.message}
+                  </p>
+
+                  <span>
+                    Resolved on{" "}
+                    {complaint.resolution.date}
+                  </span>
+
+                </div>
+
+              )}
 
             </div>
+
+            {/* =================================
+                CITIZEN FEEDBACK
+            ================================== */}
 
             <div className="card feedback-card">
 
-
               <div className="card-title">
+
                 <h2>
                   Citizen Feedback
                 </h2>
-              </div>
 
+              </div>
 
               <p className="feedback-text">
-                After your complaint is resolved, you can share your
-                experience and feedback.
+                After your complaint is resolved,
+                you can share your experience and
+                provide feedback about the service.
               </p>
 
+              {complaint.status ===
+                "Resolved" ? (
 
+                <>
+                  <div className="rating">
+                    ★ ★ ★ ★ ★
+                  </div>
 
-              <div className="rating">
-                ★ ★ ★ ★ ★
-              </div>
+                  <textarea
+                    placeholder="Write your feedback here..."
+                  ></textarea>
 
+                  <button
+                    className="feedback-button"
+                  >
+                    Submit Feedback
+                  </button>
+                </>
 
+              ) : (
 
-              <textarea
-                placeholder="Write your feedback here..."
-              ></textarea>
+                <div className="feedback-disabled">
 
+                  <p>
+                    Feedback will be available
+                    after your complaint is
+                    resolved.
+                  </p>
 
+                </div>
 
-              <button className="feedback-button">
-                Submit Feedback
-              </button>
+              )}
+
             </div>
+
+            
+
           </div>
+
         )}
+
       </div>
+
     </div>
   );
 }
-
 
 export default TrackComplaints;
