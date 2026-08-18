@@ -49,6 +49,8 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/enginner-request"><FaUserTie  /><span>Engineers Applications</span></NavLink></li>
 
+                        <li><NavLink to="/admin/category"><FaUser /><span>Category</span></NavLink></li>
+
                         <li><NavLink to="/admin/report"><FaFileAlt /><span>Reports</span></NavLink></li>
 
                         <li><NavLink to="/admin/profile"><FaUser /><span>Profile</span></NavLink></li>

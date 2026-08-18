@@ -43,6 +43,8 @@ function DepartmentSidebar() {
 
                         <li><NavLink to="/department/view-enginner-request"><FaInbox /><span>Engineer Applications</span></NavLink></li>
 
+                        <li><NavLink to="/department/categories"><FaUser /><span>Category</span></NavLink></li>
+
                         <li><NavLink to="/department/department-report"><FaChartBar /><span>Reports</span></NavLink></li>
 
                         <li><NavLink to="/department/profile"><FaUser /><span>Profile</span></NavLink></li>

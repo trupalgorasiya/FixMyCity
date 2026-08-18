@@ -34,6 +34,9 @@ import ViewFeedbackDept from "./pages/department/ViewFeedbackDept";
 import EngineerRequests from "./pages/department/EngineerRequests";
 import ReviewEngineerRequest from "./pages/admin/ReviewEngineerRequest";
 
+import CategoryManagement from "./pages/admin/CategoryManagement";
+import ManageCategory from "./pages/department/ManageCategory"
+
 function AppRoutes() {
 
     return (
@@ -61,6 +64,7 @@ function AppRoutes() {
             <Route path="notification" element={<NotificationPage/>} />
             <Route path="view-feedback" element={<ViewFeedbackDept/>}/>
             <Route path="view-enginner-request" element={<EngineerRequests/>}/>
+            <Route path="categories" element={<ManageCategory/>} />
              
              </Route>
 
@@ -86,6 +90,7 @@ function AppRoutes() {
              <Route path="notification" element={<NotificationPage/>} />
              <Route path="viewfeedback" element={<ViewFeedback/>}/>
              <Route path="enginner-request" element={<ReviewEngineerRequest/>}/>
+             <Route path="category" element={<CategoryManagement/>} />
 
              </Route>
 

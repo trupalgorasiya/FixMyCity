@@ -55,6 +55,9 @@ import ViewFeedbackDept from "./pages/department/ViewFeedbackDept";
 import EngineerRequests from "./pages/department/EngineerRequests";
 import ReviewEngineerRequest from "./pages/admin/ReviewEngineerRequest";
 
+import CategoryManagement from "./pages/admin/CategoryManagement";
+import ManageCategory from "./pages/department/ManageCategory"
+
 function App() {
   return (
     <BrowserRouter>
@@ -103,6 +106,7 @@ function App() {
     <Route path="notification" element={<NotificationPage/>} />
     <Route path="view-feedback" element={<ViewFeedbackDept/>}/>
     <Route path="view-enginner-request" element={<EngineerRequests/>} />
+    <Route path="categories" element={<ManageCategory/>} />
 </Route>
 
 {/* Engineer */}
@@ -115,6 +119,7 @@ function App() {
     <Route path="history" element={<ComplaintsHistory/>}/>
     <Route path="work/:id" element={<EngineerWorkDetails/>}/>
     <Route path="notification" element={<NotificationPage/>} />
+    
     
 
 </Route>
@@ -133,6 +138,7 @@ function App() {
     <Route path="notification" element={<NotificationPage/>} />
     <Route path="viewfeedback" element={<ViewFeedback/>}/>
     <Route path="enginner-request" element={<ReviewEngineerRequest/>}/>
+    <Route path="category" element={<CategoryManagement/>} />
 </Route>
         
       </Routes> 
