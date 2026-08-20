@@ -18,6 +18,7 @@ import ReportComplaints from "./pages/user/ReportComplaints";
 import MyComplaints from "./pages/user/MyComplaints";
 // import ComplaintTracking from "./pages/ComplaintTracking";
 import Profile from "./Authentication/Profile";
+import Dept_Profile from "./pages/department/Dept_profile";
 import EditProfile from "./Authentication/EditProfile"
 import NotificationPage from "./Authentication/NotificationPage";
 import NewComplaints from "./pages/department/NewComplaints";
@@ -27,6 +28,7 @@ import DepartmentReport from "./pages/department/DepartmentReport";
 import AssignedComplaints from "./pages/engineer/AssignedComplaints";
 import ComplaintsHistory from "./pages/engineer/ComplaintsHistory";
 import EngineerWorkDetails from "./pages/engineer/EngineerWorkDetails";
+import Engineer_Profile from "./pages/engineer/Engineer_Profile";
 // import TrackComplaints from "./pages/user/TrackComplaints";
 import ComplaintTracking from "./pages/ComplaintTracking";
 import ViewFeedback from "./pages/admin/ViewFeedback";
@@ -55,7 +57,7 @@ function AppRoutes() {
 
             <Route path="/department" element={<DepartmentLayout />}> 
              <Route path="dashboard" element={<DepartmentDashboard />} /> 
-             <Route path="profile" element={<Profile />} />
+             <Route path="profile" element={<Dept_Profile />} />
              <Route path="edit-profile" element={<EditProfile/>}/>
              <Route path="new-complaints" element={<NewComplaints/>}/>
              <Route path="all-complaints" element={<AllComplaints/>}/>
@@ -70,7 +72,7 @@ function AppRoutes() {
 
             <Route path="/engineer" element={<EngineerLayout />}>
              <Route path="dashboard" element={<EngineerDashboard />} />
-             <Route path="profile" element={<Profile />} />
+             <Route path="profile" element={<Engineer_Profile />} />
              <Route path="edit-profile" element={<EditProfile/>}/>
              <Route path="complents" element={<AssignedComplaints/>}/>
              <Route path="history" element={<ComplaintsHistory/>}/>

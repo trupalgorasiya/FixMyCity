@@ -1,0 +1,1302 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+
+/* =========================================================
+   =========================================================
+   ENGINEER PROFILE PAGE
+   =========================================================
+========================================================= */
+
+
+/* =========================================================
+   MAIN PROFILE PAGE
+========================================================= */
+
+.engineer-profile-page {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 30px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    background: #f8fafc;
+
+    font-family: "Poppins", sans-serif;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PROFILE CARD
+========================================================= */
+
+.engineer-profile-card {
+
+    width: 100%;
+
+    max-width: 900px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .05);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PROFILE HEADER
+========================================================= */
+
+.engineer-profile-header {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   PROFILE PHOTO WRAPPER
+========================================================= */
+
+.engineer-profile-photo-wrapper {
+
+    width: 140px;
+
+    height: 140px;
+
+    margin-bottom: 20px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 5px solid #2563eb;
+
+    background: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PROFILE PHOTO
+========================================================= */
+
+.engineer-profile-photo {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+}
+
+
+/* =========================================================
+   HEADER CONTENT
+========================================================= */
+
+.engineer-profile-header-content h2 {
+
+    margin: 0 0 10px;
+
+    color: #111827;
+
+    font-size: 30px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   ROLE
+========================================================= */
+
+.engineer-profile-role {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 8px 20px;
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+
+    border-radius: 30px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   PROFILE CONTENT
+========================================================= */
+
+.engineer-profile-content {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.engineer-profile-section-title {
+
+    margin-top: 10px;
+
+    padding: 4px 3px 8px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.engineer-profile-section-title h3 {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 19px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   PROFILE FIELD
+========================================================= */
+
+.engineer-profile-field {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 18px 22px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    transition: .3s;
+
+    box-sizing: border-box;
+}
+
+
+.engineer-profile-field:hover {
+
+    background: #f3f4f6;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.engineer-profile-label {
+
+    min-width: 220px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    color: #374151;
+
+    font-size: 15px;
+
+    font-weight: 600;
+}
+
+
+.engineer-profile-label svg {
+
+    color: #2563eb;
+
+    font-size: 17px;
+}
+
+
+/* =========================================================
+   VALUE
+========================================================= */
+
+.engineer-profile-value {
+
+    flex: 1;
+
+    color: #111827;
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+    text-align: right;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   CERTIFICATE
+========================================================= */
+
+.engineer-profile-certificate {
+
+    flex: 1;
+
+    padding: 9px 14px;
+
+    background: #ffffff;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    text-align: right;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   PROFILE ACTIONS
+========================================================= */
+
+.engineer-profile-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+========================================================= */
+
+.engineer-profile-edit-btn {
+
+    min-width: 175px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 12px 24px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+
+.engineer-profile-edit-btn:hover {
+
+    background: #111827;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 15px rgba(37, 99, 235, .18);
+}
+
+
+/* =========================================================
+   CHANGE PASSWORD BUTTON
+========================================================= */
+
+.engineer-profile-password-btn {
+
+    min-width: 175px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 12px 24px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+
+.engineer-profile-password-btn:hover {
+
+    background: #1f2937;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   =========================================================
+   ENGINEER EDIT PROFILE PAGE
+   =========================================================
+========================================================= */
+
+
+/* =========================================================
+   EDIT PAGE
+========================================================= */
+
+.engineer-edit-page {
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    padding: 30px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    background: #f8fafc;
+
+    font-family: "Poppins", sans-serif;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   EDIT CARD
+========================================================= */
+
+.engineer-edit-card {
+
+    width: 100%;
+
+    max-width: 900px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .05);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   EDIT HEADER
+========================================================= */
+
+.engineer-edit-header {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   EDIT TITLE
+========================================================= */
+
+.engineer-edit-header h2 {
+
+    margin: 0 0 40px;
+
+    color: #0f172a;
+
+    font-size: 36px;
+
+    font-weight: 700;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   PHOTO SECTION
+========================================================= */
+
+.engineer-edit-photo-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 100%;
+}
+
+
+/* =========================================================
+   EDIT PROFILE PHOTO
+========================================================= */
+
+.engineer-edit-photo {
+
+    width: 150px;
+
+    height: 150px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: block;
+
+    border: 5px solid #2563eb;
+
+    background: #ffffff;
+
+    margin-bottom: 24px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CHANGE PHOTO BUTTON
+========================================================= */
+
+.engineer-edit-change-photo {
+
+    min-width: 217px;
+
+    height: 59px;
+
+    padding: 0 25px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 11px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 17px;
+
+    font-weight: 600;
+
+    box-sizing: border-box;
+
+    transition: all .3s ease;
+}
+
+
+.engineer-edit-change-photo:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 15px rgba(37, 99, 235, .20);
+}
+
+
+/* =========================================================
+   CAMERA ICON
+========================================================= */
+
+.engineer-edit-change-photo svg {
+
+    font-size: 18px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   HIDDEN FILE INPUT
+========================================================= */
+
+.engineer-edit-change-photo input {
+
+    display: none;
+}
+
+
+/* =========================================================
+   EDIT FORM
+========================================================= */
+
+.engineer-edit-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    margin-top: 35px;
+
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   FIRST + LAST NAME ROW
+========================================================= */
+
+.engineer-edit-name-row {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+}
+
+
+/* =========================================================
+   FIRST/LAST NAME FIELD
+========================================================= */
+
+.engineer-edit-name-field {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 18px 20px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-name-field:focus-within {
+
+    background: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+
+/* =========================================================
+   EMAIL FIELD
+========================================================= */
+
+.engineer-edit-email-field {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 18px 20px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CONTACT FIELD
+========================================================= */
+
+.engineer-edit-contact-field {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 18px 20px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-contact-field:focus-within {
+
+    background: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.engineer-edit-label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.engineer-edit-label svg {
+
+    color: #2563eb;
+
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   NORMAL INPUT
+========================================================= */
+
+.engineer-edit-input {
+
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    color: #111827;
+
+    outline: none;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-input:focus {
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+
+/* =========================================================
+   EMAIL READ ONLY INPUT
+========================================================= */
+
+.engineer-edit-email-input {
+
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 13px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 9px;
+
+    background: #f3f4f6;
+
+    color: #6b7280;
+
+    outline: none;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 14px;
+
+    cursor: not-allowed;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   EMAIL LOCK MESSAGE
+========================================================= */
+
+.engineer-edit-email-note {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color: #9ca3af;
+
+    font-size: 11px;
+}
+
+
+.engineer-edit-email-note svg {
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   EDIT ACTIONS
+========================================================= */
+
+.engineer-edit-actions {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+========================================================= */
+
+.engineer-edit-cancel {
+
+    min-width: 175px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 12px 24px;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    background: #f3f4f6;
+
+    color: #374151;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-cancel:hover {
+
+    background: #e5e7eb;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SAVE BUTTON
+========================================================= */
+
+.engineer-edit-save {
+
+    min-width: 175px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 12px 24px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-save:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 5px 15px rgba(37, 99, 235, .18);
+}
+
+
+/* =========================================================
+   =========================================================
+   TABLET RESPONSIVE
+   =========================================================
+========================================================= */
+
+@media (max-width: 768px) {
+
+
+    /* PROFILE */
+
+    .engineer-profile-page {
+
+        padding: 20px;
+    }
+
+
+    .engineer-profile-card {
+
+        padding: 25px;
+    }
+
+
+    .engineer-profile-header-content h2 {
+
+        font-size: 25px;
+    }
+
+
+    .engineer-profile-field {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+
+    .engineer-profile-label {
+
+        min-width: 0;
+
+        width: 100%;
+    }
+
+
+    .engineer-profile-value {
+
+        width: 100%;
+
+        text-align: left;
+    }
+
+
+    .engineer-profile-certificate {
+
+        width: 100%;
+
+        text-align: left;
+
+        box-sizing: border-box;
+    }
+
+
+    .engineer-profile-actions {
+
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+
+    .engineer-profile-edit-btn,
+    .engineer-profile-password-btn {
+
+        width: 100%;
+    }
+
+
+    /* EDIT */
+
+    .engineer-edit-page {
+
+        padding: 20px;
+    }
+
+
+    .engineer-edit-card {
+
+        padding: 25px;
+    }
+
+
+    .engineer-edit-header h2 {
+
+        font-size: 30px;
+
+        margin-bottom: 32px;
+    }
+
+
+    .engineer-edit-photo {
+
+        width: 135px;
+
+        height: 135px;
+    }
+
+
+    .engineer-edit-name-row {
+
+        grid-template-columns: 1fr;
+    }
+
+
+    .engineer-edit-actions {
+
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+
+    .engineer-edit-cancel,
+    .engineer-edit-save {
+
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   =========================================================
+   MOBILE RESPONSIVE
+   =========================================================
+========================================================= */
+
+@media (max-width: 480px) {
+
+
+    /* PROFILE */
+
+    .engineer-profile-page {
+
+        padding: 15px;
+    }
+
+
+    .engineer-profile-card {
+
+        padding: 20px;
+
+        border-radius: 16px;
+    }
+
+
+    .engineer-profile-photo-wrapper {
+
+        width: 115px;
+
+        height: 115px;
+
+        border-width: 4px;
+    }
+
+
+    .engineer-profile-header-content h2 {
+
+        font-size: 22px;
+    }
+
+
+    .engineer-profile-role {
+
+        font-size: 13px;
+
+        padding: 7px 16px;
+    }
+
+
+    .engineer-profile-field {
+
+        padding: 16px;
+    }
+
+
+    .engineer-profile-label {
+
+        font-size: 14px;
+    }
+
+
+    .engineer-profile-value {
+
+        font-size: 14px;
+    }
+
+
+    .engineer-profile-section-title h3 {
+
+        font-size: 17px;
+    }
+
+
+    /* EDIT */
+
+    .engineer-edit-page {
+
+        padding: 15px;
+    }
+
+
+    .engineer-edit-card {
+
+        padding: 20px;
+
+        border-radius: 16px;
+    }
+
+
+    .engineer-edit-header h2 {
+
+        font-size: 28px;
+
+        margin-bottom: 30px;
+    }
+
+
+    .engineer-edit-photo {
+
+        width: 125px;
+
+        height: 125px;
+
+        border-width: 4px;
+
+        margin-bottom: 20px;
+    }
+
+
+    .engineer-edit-change-photo {
+
+        width: 100%;
+
+        min-width: 0;
+
+        height: 55px;
+
+        font-size: 15px;
+    }
+
+
+    .engineer-edit-form {
+
+        margin-top: 30px;
+    }
+
+
+    .engineer-edit-name-field,
+    .engineer-edit-email-field,
+    .engineer-edit-contact-field {
+
+        padding: 16px;
+    }
+
+
+    .engineer-edit-input,
+    .engineer-edit-email-input {
+
+        font-size: 14px;
+    }
+
+
+    .engineer-edit-cancel,
+    .engineer-edit-save {
+
+        width: 100%;
+
+        font-size: 14px;
+    }
+
+}
