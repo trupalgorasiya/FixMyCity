@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { useParams, useLocation  } from "react-router-dom";
-import 'leaflet/dist/leaflet.css';
+import { useParams, useLocation } from "react-router-dom";
+import "leaflet/dist/leaflet.css";
 import "./EngineerWorkDetails.css";
+
 import {
- MapContainer,
- TileLayer,
- Marker,
- Popup
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup
 } from "react-leaflet";
+
 import {
   FaMapMarkerAlt,
   FaUser,
@@ -15,139 +17,385 @@ import {
   FaEnvelope,
   FaUpload,
   FaCheckCircle,
-  FaClock,
-  FaTools
+  FaTools,
+  FaFilePdf,
+  FaVideo,
+  FaTimes
 } from "react-icons/fa";
 
 function EngineerWorkDetails() {
 
-  const {id} = useParams();
+  const { id } = useParams();
   const location = useLocation();
+
   const complaintData = location.state;
+
   const complaint = {
-
-id: complaintData?.id || id,
-citizen: complaintData?.username,
-email: complaintData?.email,
-phone: complaintData?.phone,
-category:"Road Damage",
-priority: complaintData?.priority,
-address:"Satellite, Ahmedabad, Gujarat",
-pincode:"380015",
-latitude:23.0225,
-longitude:72.5714,
-description:"Large pothole causing traffic problems near main road.",
-engineer:"Amit Patel"
-};
-  const [status,setStatus] = useState("Assigned");
-  const [beforeImages,setBeforeImages] =useState([]);
-  const [afterImages,setAfterImages] =useState([]);
-  const [uploadedBefore,setUploadedBefore] = useState(false);
-  const [uploadedAfter,setUploadedAfter] = useState(false);
-  const [remarks,setRemarks] =useState("");
-  const validateFiles = (files)=>{
+    id: complaintData?.id || id,
+    citizen: complaintData?.username,
+    email: complaintData?.email,
+    phone: complaintData?.phone,
+    category: "Road Damage",
+    priority: complaintData?.priority,
+    address: "Satellite, Ahmedabad, Gujarat",
+    pincode: "380015",
+    latitude: 23.0225,
+    longitude: 72.5714,
+    description: "Large pothole causing traffic problems near main road.",
+    engineer: "Amit Patel"
+  };
 
 
- if(files.length > 3){
+  // ================= FILE STATES =================
 
-   alert("Maximum 3 files allowed");
+  const [beforeFiles, setBeforeFiles] = useState([]);
+  const [afterFiles, setAfterFiles] = useState([]);
 
-   return false;
+  const [submittedBeforeFiles, setSubmittedBeforeFiles] = useState([]);
+  const [submittedAfterFiles, setSubmittedAfterFiles] = useState([]);
 
- }
+  const [beforeSubmitted, setBeforeSubmitted] = useState(false);
+  const [afterSubmitted, setAfterSubmitted] = useState(false);
 
-
- const allowedFiles = files.every(file =>
-
-    file.type.startsWith("image/") ||
-    file.type.startsWith("video/") ||
-    file.type === "application/pdf"
-
- );
+  const [remarks, setRemarks] = useState("");
 
 
- if(!allowedFiles){
+  // ================= VALIDATE FILES =================
 
-    alert(
-      "Only Image, Video and PDF files allowed"
+  const validateFiles = (files) => {
+
+    if (files.length > 3) {
+
+      alert("Maximum 3 files allowed.");
+
+      return false;
+    }
+
+    const allowedFiles = files.every(
+      (file) =>
+        file.type.startsWith("image/") ||
+        file.type.startsWith("video/") ||
+        file.type === "application/pdf"
     );
 
-    return false;
+    if (!allowedFiles) {
 
- }
+      alert(
+        "Only Image, Video and PDF files are allowed."
+      );
+
+      return false;
+    }
+
+    return true;
+  };
 
 
- return true;
+  // ================= MERGE FILES =================
+
+  const mergeFiles = (currentFiles, newFiles) => {
+
+    const combinedFiles = [
+      ...currentFiles,
+      ...newFiles
+    ];
+
+    if (combinedFiles.length > 3) {
+
+      alert(
+        "Maximum 3 files allowed. Please remove an existing file before adding another."
+      );
+
+      return currentFiles;
+    }
+
+    return combinedFiles;
+  };
 
 
-};
+  // ================= BEFORE FILE SELECT =================
 
-const handleBeforeUpload = (e)=>{
- const files = Array.from(e.target.files);
- if(validateFiles(files)){
-    setBeforeImages(files);
-    setUploadedBefore(false);
- }
+  const handleBeforeUpload = (e) => {
 
-};
-const handleAfterUpload = (e)=>{
- const files = Array.from(e.target.files);
+    const newFiles = Array.from(e.target.files);
 
- if(validateFiles(files)){
-    setAfterImages(files);
-    setUploadedAfter(false);
- }
-};
-  const previewImage = (file)=>{
+    if (newFiles.length === 0) {
+      return;
+    }
+
+    const combinedFiles = mergeFiles(
+      beforeFiles,
+      newFiles
+    );
+
+    if (validateFiles(combinedFiles)) {
+
+      setBeforeFiles(combinedFiles);
+
+      // New selection means user can submit again
+      setBeforeSubmitted(false);
+    }
+
+    // Allow selecting the same file again
+    e.target.value = "";
+  };
+
+
+  // ================= AFTER FILE SELECT =================
+
+  const handleAfterUpload = (e) => {
+
+    const newFiles = Array.from(e.target.files);
+
+    if (newFiles.length === 0) {
+      return;
+    }
+
+    const combinedFiles = mergeFiles(
+      afterFiles,
+      newFiles
+    );
+
+    if (validateFiles(combinedFiles)) {
+
+      setAfterFiles(combinedFiles);
+
+      // New selection means user can submit again
+      setAfterSubmitted(false);
+    }
+
+    // Allow selecting the same file again
+    e.target.value = "";
+  };
+
+
+  // ================= PREVIEW FILE =================
+
+  const previewFile = (file) => {
+
     return URL.createObjectURL(file);
   };
-  const updateStatus=(value)=>{
-    setStatus(value);
+
+
+  // ================= REMOVE BEFORE FILE =================
+
+  const removeBeforeFile = (index) => {
+
+    const updatedFiles = beforeFiles.filter(
+      (_, i) => i !== index
+    );
+
+    setBeforeFiles(updatedFiles);
+
+    setBeforeSubmitted(false);
   };
-  const saveWork=()=>{
+
+
+  // ================= REMOVE AFTER FILE =================
+
+  const removeAfterFile = (index) => {
+
+    const updatedFiles = afterFiles.filter(
+      (_, i) => i !== index
+    );
+
+    setAfterFiles(updatedFiles);
+
+    setAfterSubmitted(false);
+  };
+
+
+  // ================= SUBMIT BEFORE FILES =================
+
+  const submitBeforeFiles = () => {
+
+    if (beforeFiles.length === 0) {
+
+      alert(
+        "Please select at least one before-work file."
+      );
+
+      return;
+    }
+
+    setSubmittedBeforeFiles([
+      ...beforeFiles
+    ]);
+
+    setBeforeSubmitted(true);
+
     alert(
-      "Complaint updated successfully"
+      "Before-work files submitted successfully."
     );
   };
-const submitBeforeImages = ()=>{
- if(beforeImages.length === 0){
-   alert("Please select before work files");
-   return;
- }
- setUploadedBefore(true);
- alert(
-  "Before work images uploaded successfully"
- );
-};
-const submitAfterImages = ()=>{
- if(afterImages.length === 0){
-   alert("Please select after work files");
-   return;
- }
- setUploadedAfter(true);
- alert(
-  "After work images uploaded successfully"
- );
-};
 
-const removeBeforeFile=(index)=>{
- const updated =
- beforeImages.filter(
- (_,i)=>i !== index
- );
- setBeforeImages(updated);
-};
 
-const removeAfterFile=(index)=>{
- const updated =
- afterImages.filter(
- (_,i)=>i !== index
- );
- setAfterImages(updated);
-};
+  // ================= SUBMIT AFTER FILES =================
+
+  const submitAfterFiles = () => {
+
+    if (afterFiles.length === 0) {
+
+      alert(
+        "Please select at least one after-work file."
+      );
+
+      return;
+    }
+
+    setSubmittedAfterFiles([
+      ...afterFiles
+    ]);
+
+    setAfterSubmitted(true);
+
+    alert(
+      "After-work files submitted successfully."
+    );
+  };
+
+
+  // ================= SAVE WORK =================
+
+  const saveWork = () => {
+
+    alert(
+      "Complaint work details saved successfully."
+    );
+  };
+
+
+  // ================= FILE PREVIEW =================
+
+  const renderFilePreview = (
+    file,
+    index,
+    type
+  ) => {
+
+    const fileUrl = previewFile(file);
+
+    return (
+
+      <div
+        className="image-card"
+        key={`${file.name}-${index}`}
+      >
+
+        {/* IMAGE */}
+
+        {file.type.startsWith("image/") && (
+
+          <img
+            src={fileUrl}
+            alt={`${type} ${index + 1}`}
+          />
+
+        )}
+
+
+        {/* VIDEO */}
+
+        {file.type.startsWith("video/") && (
+
+          <div className="video-preview">
+
+            <video
+              controls
+              src={fileUrl}
+            />
+
+            <div className="file-type-label">
+
+              <FaVideo />
+
+              <span>
+                Video
+              </span>
+
+            </div>
+
+          </div>
+
+        )}
+
+
+        {/* PDF */}
+
+        {file.type === "application/pdf" && (
+
+          <div className="pdf-preview">
+
+            <FaFilePdf />
+
+            <span>
+              PDF File
+            </span>
+
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open PDF
+            </a>
+
+          </div>
+
+        )}
+
+
+        {/* FILE NAME */}
+
+        <p>
+          {type} {index + 1}
+        </p>
+
+        <small>
+          {file.name}
+        </small>
+
+
+        {/* REMOVE */}
+
+        <button
+          type="button"
+          className="remove-file"
+          onClick={() => {
+
+            if (type === "Before") {
+
+              removeBeforeFile(index);
+
+            } else {
+
+              removeAfterFile(index);
+
+            }
+
+          }}
+        >
+
+          <FaTimes />
+
+          Remove
+
+        </button>
+
+      </div>
+
+    );
+  };
+
+
   return (
 
     <div className="engineer-work-page">
+
+
+      {/* ================================================= */}
+      {/* HEADER */}
+      {/* ================================================= */}
 
       <div className="work-header">
 
@@ -156,48 +404,85 @@ const removeAfterFile=(index)=>{
           <h1>
             Engineer Work Details
           </h1>
+
           <p>
-            Update complaint progress,
-            upload evidence and complete work.
+            View complaint details, upload work
+            evidence and add work notes.
           </p>
 
         </div>
+
       </div>
+
+
+      {/* ================================================= */}
+      {/* COMPLAINT INFORMATION */}
+      {/* ================================================= */}
+
       <div className="work-card">
+
         <div className="card-title">
-          <FaTools/>
+
+          <FaTools />
+
           Complaint Information
+
         </div>
+
+
         <div className="details-grid">
+
+
+          {/* COMPLAINT ID */}
+
           <div className="detail-box">
+
             <label>
               Complaint ID
             </label>
+
             <span>
               {complaint.id}
             </span>
+
           </div>
+
+
+          {/* CATEGORY */}
+
           <div className="detail-box">
+
             <label>
               Category
             </label>
+
             <span>
               {complaint.category}
             </span>
+
           </div>
+
+
+          {/* CITIZEN */}
+
           <div className="detail-box">
+
             <label>
               Citizen
             </label>
 
             <span>
-              <FaUser/>
+
+              <FaUser />
+
               {complaint.citizen}
+
             </span>
 
           </div>
 
 
+          {/* PHONE */}
 
           <div className="detail-box">
 
@@ -206,13 +491,17 @@ const removeAfterFile=(index)=>{
             </label>
 
             <span>
-              <FaPhone/>
+
+              <FaPhone />
+
               {complaint.phone}
+
             </span>
 
           </div>
 
 
+          {/* EMAIL */}
 
           <div className="detail-box">
 
@@ -221,13 +510,17 @@ const removeAfterFile=(index)=>{
             </label>
 
             <span>
-              <FaEnvelope/>
+
+              <FaEnvelope />
+
               {complaint.email}
+
             </span>
 
           </div>
 
 
+          {/* PRIORITY */}
 
           <div className="detail-box">
 
@@ -235,20 +528,18 @@ const removeAfterFile=(index)=>{
               Priority
             </label>
 
-
             <span className="priority high">
 
               {complaint.priority}
 
             </span>
 
-
           </div>
-
 
         </div>
 
 
+        {/* DESCRIPTION */}
 
         <div className="description-box">
 
@@ -256,21 +547,20 @@ const removeAfterFile=(index)=>{
             Complaint Description
           </label>
 
-
           <p>
             {complaint.description}
           </p>
 
-
         </div>
 
-
       </div>
-         
 
+
+      {/* ================================================= */}
+      {/* LOCATION */}
+      {/* ================================================= */}
 
       <div className="work-card">
-
 
         <div className="card-title">
 
@@ -281,562 +571,370 @@ const removeAfterFile=(index)=>{
         </div>
 
 
-
         <div className="location-container">
 
 
+          {/* ADDRESS */}
+
           <div className="address-content">
 
+            <h3>
+              Selected Address
+            </h3>
 
-<h3>
- Selected Address
-</h3>
+            <p>
 
+              <FaMapMarkerAlt />
 
-<p>
- <FaMapMarkerAlt/>
+              {complaint.address}
 
- {complaint.address}
-
-</p>
-
+            </p>
 
 
-<h3>
- Pincode
-</h3>
+            <h3>
+              Pincode
+            </h3>
+
+            <p>
+              {complaint.pincode}
+            </p>
 
 
-<p>
-{complaint.pincode}
-</p>
+            <h3>
+              Latitude
+            </h3>
+
+            <p>
+              {complaint.latitude}
+            </p>
 
 
+            <h3>
+              Longitude
+            </h3>
 
-<h3>
- Latitude
-</h3>
+            <p>
+              {complaint.longitude}
+            </p>
 
-
-<p>
-{complaint.latitude}
-</p>
-
-
-
-<h3>
- Longitude
-</h3>
+          </div>
 
 
-<p>
-{complaint.longitude}
-</p>
-
-
-</div>
-
+          {/* MAP */}
 
           <div className="map-box">
 
+            <MapContainer
+              center={[
+                complaint.latitude,
+                complaint.longitude
+              ]}
+              zoom={15}
+              style={{
+                height: "300px",
+                width: "100%"
+              }}
+            >
 
-<MapContainer
-
-center={[
-complaint.latitude,
-complaint.longitude
-]}
-
-zoom={15}
-
-style={{
-height:"300px",
-width:"100%"
-}}
-
->
-
-
-<TileLayer
-
-url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-
-/>
+              <TileLayer
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
 
 
+              <Marker
+                position={[
+                  complaint.latitude,
+                  complaint.longitude
+                ]}
+              >
 
-<Marker
+                <Popup>
 
-position={[
-complaint.latitude,
-complaint.longitude
-]}
+                  {complaint.address}
 
->
+                  <br />
 
-<Popup>
+                  Pincode:
+                  {" "}
+                  {complaint.pincode}
 
-{complaint.address}
+                </Popup>
 
-<br/>
+              </Marker>
 
-Pincode:
-{complaint.pincode}
+            </MapContainer>
 
-</Popup>
-
-
-</Marker>
-
-
-</MapContainer>
-
-
-</div>
-
+          </div>
 
         </div>
-
 
       </div>
 
 
-      <div className="work-card">
+      {/* ================================================= */}
+      {/* BEFORE WORK FILES */}
+      {/* ================================================= */}
 
+      <div className="work-card">
 
         <div className="card-title">
 
           <FaUpload />
 
-          Before Work Images
+          Before Work Files
 
         </div>
 
 
-
         <p className="section-description">
 
-          Upload images before starting the repair work.
+          Upload photos, videos or PDF documents
+          showing the condition before starting
+          the repair work.
 
         </p>
 
 
+        {/* UPLOAD */}
 
         <div className="upload-area">
 
-
           <input
-
             type="file"
-
             id="before-upload"
-
             multiple
-
-            accept="image/*,video/*,.pdf"
-
+            accept="image/*,video/*,.pdf,application/pdf"
             onChange={handleBeforeUpload}
-
           />
-
 
 
           <label htmlFor="before-upload">
 
-
             <FaUpload />
 
-
             <span>
-              Upload Before Images
+              Upload Before Work Files
             </span>
 
-
             <small>
-              PNG, JPG, JPEG supported
+              Maximum 3 files • Images, Videos or PDF
             </small>
-
 
           </label>
 
-
         </div>
 
 
+        {/* SELECTED FILES */}
 
-      {
-beforeImages.length > 0 && (
+        {beforeFiles.length > 0 && (
 
-<div>
+          <div className="file-upload-section">
 
 
-<button
-className="upload-submit-btn"
-onClick={submitBeforeImages}
->
-Upload Before Files
-</button>
-{
-uploadedBefore &&
+            <div className="upload-count">
 
-<p className="upload-success">
-✓ Before files uploaded successfully
-</p>
+              <span>
+                Selected Files
+              </span>
 
-}
-
-
-<div className="image-preview">
-
-
-{
-beforeImages.map((image,index)=>(
-
-
-<div
-className="image-card"
-key={index}
->
-
-
-{
-image.type.startsWith("image") &&
-
-<img
-src={previewImage(image)}
-alt="before"
-/>
-
-}
-
-
-
-{
-image.type.startsWith("video") &&
-
-<video
-controls
-src={previewImage(image)}
-/>
-
-}
-
-
-
-{
-image.type==="application/pdf" &&
-
-<div className="pdf-preview">
-
-PDF File
-
-</div>
-
-}
-
-
-
-<p>
-Before {index+1}
-</p>
-
-
-<button
-
-className="remove-file"
-
-onClick={()=>
-removeBeforeFile(index)
-}
-
->
-
-Remove
-
-</button>
-
-
-</div>
-
-
-))
-}
-
-
-</div>
-
-
-</div>
-
-)
-}
-
-      </div>
-      <div className="work-card">
-        <div className="card-title">
-          <FaClock />
-          Update Work Status
-        </div>
-
-        <div className="status-selector">
-          <button
-            className={
-              status==="Assigned"
-              ?
-              "active-status"
-              :
-              ""
-            }
-            onClick={()=>updateStatus("Assigned")}
-          >
-            Assigned
-          </button>
-
-          <span>
-            →
-          </span>
-          <button
-            className={
-              status==="In Progress"
-              ?
-              "active-status"
-              :
-              ""
-            }
-
-
-            onClick={()=>
-              updateStatus("In Progress")
-            }
-
-
-          >
-
-            In Progress
-
-          </button>
-
-
-
-
-          <span>
-            →
-          </span>
-
-
-
-
-          <button
-
-
-            className={
-              status==="Completed"
-              ?
-              "active-status"
-              :
-              ""
-            }
-
-
-
-            onClick={()=>
-              updateStatus("Completed")
-            }
-
-
-
-          >
-
-            Completed
-
-          </button>
-
-
-
-        </div>
-
-
-
-      </div>
-
-
-
-
-
-   
-
-
-
-      <div className="work-card">
-
-
-        <div className="card-title">
-
-
-          <FaCheckCircle />
-
-
-          After Work Images
-
-
-        </div>
-
-
-
-
-        <p className="section-description">
-
-          Upload final images after completing work.
-
-        </p>
-
-
-
-
-        <div className="upload-area">
-
-
-
-          <input
-
-
-            type="file"
-
-
-            id="after-upload"
-
-
-            multiple
-
-
-            accept="image/*,video/*,.pdf"
-
-
-            onChange={handleAfterUpload}
-
-
-          />
-
-
-
-
-          <label htmlFor="after-upload">
-
-
-            <FaUpload />
-
-
-            <span>
-
-              Upload Completed Work Images
-
-            </span>
-
-
-            <small>
-
-              Show repaired condition
-
-            </small>
-
-
-          </label>
-
-
-
-        </div>
-
-
-
-
-
-        {
-
-
-          afterImages.length > 0 && (
-<button
-
-className="upload-submit-btn"
-
-onClick={submitAfterImages}
-
->
-
-Upload Completed Files
-
-</button>
-
-)
-}
-
-            <div className="image-preview">
-
-
-
-              {
-
-                afterImages.map((image,index)=>(
-
-
-                  <div
-
-                    className="image-card"
-
-                    key={index}
-
-                  >
-
-
-                    <img
-
-                      src={
-                        previewImage(image)
-                      }
-
-
-                      alt="after"
-
-
-                    />
-
-
-
-                    <p>
-
-                      After {index+1}
-
-                    </p>
-
-
-
-                  </div>
-
-
-
-                ))
-
-
-              }
-
-
+              <strong>
+                {beforeFiles.length}/3
+              </strong>
 
             </div>
 
 
+            {/* PREVIEW */}
 
-          
+            <div className="image-preview">
+
+              {beforeFiles.map(
+                (file, index) =>
+                  renderFilePreview(
+                    file,
+                    index,
+                    "Before"
+                  )
+              )}
+
+            </div>
 
 
-        
+            {/* SUBMIT BUTTON */}
+
+            <div className="upload-actions">
+
+              <button
+                type="button"
+                className="upload-submit-btn"
+                onClick={submitBeforeFiles}
+              >
+
+                <FaCheckCircle />
+
+                {beforeSubmitted
+                  ? "Submitted"
+                  : "Submit Before Files"}
+
+              </button>
+
+            </div>
 
 
+            {/* SUCCESS */}
+
+            {beforeSubmitted && (
+
+              <p className="upload-success">
+
+                ✓ Before-work files submitted successfully
+
+              </p>
+
+            )}
+
+          </div>
+
+        )}
 
       </div>
-            
 
+
+      {/* ================================================= */}
+      {/* AFTER WORK FILES */}
+      {/* ================================================= */}
 
       <div className="work-card">
 
+        <div className="card-title">
+
+          <FaCheckCircle />
+
+          After Work Files
+
+        </div>
+
+
+        <p className="section-description">
+
+          Upload photos, videos or PDF documents
+          showing the completed repair work.
+
+        </p>
+
+
+        {/* UPLOAD */}
+
+        <div className="upload-area">
+
+          <input
+            type="file"
+            id="after-upload"
+            multiple
+            accept="image/*,video/*,.pdf,application/pdf"
+            onChange={handleAfterUpload}
+          />
+
+
+          <label htmlFor="after-upload">
+
+            <FaUpload />
+
+            <span>
+              Upload Completed Work Files
+            </span>
+
+            <small>
+              Maximum 3 files • Images, Videos or PDF
+            </small>
+
+          </label>
+
+        </div>
+
+
+        {/* SELECTED FILES */}
+
+        {afterFiles.length > 0 && (
+
+          <div className="file-upload-section">
+
+
+            <div className="upload-count">
+
+              <span>
+                Selected Files
+              </span>
+
+              <strong>
+                {afterFiles.length}/3
+              </strong>
+
+            </div>
+
+
+            {/* PREVIEW */}
+
+            <div className="image-preview">
+
+              {afterFiles.map(
+                (file, index) =>
+                  renderFilePreview(
+                    file,
+                    index,
+                    "After"
+                  )
+              )}
+
+            </div>
+
+
+            {/* SUBMIT */}
+
+            <div className="upload-actions">
+
+              <button
+                type="button"
+                className="upload-submit-btn"
+                onClick={submitAfterFiles}
+              >
+
+                <FaCheckCircle />
+
+                {afterSubmitted
+                  ? "Submitted"
+                  : "Submit After Files"}
+
+              </button>
+
+            </div>
+
+
+            {/* SUCCESS */}
+
+            {afterSubmitted && (
+
+              <p className="upload-success">
+
+                ✓ After-work files submitted successfully
+
+              </p>
+
+            )}
+
+          </div>
+
+        )}
+
+      </div>
+
+
+      {/* ================================================= */}
+      {/* WORK NOTES */}
+      {/* ================================================= */}
+
+      <div className="work-card">
 
         <div className="card-title">
 
@@ -847,41 +945,31 @@ Upload Completed Files
         </div>
 
 
-
-
         <div className="notes-container">
-
 
           <label>
             Work Performed
           </label>
 
 
-
           <textarea
-
             placeholder="Write details about completed work..."
-
             value={remarks}
-
-            onChange={(e)=>
+            onChange={(e) =>
               setRemarks(e.target.value)
             }
-
           />
 
-
         </div>
-
-
 
       </div>
 
 
-
+      {/* ================================================= */}
+      {/* WORK SUMMARY */}
+      {/* ================================================= */}
 
       <div className="work-card">
-
 
         <div className="card-title">
 
@@ -892,25 +980,10 @@ Upload Completed Files
         </div>
 
 
-
-
         <div className="summary-grid">
 
 
-          <div className="summary-box">
-
-            <label>
-              Current Status
-            </label>
-
-            <strong>
-              {status}
-            </strong>
-
-          </div>
-
-
-
+          {/* ENGINEER */}
 
           <div className="summary-box">
 
@@ -925,104 +998,86 @@ Upload Completed Files
           </div>
 
 
-
+          {/* BEFORE */}
 
           <div className="summary-box">
 
             <label>
-              Before Images
+              Before Files
             </label>
 
             <strong>
-              {beforeImages.length}
+
+              {submittedBeforeFiles.length}/3
+
             </strong>
 
           </div>
 
 
-
+          {/* AFTER */}
 
           <div className="summary-box">
 
             <label>
-              After Images
+              After Files
             </label>
 
             <strong>
-              {afterImages.length}
+
+              {submittedAfterFiles.length}/3
+
             </strong>
 
           </div>
 
 
+          {/* NOTES */}
+
+          <div className="summary-box">
+
+            <label>
+              Work Notes
+            </label>
+
+            <strong>
+
+              {remarks.trim()
+                ? "Added"
+                : "Not Added"}
+
+            </strong>
+
+          </div>
 
         </div>
-
-
 
       </div>
 
 
-
-
-
+      {/* ================================================= */}
+      {/* SAVE */}
+      {/* ================================================= */}
 
       <div className="work-actions">
 
-
-
         <button
-
+          type="button"
           className="save-btn"
-
           onClick={saveWork}
-
-        >
-
-          Save Draft
-
-        </button>
-
-
-
-
-        <button
-
-          className="complete-btn"
-
-          onClick={()=>{
-
-
-            setStatus("Completed");
-
-            alert(
-              "Complaint marked as completed"
-            );
-
-
-          }}
-
         >
 
           <FaCheckCircle />
 
-          Complete Work
-
+          Save Work Details
 
         </button>
 
-
-
       </div>
-
-
 
     </div>
 
-
   );
-
 }
-
 
 export default EngineerWorkDetails;
