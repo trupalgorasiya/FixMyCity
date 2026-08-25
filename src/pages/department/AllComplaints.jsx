@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import "./AllComplaints.css";
 
 import {
@@ -7,276 +8,24 @@ import {
   FaEye,
   FaChevronLeft,
   FaChevronRight,
+  FaTimes,
+  FaSpinner,
+  FaFilePdf,
+  FaVideo,
+  FaImage
 } from "react-icons/fa";
 
 function AllComplaints() {
 
   /* ==========================================================
-     DUMMY COMPLAINT HISTORY DATA
-     (Only Complaints of Logged-in Department)
-  ========================================================== */
-
-  const complaintData = [
-
-    {
-      id: "CMP-1009",
-      citizen: "Rahul Patel",
-      email: "rahul@gmail.com",
-      mobile: "9876543210",
-
-      category: "Water Leakage",
-      location: "Satellite, Ahmedabad",
-
-      priority: "High",
-
-      engineer: "Amit Patel",
-
-      assignedDate: "20 Jul 2026",
-      resolvedDate: "24 Jul 2026",
-
-      resolutionTime: "4 Days",
-
-      status: "Completed",
-
-      description:
-        "Water pipeline leakage near society entrance causing continuous water wastage.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before+Repair",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After+Repair",
-
-      engineerRemark:
-        "Damaged pipeline replaced successfully and leakage stopped.",
-
-      citizenFeedback:
-        "Problem solved quickly. Excellent work.",
-
-      rating: 5,
-    },
-    {
-      id: "CMP-1001",
-      citizen: "Rahul Patel",
-      email: "rahul@gmail.com",
-      mobile: "9876543210",
-
-      category: "Water Leakage",
-      location: "Satellite, Ahmedabad",
-
-      priority: "High",
-
-      engineer: "Amit Patel",
-
-      assignedDate: "20 Jul 2026",
-      resolvedDate: "24 Jul 2026",
-
-      resolutionTime: "4 Days",
-
-      status: "Completed",
-
-      description:
-        "Water pipeline leakage near society entrance causing continuous water wastage.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before+Repair",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After+Repair",
-
-      engineerRemark:
-        "Damaged pipeline replaced successfully and leakage stopped.",
-
-      citizenFeedback:
-        "Problem solved quickly. Excellent work.",
-
-      rating: 5,
-    },
-    {
-      id: "CMP-1002",
-      citizen: "Jeel Bhalani",
-      email: "jeel@gmail.com",
-      mobile: "9876543211",
-
-      category: "Water Supply",
-
-      location: "Nikol, Ahmedabad",
-
-      priority: "Medium",
-
-      engineer: "Jay Mehta",
-
-      assignedDate: "18 Jul 2026",
-
-      resolvedDate: "21 Jul 2026",
-
-      resolutionTime: "3 Days",
-
-      status: "Completed",
-
-      description:
-        "Low water pressure reported in the residential area.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After",
-
-      engineerRemark:
-        "Pressure valve replaced successfully.",
-
-      citizenFeedback:
-        "Water supply restored.",
-
-      rating: 4,
-    },
-
-    {
-      id: "CMP-1003",
-      citizen: "Amit Shah",
-      email: "amit@gmail.com",
-      mobile: "9876543212",
-
-      category: "Pipeline Damage",
-
-      location: "Bopal, Ahmedabad",
-
-      priority: "High",
-
-      engineer: "Hardik Shah",
-
-      assignedDate: "16 Jul 2026",
-
-      resolvedDate: "19 Jul 2026",
-
-      resolutionTime: "3 Days",
-
-      status: "Completed",
-
-      description:
-        "Underground water pipeline damaged during construction.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After",
-
-      engineerRemark:
-        "Pipeline joint replaced and tested.",
-
-      citizenFeedback:
-        "Satisfied with repair work.",
-
-      rating: 5,
-    },
-
-    {
-      id: "CMP-1004",
-      citizen: "Priya Patel",
-      email: "priya@gmail.com",
-      mobile: "9876543213",
-
-      category: "Water Leakage",
-
-      location: "Gota",
-
-      priority: "Low",
-
-      engineer: "Amit Patel",
-
-      assignedDate: "17 Jul 2026",
-
-      resolvedDate: "20 Jul 2026",
-
-      resolutionTime: "3 Days",
-
-      status: "Completed",
-
-      description:
-        "Minor leakage near residential pipeline.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After",
-
-      engineerRemark:
-        "Leakage sealed successfully.",
-
-      citizenFeedback:
-        "Thank you.",
-
-      rating: 4,
-    },
-
-    {
-      id: "CMP-1005",
-      citizen: "Harsh Patel",
-      email: "harsh@gmail.com",
-      mobile: "9876543214",
-
-      category: "Water Tank",
-
-      location: "Naroda",
-
-      priority: "Medium",
-
-      engineer: "Jay Mehta",
-
-      assignedDate: "19 Jul 2026",
-
-      resolvedDate: "22 Jul 2026",
-
-      resolutionTime: "3 Days",
-
-      status: "Completed",
-
-      description:
-        "Water tank overflow issue.",
-
-      complaintImage:
-        "https://via.placeholder.com/600x350",
-
-      beforeImage:
-        "https://via.placeholder.com/350x220?text=Before",
-
-      afterImage:
-        "https://via.placeholder.com/350x220?text=After",
-
-      engineerRemark:
-        "Float valve replaced.",
-
-      citizenFeedback:
-        "Overflow stopped.",
-
-      rating: 5,
-    },
-
-  ];
-
-  /* ==========================================================
      STATES
   ========================================================== */
 
-  const [search, setSearch] = useState("");
+  const [complaintData, setComplaintData] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
 
   const [priorityFilter, setPriorityFilter] =
     useState("All");
@@ -290,62 +39,547 @@ function AllComplaints() {
   const [currentPage, setCurrentPage] =
     useState(1);
 
+  const [loading, setLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
   const complaintsPerPage = 5;
+
+
+  /* ==========================================================
+     GET COMPLAINTS FROM API
+  ========================================================== */
+
+  const fetchComplaints = async () => {
+
+    const token =
+      localStorage.getItem("token");
+
+    if (!token) {
+
+      setError(
+        "You are not logged in. Please login again."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setLoading(true);
+
+      setError("");
+
+
+      const response =
+        await axios.get(
+          "http://localhost:8085/api/department/assigned",
+          {
+            params: {
+              page: 0,
+              size: 100,
+              sortBy: "createdAt",
+              direction: "desc"
+            },
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
+
+
+      console.log(
+        "Department Complaints:",
+        response.data
+      );
+
+
+      const complaints =
+        response.data?.content || [];
+
+
+      const formattedComplaints =
+        complaints.map((item) => {
+
+          const media =
+            item.media || [];
+
+
+          /*
+           * Complaint media
+           */
+          const complaintMedia =
+            media.filter(
+              (file) =>
+                !file.mediaType ||
+                file.mediaType === "COMPLAINT"
+            );
+
+
+          /*
+           * Before work media
+           */
+          const beforeMedia =
+            media.filter(
+              (file) =>
+                file.mediaType === "BEFORE"
+            );
+
+
+          /*
+           * After work media
+           */
+          const afterMedia =
+            media.filter(
+              (file) =>
+                file.mediaType === "AFTER"
+            );
+
+
+          /*
+           * Engineer name
+           */
+          const engineerName =
+            `${item.engineerFirstName || ""} ${
+              item.engineerLastName || ""
+            }`.trim();
+
+
+          return {
+
+            id:
+              item.complaintNumber ||
+              `CMP-${item.complaintId}`,
+
+            complaintId:
+              item.complaintId,
+
+            citizen:
+              `${item.firstName || ""} ${
+                item.lastName || ""
+              }`.trim(),
+
+            email:
+              item.email || "-",
+
+            mobile:
+              item.contact || "-",
+
+            category:
+              item.category || "-",
+
+            department:
+              item.department || "-",
+
+            location:
+              item.address || "Address not available",
+
+            address:
+              item.address || "Address not available",
+
+            pincode:
+              item.pincode || "-",
+
+            latitude:
+              item.latitude || "-",
+
+            longitude:
+              item.longitude || "-",
+
+            priority:
+              item.priority || "-",
+
+            engineer:
+              engineerName ||
+              "Not Assigned",
+
+            assignedDate:
+              formatDate(item.assignedAt),
+
+            resolvedDate:
+              formatDate(item.resolveAt),
+
+            createdDate:
+              formatDate(item.createdAt),
+
+            updatedDate:
+              formatDate(item.updateAt),
+
+            resolutionTime:
+              formatResolutionTime(
+                item.assignedAt,
+                item.resolveAt
+              ),
+
+            status:
+              formatStatus(item.status),
+
+            description:
+              item.description ||
+              "No complaint description available.",
+
+            title:
+              item.title || "-",
+
+            engineerRemark:
+              item.engineerWorkNote ||
+              "No engineer work note available.",
+
+            citizenFeedback:
+              item.citizenFeedback ||
+              "No citizen feedback available.",
+
+            rating:
+              item.rating || 0,
+
+            complaintMedia,
+
+            beforeMedia,
+
+            afterMedia,
+
+            media
+
+          };
+
+        });
+
+
+      setComplaintData(
+        formattedComplaints
+      );
+
+
+      setCurrentPage(1);
+
+
+    } catch (err) {
+
+      console.error(
+        "Fetch Complaints Error:",
+        err
+      );
+
+
+      if (
+        err.response?.status === 401
+      ) {
+
+        setError(
+          "Your session has expired. Please login again."
+        );
+
+      } else if (
+        err.response?.status === 403
+      ) {
+
+        setError(
+          "You are not authorized to view department complaints."
+        );
+
+      } else {
+
+        setError(
+          err.response?.data?.message ||
+          "Unable to load complaint history."
+        );
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+  /* ==========================================================
+     LOAD DATA
+  ========================================================== */
+
+  useEffect(() => {
+
+    fetchComplaints();
+
+  }, []);
+
+
+  /* ==========================================================
+     FORMAT DATE
+  ========================================================== */
+
+  function formatDate(dateValue) {
+
+    if (!dateValue) {
+      return "-";
+    }
+
+
+    try {
+
+      const date =
+        new Date(dateValue);
+
+
+      if (isNaN(date.getTime())) {
+        return "-";
+      }
+
+
+      return date.toLocaleDateString(
+        "en-IN",
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+
+    } catch {
+
+      return "-";
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     CALCULATE RESOLUTION TIME
+  ========================================================== */
+
+  function formatResolutionTime(
+    assignedAt,
+    resolveAt
+  ) {
+
+    if (!assignedAt || !resolveAt) {
+      return "-";
+    }
+
+
+    const assigned =
+      new Date(assignedAt);
+
+    const resolved =
+      new Date(resolveAt);
+
+
+    if (
+      isNaN(assigned.getTime()) ||
+      isNaN(resolved.getTime())
+    ) {
+
+      return "-";
+
+    }
+
+
+    const difference =
+      resolved.getTime() -
+      assigned.getTime();
+
+
+    if (difference < 0) {
+      return "-";
+    }
+
+
+    const totalMinutes =
+      Math.floor(
+        difference / (1000 * 60)
+      );
+
+
+    const days =
+      Math.floor(
+        totalMinutes / (60 * 24)
+      );
+
+
+    const hours =
+      Math.floor(
+        (totalMinutes % (60 * 24)) / 60
+      );
+
+
+    const minutes =
+      totalMinutes % 60;
+
+
+    if (days > 0) {
+
+      return `${days} ${
+        days === 1 ? "Day" : "Days"
+      }`;
+
+    }
+
+
+    if (hours > 0) {
+
+      return `${hours} ${
+        hours === 1 ? "Hour" : "Hours"
+      }`;
+
+    }
+
+
+    return `${minutes} ${
+      minutes === 1 ? "Minute" : "Minutes"
+    }`;
+
+  }
+
+
+  /* ==========================================================
+     FORMAT STATUS
+  ========================================================== */
+
+  function formatStatus(status) {
+
+    if (!status) {
+      return "-";
+    }
+
+
+    const formatted =
+      status
+        .toLowerCase()
+        .replace(/_/g, " ");
+
+
+    return formatted
+      .charAt(0)
+      .toUpperCase() +
+      formatted.slice(1);
+
+  }
+
+
+  /* ==========================================================
+     FORMAT PRIORITY
+  ========================================================== */
+
+  function formatPriority(priority) {
+
+    if (!priority) {
+      return "-";
+    }
+
+
+    const formatted =
+      priority.toLowerCase();
+
+
+    return formatted
+      .charAt(0)
+      .toUpperCase() +
+      formatted.slice(1);
+
+  }
+
 
   /* ==========================================================
      SEARCH & FILTER
   ========================================================== */
 
-  const filteredComplaints = useMemo(() => {
+  const filteredComplaints =
+    useMemo(() => {
 
-    return complaintData.filter((item) => {
+      return complaintData.filter(
+        (item) => {
 
-      const keyword =
-        search.toLowerCase();
+          const keyword =
+            search
+              .toLowerCase()
+              .trim();
 
-      const matchesSearch =
-        item.id.toLowerCase().includes(keyword) ||
-        item.citizen.toLowerCase().includes(keyword) ||
-        item.category.toLowerCase().includes(keyword) ||
-        item.engineer.toLowerCase().includes(keyword);
 
-      const matchesPriority =
-        priorityFilter === "All" ||
-        item.priority === priorityFilter;
+          const matchesSearch =
+            !keyword ||
 
-      const matchesStatus =
-        statusFilter === "All" ||
-        item.status === statusFilter;
+            item.id
+              .toLowerCase()
+              .includes(keyword) ||
 
-      return (
-        matchesSearch &&
-        matchesPriority &&
-        matchesStatus
+            item.citizen
+              .toLowerCase()
+              .includes(keyword) ||
+
+            item.category
+              .toLowerCase()
+              .includes(keyword) ||
+
+            item.engineer
+              .toLowerCase()
+              .includes(keyword) ||
+
+            item.department
+              .toLowerCase()
+              .includes(keyword) ||
+
+            item.title
+              .toLowerCase()
+              .includes(keyword);
+
+
+          const matchesPriority =
+            priorityFilter === "All" ||
+            item.priority ===
+              priorityFilter.toUpperCase();
+
+
+          const matchesStatus =
+            statusFilter === "All" ||
+            item.status.toLowerCase() ===
+              statusFilter.toLowerCase();
+
+
+          return (
+            matchesSearch &&
+            matchesPriority &&
+            matchesStatus
+          );
+
+        }
       );
 
-    });
+    }, [
+      complaintData,
+      search,
+      priorityFilter,
+      statusFilter
+    ]);
 
-  }, [
-    search,
-    priorityFilter,
-    statusFilter,
-  ]);
 
   /* ==========================================================
      PAGINATION
   ========================================================== */
 
-  const totalPages = Math.ceil(
-    filteredComplaints.length /
+  const totalPages =
+    Math.ceil(
+      filteredComplaints.length /
       complaintsPerPage
-  );
+    );
+
 
   const indexOfLastComplaint =
-    currentPage * complaintsPerPage;
+    currentPage *
+    complaintsPerPage;
+
 
   const indexOfFirstComplaint =
     indexOfLastComplaint -
     complaintsPerPage;
+
 
   const currentComplaints =
     filteredComplaints.slice(
@@ -353,29 +587,235 @@ function AllComplaints() {
       indexOfLastComplaint
     );
 
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const previousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
 
   /* ==========================================================
-     JSX START
+     NEXT PAGE
+  ========================================================== */
+
+  const nextPage = () => {
+
+    if (
+      currentPage < totalPages
+    ) {
+
+      setCurrentPage(
+        (prev) => prev + 1
+      );
+
+    }
+
+  };
+
+
+  /* ==========================================================
+     PREVIOUS PAGE
+  ========================================================== */
+
+  const previousPage = () => {
+
+    if (
+      currentPage > 1
+    ) {
+
+      setCurrentPage(
+        (prev) => prev - 1
+      );
+
+    }
+
+  };
+
+
+  /* ==========================================================
+     MEDIA URL
+  ========================================================== */
+
+  const getMediaUrl = (file) => {
+
+    if (!file?.fileUrl) {
+      return "";
+    }
+
+
+    /*
+     * Backend returns:
+     *
+     * uploads\complaints\CMP-...\after\file.jpg
+     *
+     * Browser needs:
+     *
+     * /uploads/complaints/CMP-.../after/file.jpg
+     */
+
+    const normalizedPath =
+      file.fileUrl
+        .replace(/\\/g, "/");
+
+
+    return `http://localhost:8085/${normalizedPath}`;
+
+  };
+
+
+  /* ==========================================================
+     MEDIA PREVIEW
+  ========================================================== */
+
+  const renderMedia = (
+    file,
+    index
+  ) => {
+
+    const url =
+      getMediaUrl(file);
+
+
+    if (!url) {
+      return null;
+    }
+
+
+    const fileType =
+      file.fileType || "";
+
+
+    /* IMAGE */
+
+    if (
+      fileType.startsWith("image/")
+    ) {
+
+      return (
+
+        <div
+          className="repair-card"
+          key={
+            file.mediaId ||
+            `${file.fileName}-${index}`
+          }
+        >
+
+          <h4>
+            {file.fileName ||
+              `Image ${index + 1}`}
+          </h4>
+
+          <img
+            src={url}
+            alt={
+              file.fileName ||
+              "Complaint media"
+            }
+          />
+
+        </div>
+
+      );
+
+    }
+
+
+    /* VIDEO */
+
+    if (
+      fileType.startsWith("video/")
+    ) {
+
+      return (
+
+        <div
+          className="repair-card"
+          key={
+            file.mediaId ||
+            `${file.fileName}-${index}`
+          }
+        >
+
+          <h4>
+            <FaVideo />
+            {" "}
+            {file.fileName ||
+              `Video ${index + 1}`}
+          </h4>
+
+          <video
+            controls
+            src={url}
+            style={{
+              width: "100%",
+              maxHeight: "300px"
+            }}
+          />
+
+        </div>
+
+      );
+
+    }
+
+
+    /* PDF */
+
+    if (
+      fileType ===
+      "application/pdf"
+    ) {
+
+      return (
+
+        <div
+          className="repair-card"
+          key={
+            file.mediaId ||
+            `${file.fileName}-${index}`
+          }
+        >
+
+          <h4>
+
+            <FaFilePdf />
+
+            {" "}
+
+            {file.fileName ||
+              "PDF File"}
+
+          </h4>
+
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+          >
+
+            Open PDF
+
+          </a>
+
+        </div>
+
+      );
+
+    }
+
+
+    return null;
+
+  };
+
+
+  /* ==========================================================
+     JSX
   ========================================================== */
 
   return (
 
     <div className="assigned-page">
 
-      {/* ==========================================================
+
+      {/* ======================================================
           PAGE HEADER
-      ========================================================== */}
+      ====================================================== */}
 
       <div className="assigned-header">
 
@@ -394,11 +834,15 @@ function AllComplaints() {
 
       </div>
 
-      {/* ==========================================================
+
+      {/* ======================================================
           SEARCH & FILTER
-      ========================================================== */}
+      ====================================================== */}
 
       <div className="complaint-toolbar">
+
+
+        {/* SEARCH */}
 
         <div className="search-box">
 
@@ -410,7 +854,9 @@ function AllComplaints() {
             value={search}
             onChange={(e) => {
 
-              setSearch(e.target.value);
+              setSearch(
+                e.target.value
+              );
 
               setCurrentPage(1);
 
@@ -419,7 +865,13 @@ function AllComplaints() {
 
         </div>
 
+
+        {/* FILTER */}
+
         <div className="toolbar-right">
+
+
+          {/* PRIORITY */}
 
           <div className="filter-box">
 
@@ -438,14 +890,28 @@ function AllComplaints() {
               }}
             >
 
-              <option>All</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
+              <option value="All">
+                All
+              </option>
+
+              <option value="High">
+                High
+              </option>
+
+              <option value="Medium">
+                Medium
+              </option>
+
+              <option value="Low">
+                Low
+              </option>
 
             </select>
 
           </div>
+
+
+          {/* STATUS */}
 
           <div className="filter-box">
 
@@ -464,9 +930,21 @@ function AllComplaints() {
               }}
             >
 
-              <option>All</option>
-              <option>Completed</option>
-              <option>Closed</option>
+              <option value="All">
+                All
+              </option>
+
+              <option value="Completed">
+                Completed
+              </option>
+
+              <option value="Closed">
+                Closed
+              </option>
+
+              <option value="Resolved">
+                Resolved
+              </option>
 
             </select>
 
@@ -476,203 +954,317 @@ function AllComplaints() {
 
       </div>
 
-      {/* ==========================================================
-          COMPLAINT HISTORY TABLE
-      ========================================================== */}
-            <div className="assigned-card">
 
-        <div className="card-header">
+      {/* ======================================================
+          LOADING
+      ====================================================== */}
 
-          <h2>Complaint History</h2>
+      {loading && (
+
+        <div className="loading-container">
+
+          <FaSpinner
+            className="loading-spinner"
+          />
+
+          <p>
+            Loading complaint history...
+          </p>
 
         </div>
 
-        <div className="table-wrapper">
+      )}
 
-          <table className="assigned-table">
 
-            <thead>
+      {/* ======================================================
+          ERROR
+      ====================================================== */}
 
-              <tr>
+      {!loading && error && (
 
-                <th>Complaint ID</th>
+        <div className="error-container">
 
-                <th>Citizen</th>
+          <p>
+            {error}
+          </p>
 
-                <th>Category</th>
+          <button
+            onClick={fetchComplaints}
+          >
+            Try Again
+          </button>
 
-                <th>Priority</th>
+        </div>
 
-                <th>Engineer</th>
+      )}
 
-                <th>Resolved Date</th>
 
-                <th>Status</th>
+      {/* ======================================================
+          COMPLAINT TABLE
+      ====================================================== */}
 
-                <th>Action</th>
+      {!loading && !error && (
 
-              </tr>
+        <div className="assigned-card">
 
-            </thead>
+          <div className="card-header">
 
-            <tbody>
+            <h2>
+              Complaint History
+            </h2>
 
-              {currentComplaints.length === 0 ? (
+          </div>
+
+
+          <div className="table-wrapper">
+
+            <table className="assigned-table">
+
+              <thead>
 
                 <tr>
 
-                  <td
-                    colSpan="8"
-                    className="empty-row"
-                  >
-                    No complaint history found.
-                  </td>
+                  <th>
+                    Complaint ID
+                  </th>
+
+                  <th>
+                    Citizen
+                  </th>
+
+                  <th>
+                    Category
+                  </th>
+
+                  <th>
+                    Priority
+                  </th>
+
+                  <th>
+                    Engineer
+                  </th>
+
+                  <th>
+                    Resolved Date
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Action
+                  </th>
 
                 </tr>
 
-              ) : (
+              </thead>
 
-                currentComplaints.map((item) => (
 
-                  <tr key={item.id}>
+              <tbody>
 
-                    {/* Complaint ID */}
+                {currentComplaints.length === 0 ? (
 
-                    <td className="complaint-id">
+                  <tr>
 
-                      {item.id}
+                    <td
+                      colSpan="8"
+                      className="empty-row"
+                    >
 
-                    </td>
-
-                    {/* Citizen */}
-
-                    <td>
-
-                      <strong>
-                        {item.citizen}
-                      </strong>
-
-                      <br />
-
-                      <small>
-                        {item.email}
-                      </small>
-
-                    </td>
-
-                    {/* Category */}
-
-                    <td>
-
-                      {item.category}
-
-                    </td>
-
-                    {/* Priority */}
-
-                    <td>
-
-                      <span
-                        className={`priority ${item.priority.toLowerCase()}`}
-                      >
-                        {item.priority}
-                      </span>
-
-                    </td>
-
-                    {/* Engineer */}
-
-                    <td>
-
-                      {item.engineer}
-
-                    </td>
-
-                    {/* Resolve Date */}
-
-                    <td>
-
-                      <strong>
-                        {item.resolvedDate}
-                      </strong>
-
-                      <br />
-
-                      <small>
-                        {item.resolutionTime}
-                      </small>
-
-                    </td>
-
-                    {/* Status */}
-
-                    <td>
-
-                      <span
-                        className={`status ${item.status
-                          .toLowerCase()
-                          .replace(/\s/g, "-")}`}
-                      >
-                        {item.status}
-                      </span>
-
-                    </td>
-
-                    {/* Action */}
-
-                    <td>
-
-                      <button
-                        className="view-btn"
-                        onClick={() =>
-                          setSelectedComplaint(item)
-                        }
-                      >
-
-                        <FaEye />
-
-                        View
-
-                      </button>
+                      No complaint history found.
 
                     </td>
 
                   </tr>
 
-                ))
+                ) : (
 
-              )}
+                  currentComplaints.map(
+                    (item) => (
 
-            </tbody>
+                      <tr
+                        key={
+                          item.complaintId ||
+                          item.id
+                        }
+                      >
 
-          </table>
+
+                        {/* COMPLAINT ID */}
+
+                        <td
+                          className="complaint-id"
+                        >
+
+                          {item.id}
+
+                        </td>
+
+
+                        {/* CITIZEN */}
+
+                        <td>
+
+                          <strong>
+                            {item.citizen}
+                          </strong>
+
+                          <br />
+
+                          <small>
+                            {item.email}
+                          </small>
+
+                        </td>
+
+
+                        {/* CATEGORY */}
+
+                        <td>
+
+                          {item.category}
+
+                        </td>
+
+
+                        {/* PRIORITY */}
+
+                        <td>
+
+                          <span
+                            className={`priority ${
+                              item.priority
+                                .toLowerCase()
+                            }`}
+                          >
+
+                            {formatPriority(
+                              item.priority
+                            )}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* ENGINEER */}
+
+                        <td>
+
+                          {item.engineer}
+
+                        </td>
+
+
+                        {/* RESOLVED DATE */}
+
+                        <td>
+
+                          <strong>
+                            {item.resolvedDate}
+                          </strong>
+
+                          <br />
+
+                          <small>
+                            {item.resolutionTime}
+                          </small>
+
+                        </td>
+
+
+                        {/* STATUS */}
+
+                        <td>
+
+                          <span
+                            className={`status ${
+                              item.status
+                                .toLowerCase()
+                                .replace(
+                                  /\s/g,
+                                  "-"
+                                )
+                            }`}
+                          >
+
+                            {item.status}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* ACTION */}
+
+                        <td>
+
+                          <button
+                            className="view-btn"
+                            onClick={() =>
+                              setSelectedComplaint(
+                                item
+                              )
+                            }
+                          >
+
+                            <FaEye />
+
+                            View
+
+                          </button>
+
+                        </td>
+
+                      </tr>
+
+                    )
+                  )
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
 
         </div>
 
-      </div>
+      )}
 
-      {/* ==========================================================
+
+      {/* ======================================================
           VIEW COMPLAINT MODAL
-      ========================================================== */}
-            {selectedComplaint && (
+      ====================================================== */}
+
+      {selectedComplaint && (
 
         <div
           className="modal-overlay"
-          onClick={() => setSelectedComplaint(null)}
+          onClick={() =>
+            setSelectedComplaint(null)
+          }
         >
 
           <div
             className="history-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
 
-            {/* ==========================================
+
+            {/* =================================================
                 MODAL HEADER
-            ========================================== */}
+            ================================================= */}
 
             <div className="modal-header">
 
-              <h2>Complaint Details</h2>
+              <h2>
+                Complaint Details
+              </h2>
 
               <button
                 className="close-btn"
@@ -680,88 +1272,254 @@ function AllComplaints() {
                   setSelectedComplaint(null)
                 }
               >
-                ✕
+
+                <FaTimes />
+
               </button>
 
             </div>
 
-            {/* ==========================================
+
+            {/* =================================================
                 MODAL BODY
-            ========================================== */}
+            ================================================= */}
 
             <div className="modal-body">
 
-              {/* Complaint Information */}
+
+              {/* =================================================
+                  COMPLAINT INFORMATION
+              ================================================= */}
 
               <div className="location-info">
 
-                <div className="location-item">
-                  <label>Complaint ID</label>
-                  <span>{selectedComplaint.id}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Citizen</label>
-                  <span>{selectedComplaint.citizen}</span>
+
+                  <label>
+                    Complaint ID
+                  </label>
+
+                  <span>
+                    {selectedComplaint.id}
+                  </span>
+
                 </div>
 
-                <div className="location-item">
-                  <label>Email</label>
-                  <span>{selectedComplaint.email}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Mobile</label>
-                  <span>{selectedComplaint.mobile}</span>
+
+                  <label>
+                    Complaint Title
+                  </label>
+
+                  <span>
+                    {selectedComplaint.title}
+                  </span>
+
                 </div>
 
-                <div className="location-item">
-                  <label>Category</label>
-                  <span>{selectedComplaint.category}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Location</label>
-                  <span>{selectedComplaint.location}</span>
+
+                  <label>
+                    Citizen
+                  </label>
+
+                  <span>
+                    {selectedComplaint.citizen}
+                  </span>
+
                 </div>
 
-                <div className="location-item">
-                  <label>Priority</label>
-                  <span>{selectedComplaint.priority}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Engineer</label>
-                  <span>{selectedComplaint.engineer}</span>
+
+                  <label>
+                    Email
+                  </label>
+
+                  <span>
+                    {selectedComplaint.email}
+                  </span>
+
                 </div>
 
-                <div className="location-item">
-                  <label>Assigned Date</label>
-                  <span>{selectedComplaint.assignedDate}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Resolved Date</label>
-                  <span>{selectedComplaint.resolvedDate}</span>
+
+                  <label>
+                    Mobile
+                  </label>
+
+                  <span>
+                    {selectedComplaint.mobile}
+                  </span>
+
                 </div>
 
-                <div className="location-item">
-                  <label>Resolution Time</label>
-                  <span>{selectedComplaint.resolutionTime}</span>
-                </div>
 
                 <div className="location-item">
-                  <label>Status</label>
-                  <span>{selectedComplaint.status}</span>
+
+                  <label>
+                    Category
+                  </label>
+
+                  <span>
+                    {selectedComplaint.category}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Department
+                  </label>
+
+                  <span>
+                    {selectedComplaint.department}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Location
+                  </label>
+
+                  <span>
+                    {selectedComplaint.location}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Pincode
+                  </label>
+
+                  <span>
+                    {selectedComplaint.pincode}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Priority
+                  </label>
+
+                  <span
+                    className={`priority ${
+                      selectedComplaint.priority
+                        .toLowerCase()
+                    }`}
+                  >
+
+                    {formatPriority(
+                      selectedComplaint.priority
+                    )}
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Engineer
+                  </label>
+
+                  <span>
+                    {selectedComplaint.engineer}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Assigned Date
+                  </label>
+
+                  <span>
+                    {selectedComplaint.assignedDate}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Resolved Date
+                  </label>
+
+                  <span>
+                    {selectedComplaint.resolvedDate}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Resolution Time
+                  </label>
+
+                  <span>
+                    {selectedComplaint.resolutionTime}
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Status
+                  </label>
+
+                  <span
+                    className={`status ${
+                      selectedComplaint.status
+                        .toLowerCase()
+                        .replace(
+                          /\s/g,
+                          "-"
+                        )
+                    }`}
+                  >
+
+                    {selectedComplaint.status}
+
+                  </span>
+
                 </div>
 
               </div>
 
-              {/* Description */}
+
+              {/* =================================================
+                  DESCRIPTION
+              ================================================= */}
 
               <div className="address-box">
 
-                <h4>Complaint Description</h4>
+                <h4>
+                  Complaint Description
+                </h4>
 
                 <p>
                   {selectedComplaint.description}
@@ -769,53 +1527,103 @@ function AllComplaints() {
 
               </div>
 
-              {/* Complaint Image */}
 
-              <div className="image-section">
+              {/* =================================================
+                  COMPLAINT MEDIA
+              ================================================= */}
 
-                <h4>Complaint Image</h4>
+              {selectedComplaint
+                .complaintMedia
+                ?.length > 0 && (
 
-                <img
-                  src={selectedComplaint.complaintImage}
-                  alt="Complaint"
-                  className="complaint-image"
-                />
+                <div className="image-section">
 
-              </div>
+                  <h4>
+                    Complaint Media
+                  </h4>
 
-              {/* Before & After Images */}
+                  <div className="repair-images">
 
-              <div className="repair-images">
+                    {selectedComplaint
+                      .complaintMedia
+                      .map(
+                        renderMedia
+                      )}
 
-                <div className="repair-card">
-
-                  <h4>Before Repair</h4>
-
-                  <img
-                    src={selectedComplaint.beforeImage}
-                    alt="Before Repair"
-                  />
+                  </div>
 
                 </div>
 
-                <div className="repair-card">
+              )}
 
-                  <h4>After Repair</h4>
 
-                  <img
-                    src={selectedComplaint.afterImage}
-                    alt="After Repair"
-                  />
+              {/* =================================================
+                  BEFORE WORK
+              ================================================= */}
+
+              {selectedComplaint
+                .beforeMedia
+                ?.length > 0 && (
+
+                <div className="image-section">
+
+                  <h4>
+                    Before Work
+                  </h4>
+
+                  <div className="repair-images">
+
+                    {selectedComplaint
+                      .beforeMedia
+                      .map(
+                        renderMedia
+                      )}
+
+                  </div>
 
                 </div>
 
-              </div>
+              )}
 
-              {/* Engineer Notes */}
+
+              {/* =================================================
+                  AFTER WORK
+              ================================================= */}
+
+              {selectedComplaint
+                .afterMedia
+                ?.length > 0 && (
+
+                <div className="image-section">
+
+                  <h4>
+                    After Work
+                  </h4>
+
+                  <div className="repair-images">
+
+                    {selectedComplaint
+                      .afterMedia
+                      .map(
+                        renderMedia
+                      )}
+
+                  </div>
+
+                </div>
+
+              )}
+
+
+              {/* =================================================
+                  ENGINEER NOTES
+              ================================================= */}
 
               <div className="address-box">
 
-                <h4>Engineer Work Notes</h4>
+                <h4>
+                  Engineer Work Notes
+                </h4>
 
                 <p>
                   {selectedComplaint.engineerRemark}
@@ -823,22 +1631,92 @@ function AllComplaints() {
 
               </div>
 
-              {/* Citizen Feedback */}
+
+              {/* =================================================
+                  CITIZEN FEEDBACK
+              ================================================= */}
 
               <div className="address-box">
 
-                <h4>Citizen Rating</h4>
+                <h4>
+                  Citizen Rating
+                </h4>
 
-                <p style={{ fontSize: "22px" }}>
-                  {"⭐".repeat(selectedComplaint.rating)}
-                </p>
+                {selectedComplaint.rating > 0 ? (
 
-                <h4 style={{ marginTop: "15px" }}>
+                  <p
+                    style={{
+                      fontSize: "22px"
+                    }}
+                  >
+
+                    {"⭐".repeat(
+                      selectedComplaint.rating
+                    )}
+
+                  </p>
+
+                ) : (
+
+                  <p>
+                    No rating available.
+                  </p>
+
+                )}
+
+
+                <h4
+                  style={{
+                    marginTop: "15px"
+                  }}
+                >
+
                   Citizen Feedback
+
                 </h4>
 
                 <p>
-                  {selectedComplaint.citizenFeedback}
+
+                  {selectedComplaint
+                    .citizenFeedback}
+
+                </p>
+
+              </div>
+
+
+              {/* =================================================
+                  LOCATION COORDINATES
+              ================================================= */}
+
+              <div className="address-box">
+
+                <h4>
+                  Complaint Coordinates
+                </h4>
+
+                <p>
+
+                  <strong>
+                    Latitude:
+                  </strong>
+
+                  {" "}
+
+                  {selectedComplaint.latitude}
+
+                </p>
+
+                <p>
+
+                  <strong>
+                    Longitude:
+                  </strong>
+
+                  {" "}
+
+                  {selectedComplaint.longitude}
+
                 </p>
 
               </div>
@@ -851,50 +1729,81 @@ function AllComplaints() {
 
       )}
 
-      {/* ==========================================
-          PAGINATION
-      ========================================== */}
 
-      {filteredComplaints.length > complaintsPerPage && (
+      {/* ======================================================
+          PAGINATION
+      ====================================================== */}
+
+      {!loading &&
+        !error &&
+        filteredComplaints.length >
+          complaintsPerPage && (
 
         <div className="pagination-wrapper">
 
+
+          {/* PREVIOUS */}
+
           <button
             onClick={previousPage}
-            disabled={currentPage === 1}
+            disabled={
+              currentPage === 1
+            }
           >
+
             <FaChevronLeft />
+
             Previous
+
           </button>
+
+
+          {/* PAGE NUMBERS */}
 
           <div className="page-numbers">
 
-            {[...Array(totalPages)].map((_, index) => (
+            {[...Array(totalPages)].map(
+              (_, index) => (
 
-              <button
-                key={index}
-                className={
-                  currentPage === index + 1
-                    ? "active-page"
-                    : ""
-                }
-                onClick={() =>
-                  setCurrentPage(index + 1)
-                }
-              >
-                {index + 1}
-              </button>
+                <button
+                  key={index}
+                  className={
+                    currentPage ===
+                    index + 1
+                      ? "active-page"
+                      : ""
+                  }
+                  onClick={() =>
+                    setCurrentPage(
+                      index + 1
+                    )
+                  }
+                >
 
-            ))}
+                  {index + 1}
+
+                </button>
+
+              )
+            )}
 
           </div>
 
+
+          {/* NEXT */}
+
           <button
             onClick={nextPage}
-            disabled={currentPage === totalPages}
+            disabled={
+              currentPage ===
+              totalPages
+            }
           >
+
             Next
+
             <FaChevronRight />
+
           </button>
 
         </div>

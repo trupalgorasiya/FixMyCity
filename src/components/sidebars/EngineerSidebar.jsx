@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
 import {
     FaHome,
     FaTasks,
@@ -7,10 +7,15 @@ import {
     FaSignOutAlt
 } from "react-icons/fa";
 
-
+import { logout } from "../../api/auth";
 import "./Sidebar.css";
 
 function EngineerSidebar() {
+    const navigate = useNavigate();
+    const handleLogout=() => {
+        logout();
+        navigate("/login", { replace: true });
+    };
 
     return (
 
@@ -43,10 +48,14 @@ function EngineerSidebar() {
 
             <div className="sidebar-footer">
 
-                <NavLink to="/logout">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="logout-btn"
+                >
                     <FaSignOutAlt />
                     <span>Logout</span>
-                </NavLink>
+                </button>
 
             </div>
 

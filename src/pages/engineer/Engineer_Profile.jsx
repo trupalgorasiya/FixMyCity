@@ -808,8 +808,876 @@
 // export default Engineer_profile;
 
 
-import { useState } from "react";
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// import {
+//     FaUser,
+//     FaEnvelope,
+//     FaPhoneAlt,
+//     FaMapMarkerAlt,
+//     FaGraduationCap,
+//     FaBriefcase,
+//     FaBuilding,
+//     FaCertificate,
+//     FaUserEdit,
+//     FaLock,
+//     FaCamera,
+//     FaSave,
+//     FaTimes
+// } from "react-icons/fa";
+
+// import defaultProfile from "../../assets/default-profile.jpeg";
+
+// import "./Engineer_profile.css";
+
+
+// function EngineerProfile() {
+
+//     const navigate = useNavigate();
+
+//     /* =========================================================
+//        ENGINEER PROFILE DATA
+//     ========================================================= */
+
+//     const [engineer, setEngineer] = useState({
+
+//         firstName: "John",
+
+//         lastName: "Doe",
+
+//         email: "john.doe@gmail.com",
+
+//         contact: "9876543210",
+
+//         address:
+//             "Ahmedabad, Gujarat, India",
+
+//         branch:
+//             "Civil Engineering",
+
+//         qualification:
+//             "Bachelor of Engineering",
+
+//         experience:
+//             "3 Years",
+
+//         department:
+//             "Road & Infrastructure Department",
+
+//         degreeCertificate:
+//             "degree-certificate.jpg",
+
+//         experienceCertificate:
+//             "experience-certificate.jpg",
+
+//         profileImage: defaultProfile
+
+//     });
+
+
+//     /* =========================================================
+//        EDIT MODE
+//     ========================================================= */
+
+//     const [isEditing, setIsEditing] = useState(false);
+
+
+//     /* =========================================================
+//        TEMPORARY EDIT DATA
+//     ========================================================= */
+
+//     const [editEngineer, setEditEngineer] = useState(engineer);
+
+
+//     /* =========================================================
+//        OPEN EDIT PROFILE
+//     ========================================================= */
+
+//     const handleEdit = () => {
+
+//         setEditEngineer({
+//             ...engineer
+//         });
+
+//         setIsEditing(true);
+//     };
+
+
+//     /* =========================================================
+//        HANDLE INPUT CHANGE
+//     ========================================================= */
+
+//     const handleEditChange = (e) => {
+
+//         const {
+//             name,
+//             value
+//         } = e.target;
+
+//         setEditEngineer((previous) => ({
+
+//             ...previous,
+
+//             [name]: value
+
+//         }));
+//     };
+
+
+//     /* =========================================================
+//        CHANGE PROFILE PHOTO
+//     ========================================================= */
+
+//     const handlePhotoChange = (e) => {
+
+//         const file = e.target.files?.[0];
+
+//         if (!file) {
+//             return;
+//         }
+
+//         /*
+//          * Create temporary image preview
+//          */
+
+//         const imageURL = URL.createObjectURL(file);
+
+//         setEditEngineer((previous) => ({
+
+//             ...previous,
+
+//             profileImage: imageURL
+
+//         }));
+//     };
+
+
+//     /* =========================================================
+//        SAVE CHANGES
+//     ========================================================= */
+
+//     const handleSave = () => {
+
+//         setEngineer({
+
+//             ...editEngineer
+
+//         });
+
+//         setIsEditing(false);
+//     };
+
+
+//     /* =========================================================
+//        CANCEL EDIT
+//     ========================================================= */
+
+//     const handleCancel = () => {
+
+//         /*
+//          * Restore original information
+//          */
+
+//         setEditEngineer({
+
+//             ...engineer
+
+//         });
+
+//         setIsEditing(false);
+//     };
+
+
+//     /* =========================================================
+//        EDIT PROFILE PAGE
+//     ========================================================= */
+
+//     if (isEditing) {
+
+//         return (
+
+//             <div className="engineer-edit-page">
+
+//                 <div className="engineer-edit-card">
+
+
+//                     {/* =================================================
+//                         EDIT PROFILE HEADER
+//                     ================================================= */}
+
+//                     <div className="engineer-edit-header">
+
+//                         <h2>
+//                             Edit Profile
+//                         </h2>
+
+
+//                         {/* =================================================
+//                             PROFILE PHOTO
+//                         ================================================= */}
+
+//                         <div className="engineer-edit-photo-section">
+
+//                             <img
+//                                 src={
+//                                     editEngineer.profileImage ||
+//                                     defaultProfile
+//                                 }
+//                                 alt="Engineer Profile"
+//                                 className="engineer-edit-photo"
+//                             />
+
+
+//                             {/* =================================================
+//                                 CHANGE PHOTO BUTTON
+//                             ================================================= */}
+
+//                             <label className="engineer-edit-change-photo">
+
+//                                 <FaCamera />
+
+//                                 <span>
+//                                     Change Photo
+//                                 </span>
+
+//                                 <input
+//                                     type="file"
+//                                     accept="image/*"
+//                                     onChange={handlePhotoChange}
+//                                 />
+
+//                             </label>
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* =================================================
+//                         EDIT FORM
+//                     ================================================= */}
+
+//                     <div className="engineer-edit-form">
+
+
+//                         {/* =================================================
+//                             FIRST NAME + LAST NAME
+//                         ================================================= */}
+
+//                         <div className="engineer-edit-name-row">
+
+
+//                             {/* FIRST NAME */}
+
+//                             <div className="engineer-edit-name-field">
+
+//                                 <label className="engineer-edit-label">
+
+//                                     <FaUser />
+
+//                                     <span>
+//                                         First Name
+//                                     </span>
+
+//                                 </label>
+
+
+//                                 <input
+//                                     type="text"
+//                                     name="firstName"
+//                                     value={
+//                                         editEngineer.firstName
+//                                     }
+//                                     onChange={
+//                                         handleEditChange
+//                                     }
+//                                     className="engineer-edit-input"
+//                                     placeholder="Enter first name"
+//                                 />
+
+//                             </div>
+
+
+//                             {/* LAST NAME */}
+
+//                             <div className="engineer-edit-name-field">
+
+//                                 <label className="engineer-edit-label">
+
+//                                     <FaUser />
+
+//                                     <span>
+//                                         Last Name
+//                                     </span>
+
+//                                 </label>
+
+
+//                                 <input
+//                                     type="text"
+//                                     name="lastName"
+//                                     value={
+//                                         editEngineer.lastName
+//                                     }
+//                                     onChange={
+//                                         handleEditChange
+//                                     }
+//                                     className="engineer-edit-input"
+//                                     placeholder="Enter last name"
+//                                 />
+
+//                             </div>
+
+//                         </div>
+
+
+//                         {/* =================================================
+//                             EMAIL
+//                         ================================================= */}
+
+//                         <div className="engineer-edit-email-field">
+
+//                             <label className="engineer-edit-label">
+
+//                                 <FaEnvelope />
+
+//                                 <span>
+//                                     Email
+//                                 </span>
+
+//                             </label>
+
+
+//                             <input
+//                                 type="email"
+//                                 value={
+//                                     editEngineer.email
+//                                 }
+//                                 disabled
+//                                 className="engineer-edit-email-input"
+//                             />
+
+
+//                             <span className="engineer-edit-email-note">
+
+//                                 <FaLock />
+
+//                                 Email cannot be changed
+
+//                             </span>
+
+//                         </div>
+
+
+//                         {/* =================================================
+//                             CONTACT
+//                         ================================================= */}
+
+//                         <div className="engineer-edit-contact-field">
+
+//                             <label className="engineer-edit-label">
+
+//                                 <FaPhoneAlt />
+
+//                                 <span>
+//                                     Contact Number
+//                                 </span>
+
+//                             </label>
+
+
+//                             <input
+//                                 type="tel"
+//                                 name="contact"
+//                                 value={
+//                                     editEngineer.contact
+//                                 }
+//                                 onChange={
+//                                     handleEditChange
+//                                 }
+//                                 className="engineer-edit-input"
+//                                 placeholder="Enter contact number"
+//                             />
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* =================================================
+//                         ACTION BUTTONS
+//                     ================================================= */}
+
+//                     <div className="engineer-edit-actions">
+
+
+//                         {/* CANCEL */}
+
+//                         <button
+//                             type="button"
+//                             className="engineer-edit-cancel"
+//                             onClick={handleCancel}
+//                         >
+
+//                             <FaTimes />
+
+//                             <span>
+//                                 Cancel
+//                             </span>
+
+//                         </button>
+
+
+//                         {/* SAVE */}
+
+//                         <button
+//                             type="button"
+//                             className="engineer-edit-save"
+//                             onClick={handleSave}
+//                         >
+
+//                             <FaSave />
+
+//                             <span>
+//                                 Save Changes
+//                             </span>
+
+//                         </button>
+
+//                     </div>
+
+//                 </div>
+
+//             </div>
+
+//         );
+//     }
+
+
+//     /* =========================================================
+//        NORMAL ENGINEER PROFILE PAGE
+//     ========================================================= */
+
+//     return (
+
+//         <div className="engineer-profile-page">
+
+//             <div className="engineer-profile-card">
+
+
+//                 {/* =================================================
+//                     PROFILE HEADER
+//                 ================================================= */}
+
+//                 <div className="engineer-profile-header">
+
+
+//                     <div className="engineer-profile-photo-wrapper">
+
+//                         <img
+//                             src={
+//                                 engineer.profileImage ||
+//                                 defaultProfile
+//                             }
+//                             alt="Engineer Profile"
+//                             className="engineer-profile-photo"
+//                         />
+
+//                     </div>
+
+
+//                     <div className="engineer-profile-header-content">
+
+//                         <h2>
+
+//                             {engineer.firstName}{" "}
+
+//                             {engineer.lastName}
+
+//                         </h2>
+
+
+//                         <span className="engineer-profile-role">
+
+//                             Engineer
+
+//                         </span>
+
+//                     </div>
+
+//                 </div>
+
+
+//                 {/* =================================================
+//                     PROFILE INFORMATION
+//                 ================================================= */}
+
+//                 <div className="engineer-profile-content">
+
+
+//                     {/* =================================================
+//                         PERSONAL INFORMATION
+//                     ================================================= */}
+
+//                     <div className="engineer-profile-section-title">
+
+//                         <h3>
+//                             Personal Information
+//                         </h3>
+
+//                     </div>
+
+
+//                     {/* FIRST NAME */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaUser />
+
+//                             <span>
+//                                 First Name
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.firstName}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* LAST NAME */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaUser />
+
+//                             <span>
+//                                 Last Name
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.lastName}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* EMAIL */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaEnvelope />
+
+//                             <span>
+//                                 Email
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.email}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* CONTACT */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaPhoneAlt />
+
+//                             <span>
+//                                 Contact Number
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.contact}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* ADDRESS */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaMapMarkerAlt />
+
+//                             <span>
+//                                 Address
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.address}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* =================================================
+//                         PROFESSIONAL INFORMATION
+//                     ================================================= */}
+
+//                     <div className="engineer-profile-section-title">
+
+//                         <h3>
+//                             Professional Information
+//                         </h3>
+
+//                     </div>
+
+
+//                     {/* ENGINEER BRANCH */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaBuilding />
+
+//                             <span>
+//                                 Engineer Branch
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.branch}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* HIGHEST QUALIFICATION */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaGraduationCap />
+
+//                             <span>
+//                                 Highest Qualification
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.qualification}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* EXPERIENCE */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaBriefcase />
+
+//                             <span>
+//                                 Experience
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.experience}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* DEPARTMENT */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaBuilding />
+
+//                             <span>
+//                                 Department
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-value">
+
+//                             {engineer.department}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* =================================================
+//                         CERTIFICATES
+//                     ================================================= */}
+
+//                     <div className="engineer-profile-section-title">
+
+//                         <h3>
+//                             Certificates
+//                         </h3>
+
+//                     </div>
+
+
+//                     {/* DEGREE CERTIFICATE */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaCertificate />
+
+//                             <span>
+//                                 Degree Certificate
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-certificate">
+
+//                             {engineer.degreeCertificate}
+
+//                         </div>
+
+//                     </div>
+
+
+//                     {/* EXPERIENCE CERTIFICATE */}
+
+//                     <div className="engineer-profile-field">
+
+//                         <div className="engineer-profile-label">
+
+//                             <FaCertificate />
+
+//                             <span>
+//                                 Experience Certificate
+//                             </span>
+
+//                         </div>
+
+
+//                         <div className="engineer-profile-certificate">
+
+//                             {engineer.experienceCertificate}
+
+//                         </div>
+
+//                     </div>
+
+//                 </div>
+
+
+//                 {/* =================================================
+//                     PROFILE ACTION BUTTONS
+//                 ================================================= */}
+
+//                 <div className="engineer-profile-actions">
+
+
+//                     {/* EDIT PROFILE */}
+
+//                     <button
+//                         type="button"
+//                         className="engineer-profile-edit-btn"
+//                         onClick={handleEdit}
+//                     >
+
+//                         <FaUserEdit />
+
+//                         <span>
+//                             Edit Profile
+//                         </span>
+
+//                     </button>
+
+
+//                     {/* CHANGE PASSWORD */}
+
+//                     <button
+//                         type="button"
+//                         className="engineer-profile-password-btn"
+//                         onClick={() =>
+//                             navigate("/change-password")
+//                         }
+//                     >
+
+//                         <FaLock />
+
+//                         <span>
+//                             Change Password
+//                         </span>
+
+//                     </button>
+
+//                 </div>
+
+//             </div>
+
+//         </div>
+
+//     );
+// }
+
+// export default EngineerProfile;
+
+
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import {
     FaUser,
@@ -836,44 +1704,14 @@ function EngineerProfile() {
 
     const navigate = useNavigate();
 
+    const API_BASE_URL = "http://localhost:8085";
+
+
     /* =========================================================
        ENGINEER PROFILE DATA
     ========================================================= */
 
-    const [engineer, setEngineer] = useState({
-
-        firstName: "John",
-
-        lastName: "Doe",
-
-        email: "john.doe@gmail.com",
-
-        contact: "9876543210",
-
-        address:
-            "Ahmedabad, Gujarat, India",
-
-        branch:
-            "Civil Engineering",
-
-        qualification:
-            "Bachelor of Engineering",
-
-        experience:
-            "3 Years",
-
-        department:
-            "Road & Infrastructure Department",
-
-        degreeCertificate:
-            "degree-certificate.jpg",
-
-        experienceCertificate:
-            "experience-certificate.jpg",
-
-        profileImage: defaultProfile
-
-    });
+    const [engineer, setEngineer] = useState(null);
 
 
     /* =========================================================
@@ -887,7 +1725,212 @@ function EngineerProfile() {
        TEMPORARY EDIT DATA
     ========================================================= */
 
-    const [editEngineer, setEditEngineer] = useState(engineer);
+    const [editEngineer, setEditEngineer] = useState(null);
+
+
+    /* =========================================================
+       LOADING
+    ========================================================= */
+
+    const [loading, setLoading] = useState(true);
+
+
+    /* =========================================================
+       ERROR
+    ========================================================= */
+
+    const [error, setError] = useState("");
+
+
+    /* =========================================================
+       FILE URL
+    ========================================================= */
+
+    const getFileUrl = (filePath) => {
+
+        if (!filePath) {
+            return null;
+        }
+
+        /*
+         * Backend returns:
+         *
+         * uploads\complaints\ENGINEER-20\degree\file.jpeg
+         *
+         * Browser needs:
+         *
+         * /uploads/complaints/ENGINEER-20/degree/file.jpeg
+         */
+
+        const normalizedPath =
+            filePath.replace(/\\/g, "/");
+
+        return `${API_BASE_URL}/${normalizedPath}`;
+    };
+
+
+    /* =========================================================
+       FETCH PROFILE
+    ========================================================= */
+
+    const fetchProfile = async () => {
+
+        try {
+
+            setLoading(true);
+            setError("");
+
+            const token =
+                localStorage.getItem("token");
+
+
+            if (!token) {
+
+                setError(
+                    "You are not logged in. Please login again."
+                );
+
+                return;
+            }
+
+
+            const response =
+                await axios.get(
+                    `${API_BASE_URL}/api/auth/profile`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            console.log(
+                "Engineer Profile:",
+                response.data
+            );
+
+
+            const data =
+                response.data;
+
+
+            const roleData =
+                data.roleData || {};
+
+
+            /* =====================================================
+               CREATE ENGINEER OBJECT FOR UI
+            ===================================================== */
+
+            const profileData = {
+
+                userId:
+                    data.userId,
+
+                engineerId:
+                    roleData.engineerId,
+
+                firstName:
+                    data.firstName,
+
+                lastName:
+                    data.lastName,
+
+                email:
+                    data.email,
+
+                contact:
+                    data.contact,
+
+                address:
+                    roleData.address || "",
+
+                branch:
+                    roleData.engineerBranch || "",
+
+                qualification:
+                    roleData.highestQualification || "",
+
+                experience:
+                    roleData.experience ?? 0,
+
+                department:
+                    roleData.department || "",
+
+                degreeCertificate:
+                    roleData.degreeCertificate || null,
+
+                experienceCertificate:
+                    roleData.experienceCertificate || null,
+
+                profileImage:
+                    data.profileImage || null,
+
+                joiningDate:
+                    roleData.joiningDate || null,
+
+                isAvailable:
+                    roleData.isAvailable ?? false
+
+            };
+
+
+            setEngineer(
+                profileData
+            );
+
+
+            setEditEngineer(
+                profileData
+            );
+
+
+        } catch (err) {
+
+            console.error(
+                "Engineer Profile Fetch Error:",
+                err
+            );
+
+
+            const backendMessage =
+                err.response?.data?.message;
+
+
+            if (backendMessage) {
+
+                setError(
+                    backendMessage
+                );
+
+            } else {
+
+                setError(
+                    "Unable to load profile. Please try again."
+                );
+
+            }
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+
+    /* =========================================================
+       LOAD PROFILE
+    ========================================================= */
+
+    useEffect(() => {
+
+        fetchProfile();
+
+    }, []);
 
 
     /* =========================================================
@@ -901,6 +1944,7 @@ function EngineerProfile() {
         });
 
         setIsEditing(true);
+
     };
 
 
@@ -915,13 +1959,17 @@ function EngineerProfile() {
             value
         } = e.target;
 
-        setEditEngineer((previous) => ({
 
-            ...previous,
+        setEditEngineer(
+            (previous) => ({
 
-            [name]: value
+                ...previous,
 
-        }));
+                [name]: value
+
+            })
+        );
+
     };
 
 
@@ -931,25 +1979,33 @@ function EngineerProfile() {
 
     const handlePhotoChange = (e) => {
 
-        const file = e.target.files?.[0];
+        const file =
+            e.target.files?.[0];
+
 
         if (!file) {
             return;
         }
 
-        /*
-         * Create temporary image preview
-         */
 
-        const imageURL = URL.createObjectURL(file);
+        const imageURL =
+            URL.createObjectURL(file);
 
-        setEditEngineer((previous) => ({
 
-            ...previous,
+        setEditEngineer(
+            (previous) => ({
 
-            profileImage: imageURL
+                ...previous,
 
-        }));
+                profileImage:
+                    imageURL,
+
+                profileImageFile:
+                    file
+
+            })
+        );
+
     };
 
 
@@ -959,13 +2015,19 @@ function EngineerProfile() {
 
     const handleSave = () => {
 
+        /*
+         * Currently this only updates frontend state.
+         *
+         * When your UPDATE PROFILE API is ready,
+         * we will replace this with axios.put().
+         */
+
         setEngineer({
-
             ...editEngineer
-
         });
 
         setIsEditing(false);
+
     };
 
 
@@ -975,18 +2037,74 @@ function EngineerProfile() {
 
     const handleCancel = () => {
 
-        /*
-         * Restore original information
-         */
-
         setEditEngineer({
-
             ...engineer
-
         });
 
         setIsEditing(false);
+
     };
+
+
+    /* =========================================================
+       LOADING SCREEN
+    ========================================================= */
+
+    if (loading) {
+
+        return (
+
+            <div className="engineer-profile-page">
+
+                <div className="engineer-profile-card">
+
+                    <h2>
+                        Loading Profile...
+                    </h2>
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    /* =========================================================
+       ERROR SCREEN
+    ========================================================= */
+
+    if (error) {
+
+        return (
+
+            <div className="engineer-profile-page">
+
+                <div className="engineer-profile-card">
+
+                    <h2>
+                        Unable to Load Profile
+                    </h2>
+
+                    <p>
+                        {error}
+                    </p>
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    if (!engineer) {
+
+        return null;
+
+    }
 
 
     /* =========================================================
@@ -1013,25 +2131,28 @@ function EngineerProfile() {
                         </h2>
 
 
-                        {/* =================================================
-                            PROFILE PHOTO
-                        ================================================= */}
+                        {/* PROFILE PHOTO */}
 
                         <div className="engineer-edit-photo-section">
 
                             <img
                                 src={
-                                    editEngineer.profileImage ||
-                                    defaultProfile
+                                    editEngineer.profileImage
+                                        ? (
+                                            editEngineer.profileImage.startsWith("blob:")
+                                                ? editEngineer.profileImage
+                                                : getFileUrl(
+                                                    editEngineer.profileImage
+                                                )
+                                        )
+                                        : defaultProfile
                                 }
                                 alt="Engineer Profile"
                                 className="engineer-edit-photo"
                             />
 
 
-                            {/* =================================================
-                                CHANGE PHOTO BUTTON
-                            ================================================= */}
+                            {/* CHANGE PHOTO */}
 
                             <label className="engineer-edit-change-photo">
 
@@ -1044,7 +2165,9 @@ function EngineerProfile() {
                                 <input
                                     type="file"
                                     accept="image/*"
-                                    onChange={handlePhotoChange}
+                                    onChange={
+                                        handlePhotoChange
+                                    }
                                 />
 
                             </label>
@@ -1061,9 +2184,7 @@ function EngineerProfile() {
                     <div className="engineer-edit-form">
 
 
-                        {/* =================================================
-                            FIRST NAME + LAST NAME
-                        ================================================= */}
+                        {/* FIRST + LAST NAME */}
 
                         <div className="engineer-edit-name-row">
 
@@ -1132,9 +2253,7 @@ function EngineerProfile() {
                         </div>
 
 
-                        {/* =================================================
-                            EMAIL
-                        ================================================= */}
+                        {/* EMAIL */}
 
                         <div className="engineer-edit-email-field">
 
@@ -1170,9 +2289,7 @@ function EngineerProfile() {
                         </div>
 
 
-                        {/* =================================================
-                            CONTACT
-                        ================================================= */}
+                        {/* CONTACT */}
 
                         <div className="engineer-edit-contact-field">
 
@@ -1205,9 +2322,7 @@ function EngineerProfile() {
                     </div>
 
 
-                    {/* =================================================
-                        ACTION BUTTONS
-                    ================================================= */}
+                    {/* ACTION BUTTONS */}
 
                     <div className="engineer-edit-actions">
 
@@ -1217,7 +2332,9 @@ function EngineerProfile() {
                         <button
                             type="button"
                             className="engineer-edit-cancel"
-                            onClick={handleCancel}
+                            onClick={
+                                handleCancel
+                            }
                         >
 
                             <FaTimes />
@@ -1234,7 +2351,9 @@ function EngineerProfile() {
                         <button
                             type="button"
                             className="engineer-edit-save"
-                            onClick={handleSave}
+                            onClick={
+                                handleSave
+                            }
                         >
 
                             <FaSave />
@@ -1252,11 +2371,12 @@ function EngineerProfile() {
             </div>
 
         );
+
     }
 
 
     /* =========================================================
-       NORMAL ENGINEER PROFILE PAGE
+       NORMAL PROFILE PAGE
     ========================================================= */
 
     return (
@@ -1272,13 +2392,15 @@ function EngineerProfile() {
 
                 <div className="engineer-profile-header">
 
-
                     <div className="engineer-profile-photo-wrapper">
 
                         <img
                             src={
-                                engineer.profileImage ||
-                                defaultProfile
+                                engineer.profileImage
+                                    ? getFileUrl(
+                                        engineer.profileImage
+                                    )
+                                    : defaultProfile
                             }
                             alt="Engineer Profile"
                             className="engineer-profile-photo"
@@ -1442,7 +2564,7 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-value">
 
-                            {engineer.address}
+                            {engineer.address || "-"}
 
                         </div>
 
@@ -1479,7 +2601,7 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-value">
 
-                            {engineer.branch}
+                            {engineer.branch || "-"}
 
                         </div>
 
@@ -1503,7 +2625,7 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-value">
 
-                            {engineer.qualification}
+                            {engineer.qualification || "-"}
 
                         </div>
 
@@ -1527,7 +2649,11 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-value">
 
-                            {engineer.experience}
+                            {engineer.experience}{" "}
+                            {engineer.experience === 1
+                                ? "Year"
+                                : "Years"
+                            }
 
                         </div>
 
@@ -1551,7 +2677,7 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-value">
 
-                            {engineer.department}
+                            {engineer.department || "-"}
 
                         </div>
 
@@ -1588,7 +2714,29 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-certificate">
 
-                            {engineer.degreeCertificate}
+                            {engineer.degreeCertificate ? (
+
+                                <a
+                                    href={
+                                        getFileUrl(
+                                            engineer.degreeCertificate
+                                        )
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+
+                                    View Degree Certificate
+
+                                </a>
+
+                            ) : (
+
+                                <span>
+                                    Not Uploaded
+                                </span>
+
+                            )}
 
                         </div>
 
@@ -1612,7 +2760,29 @@ function EngineerProfile() {
 
                         <div className="engineer-profile-certificate">
 
-                            {engineer.experienceCertificate}
+                            {engineer.experienceCertificate ? (
+
+                                <a
+                                    href={
+                                        getFileUrl(
+                                            engineer.experienceCertificate
+                                        )
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+
+                                    View Experience Certificate
+
+                                </a>
+
+                            ) : (
+
+                                <span>
+                                    Not Uploaded
+                                </span>
+
+                            )}
 
                         </div>
 
@@ -1633,7 +2803,9 @@ function EngineerProfile() {
                     <button
                         type="button"
                         className="engineer-profile-edit-btn"
-                        onClick={handleEdit}
+                        onClick={
+                            handleEdit
+                        }
                     >
 
                         <FaUserEdit />
@@ -1651,7 +2823,9 @@ function EngineerProfile() {
                         type="button"
                         className="engineer-profile-password-btn"
                         onClick={() =>
-                            navigate("/change-password")
+                            navigate(
+                                "/change-password"
+                            )
                         }
                     >
 
@@ -1670,6 +2844,7 @@ function EngineerProfile() {
         </div>
 
     );
+
 }
 
 export default EngineerProfile;

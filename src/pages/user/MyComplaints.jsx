@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     FaClipboardList,
     FaClock,
@@ -7,123 +7,213 @@ import {
     FaSearch,
     FaTimes
 } from "react-icons/fa";
-import "./MyComplaints.css";
 import { useNavigate } from "react-router-dom";
+import { getCitizenComplaints } from "../../api/citizenApi";
+import "./MyComplaints.css";
 
 function MyComplaints() {
 
     const navigate = useNavigate();
 
+    // ==========================================================
+    // STATE
+    // ==========================================================
+
+    const [complaints, setComplaints] = useState([]);
+
     const [statusFilter, setStatusFilter] = useState("All");
+
     const [searchTerm, setSearchTerm] = useState("");
 
-    // ==========================================================
-    // COMPLAINT DATA
-    // ==========================================================
+    const [page, setPage] = useState(0);
 
-    const complaints = [
-        {
-            id: "CMP001",
-            department: "Sanitation",
-            date: "15 Jul 2026",
-            res_date: "17 Jul 2026",
-            status: "Pending"
-        },
-        {
-            id: "CMP002",
-            department: "Road Department",
-            date: "13 Jul 2026",
-            res_date: "17 Jul 2026",
-            status: "In Progress"
-        },
-        {
-            id: "CMP003",
-            department: "Electrical",
-            date: "10 Jul 2026",
-            res_date: "17 Jul 2026",
-            status: "Resolved"
-        },
-        {
-            id: "CMP004",
-            department: "Water Department",
-            date: "08 Jul 2026",
-            res_date: "17 Jul 2026",
-            status: "Pending"
-        },
-        {
-            id: "CMP005",
-            department: "Drainage",
-            date: "05 Jul 2026",
-            res_date: "17 Jul 2026",
-            status: "Resolved"
-        }
-    ];
+    const size = 5;
+
+    const [totalPages, setTotalPages] = useState(0);
+
+    const [totalElements, setTotalElements] = useState(0);
+
+    const [loading, setLoading] = useState(false);
+
+    const [error, setError] = useState("");
 
     // ==========================================================
-    // SEARCH + STATUS FILTER
+    // FETCH COMPLAINTS
+    // ==========================================================
+
+    useEffect(() => {
+
+        let cancelled = false;
+
+        const loadComplaints = async () => {
+
+            try {
+
+                setLoading(true);
+                setError("");
+
+                const response = await getCitizenComplaints(
+                    page,
+                    size,
+                    searchTerm,
+                    "createdAt",
+                    "desc"
+                );
+
+                if (cancelled) {
+                    return;
+                }
+
+                const data = response.data;
+
+                setComplaints(data.content || []);
+
+                setTotalPages(data.totalPages || 0);
+
+                setTotalElements(data.totalElements || 0);
+
+            } catch (error) {
+
+                if (cancelled) {
+                    return;
+                }
+
+                console.error(
+                    "Error fetching complaints:",
+                    error
+                );
+
+                if (error.response?.data?.message) {
+
+                    setError(
+                        error.response.data.message
+                    );
+
+                } else {
+
+                    setError(
+                        "Unable to load complaints."
+                    );
+
+                }
+
+                setComplaints([]);
+
+                setTotalPages(0);
+
+                setTotalElements(0);
+
+            } finally {
+
+                if (!cancelled) {
+
+                    setLoading(false);
+
+                }
+
+            }
+
+        };
+
+        loadComplaints();
+
+        return () => {
+
+            cancelled = true;
+
+        };
+
+    }, [page, searchTerm]);
+
+    // ==========================================================
+    // STATUS FILTER
     // ==========================================================
 
     const filteredComplaints = useMemo(() => {
 
-        const search = searchTerm
-            .trim()
-            .toLowerCase();
+        if (statusFilter === "All") {
+
+            return complaints;
+
+        }
 
         return complaints.filter((complaint) => {
 
-            // --------------------------------------------------
-            // STATUS FILTER
-            // --------------------------------------------------
-
-            const statusMatch =
-                statusFilter === "All" ||
+            return (
                 String(complaint.status || "")
                     .toLowerCase()
-                    .trim() ===
-                statusFilter.toLowerCase().trim();
+                    .trim()
+                ===
+                statusFilter
+                    .toLowerCase()
+                    .trim()
+            );
 
-            // --------------------------------------------------
-            // SEARCH ALL FIELDS
-            // --------------------------------------------------
-
-            const searchMatch =
-                search === "" ||
-                Object.values(complaint).some((value) =>
-                    String(value ?? "")
-                        .toLowerCase()
-                        .trim()
-                        .includes(search)
-                );
-
-            return statusMatch && searchMatch;
         });
 
-    }, [statusFilter, searchTerm]);
+    }, [complaints, statusFilter]);
 
     // ==========================================================
     // SUMMARY COUNTS
     // ==========================================================
 
-    const totalComplaints = complaints.length;
+    const totalComplaints = totalElements;
 
     const pendingComplaints = complaints.filter(
-        (item) => item.status === "Pending"
+        (item) =>
+            String(item.status || "")
+                .toLowerCase()
+                .trim() === "pending"
     ).length;
 
     const inProgressComplaints = complaints.filter(
-        (item) => item.status === "In Progress"
+        (item) =>
+            String(item.status || "")
+                .toLowerCase()
+                .trim() === "in progress"
     ).length;
 
     const resolvedComplaints = complaints.filter(
-        (item) => item.status === "Resolved"
+        (item) =>
+            String(item.status || "")
+                .toLowerCase()
+                .trim() === "resolved"
     ).length;
+
+    // ==========================================================
+    // SEARCH
+    // ==========================================================
+
+    const handleSearch = (e) => {
+
+        setSearchTerm(e.target.value);
+
+        setPage(0);
+
+    };
+
+    // ==========================================================
+    // STATUS FILTER
+    // ==========================================================
+
+    const handleStatusFilter = (e) => {
+
+        setStatusFilter(e.target.value);
+
+        setPage(0);
+
+    };
 
     // ==========================================================
     // TRACK COMPLAINT
     // ==========================================================
 
-    const handleTrack = (id) => {
-        navigate(`/user/complaint-tracking/${id}`);
+    const handleTrack = (complaintNumber) => {
+
+        navigate(
+            `/user/complaint-tracking/${complaintNumber}`
+        );
+
     };
 
     // ==========================================================
@@ -131,7 +221,11 @@ function MyComplaints() {
     // ==========================================================
 
     const clearSearch = () => {
+
         setSearchTerm("");
+
+        setPage(0);
+
     };
 
     // ==========================================================
@@ -139,8 +233,51 @@ function MyComplaints() {
     // ==========================================================
 
     const resetFilters = () => {
+
         setSearchTerm("");
+
         setStatusFilter("All");
+
+        setPage(0);
+
+    };
+
+    // ==========================================================
+    // PREVIOUS PAGE
+    // ==========================================================
+
+    const previousPage = () => {
+
+        if (page > 0) {
+
+            setPage(page - 1);
+
+        }
+
+    };
+
+    // ==========================================================
+    // NEXT PAGE
+    // ==========================================================
+
+    const nextPage = () => {
+
+        if (page < totalPages - 1) {
+
+            setPage(page + 1);
+
+        }
+
+    };
+
+    // ==========================================================
+    // GO TO PAGE
+    // ==========================================================
+
+    const goToPage = (pageNumber) => {
+
+        setPage(pageNumber);
+
     };
 
     // ==========================================================
@@ -148,6 +285,7 @@ function MyComplaints() {
     // ==========================================================
 
     return (
+
         <div className="mycomplaints-page">
 
             {/* ==================================================
@@ -196,7 +334,9 @@ function MyComplaints() {
                     </div>
 
                     <div className="summary-icon">
+
                         <FaClipboardList />
+
                     </div>
 
                 </div>
@@ -219,7 +359,9 @@ function MyComplaints() {
                     </div>
 
                     <div className="summary-icon">
+
                         <FaExclamationTriangle />
+
                     </div>
 
                 </div>
@@ -242,7 +384,9 @@ function MyComplaints() {
                     </div>
 
                     <div className="summary-icon">
+
                         <FaClock />
+
                     </div>
 
                 </div>
@@ -265,7 +409,9 @@ function MyComplaints() {
                     </div>
 
                     <div className="summary-icon">
+
                         <FaCheckCircle />
+
                     </div>
 
                 </div>
@@ -289,9 +435,7 @@ function MyComplaints() {
                         type="text"
                         value={searchTerm}
                         placeholder="Search by ID, department, date, status..."
-                        onChange={(e) =>
-                            setSearchTerm(e.target.value)
-                        }
+                        onChange={handleSearch}
                     />
 
                     {searchTerm && (
@@ -302,7 +446,9 @@ function MyComplaints() {
                             onClick={clearSearch}
                             title="Clear Search"
                         >
+
                             <FaTimes />
+
                         </button>
 
                     )}
@@ -320,9 +466,7 @@ function MyComplaints() {
 
                         <select
                             value={statusFilter}
-                            onChange={(e) =>
-                                setStatusFilter(e.target.value)
-                            }
+                            onChange={handleStatusFilter}
                         >
 
                             <option value="All">
@@ -359,27 +503,52 @@ function MyComplaints() {
                 <div className="search-result-info">
 
                     <span>
+
                         Showing{" "}
+
                         <strong>
                             {filteredComplaints.length}
                         </strong>{" "}
+
                         matching complaint
                         {filteredComplaints.length !== 1
                             ? "s"
                             : ""}
+
                     </span>
 
                     {searchTerm && (
 
                         <span>
-                            for "
+
+                            {" "}for "
+
                             <strong>
                                 {searchTerm}
                             </strong>
+
                             "
+
                         </span>
 
                     )}
+
+                </div>
+
+            )}
+
+
+            {/* ==================================================
+                ERROR
+            ================================================== */}
+
+            {error && (
+
+                <div className="search-result-info">
+
+                    <strong>
+                        {error}
+                    </strong>
 
                 </div>
 
@@ -431,38 +600,98 @@ function MyComplaints() {
 
                         <tbody>
 
-                            {filteredComplaints.length > 0 ? (
+                            {/* LOADING */}
+
+                            {loading ? (
+
+                                <tr>
+
+                                    <td
+                                        colSpan="6"
+                                        className="no-data"
+                                    >
+
+                                        Loading complaints...
+
+                                    </td>
+
+                                </tr>
+
+                            ) : filteredComplaints.length > 0 ? (
+
+                                /* DATA */
 
                                 filteredComplaints.map(
                                     (complaint) => (
 
-                                        <tr key={complaint.id}>
+                                        <tr
+                                            key={
+                                                complaint.complaintId
+                                            }
+                                        >
 
-                                            {/* ID */}
+                                            {/* COMPLAINT ID */}
 
                                             <td className="complaint-id">
-                                                {complaint.id}
+
+                                                {
+                                                    complaint.complaintNumber
+                                                }
+
                                             </td>
 
 
                                             {/* DEPARTMENT */}
 
                                             <td>
-                                                {complaint.department}
+
+                                                {
+                                                    complaint.department ||
+                                                    "-"
+                                                }
+
                                             </td>
 
 
                                             {/* COMPLAINT DATE */}
 
                                             <td>
-                                                {complaint.date}
+
+                                                {complaint.createdAt
+                                                    ? new Date(
+                                                        complaint.createdAt
+                                                    ).toLocaleDateString(
+                                                        "en-GB",
+                                                        {
+                                                            day: "2-digit",
+                                                            month: "short",
+                                                            year: "numeric"
+                                                        }
+                                                    )
+                                                    : "-"
+                                                }
+
                                             </td>
 
 
                                             {/* RESOLVE DATE */}
 
                                             <td>
-                                                {complaint.res_date || "-"}
+
+                                                {complaint.resolveAt
+                                                    ? new Date(
+                                                        complaint.resolveAt
+                                                    ).toLocaleDateString(
+                                                        "en-GB",
+                                                        {
+                                                            day: "2-digit",
+                                                            month: "short",
+                                                            year: "numeric"
+                                                        }
+                                                    )
+                                                    : "-"
+                                                }
+
                                             </td>
 
 
@@ -473,7 +702,8 @@ function MyComplaints() {
                                                 <span
                                                     className={`status-badge ${
                                                         String(
-                                                            complaint.status || ""
+                                                            complaint.status ||
+                                                            ""
                                                         )
                                                             .toLowerCase()
                                                             .replace(
@@ -482,7 +712,12 @@ function MyComplaints() {
                                                             )
                                                     }`}
                                                 >
-                                                    {complaint.status}
+
+                                                    {
+                                                        complaint.status ||
+                                                        "-"
+                                                    }
+
                                                 </span>
 
                                             </td>
@@ -497,11 +732,13 @@ function MyComplaints() {
                                                     className="track-btn"
                                                     onClick={() =>
                                                         handleTrack(
-                                                            complaint.id
+                                                            complaint.complaintNumber
                                                         )
                                                     }
                                                 >
+
                                                     Track
+
                                                 </button>
 
                                             </td>
@@ -512,6 +749,8 @@ function MyComplaints() {
                                 )
 
                             ) : (
+
+                                /* NO DATA */
 
                                 <tr>
 
@@ -539,7 +778,9 @@ function MyComplaints() {
                                                 className="reset-search-btn"
                                                 onClick={resetFilters}
                                             >
+
                                                 Clear Search & Filter
+
                                             </button>
 
                                         </div>
@@ -561,50 +802,97 @@ function MyComplaints() {
                     PAGINATION
                 ================================================== */}
 
-                <div className="pagination">
+                {totalPages > 0 && (
 
-                    <span className="pagination-info">
+                    <div className="pagination">
 
-                        Showing{" "}
-                        {filteredComplaints.length}{" "}
-                        of{" "}
-                        {complaints.length}{" "}
-                        complaints
+                        <span className="pagination-info">
 
-                    </span>
+                            Showing{" "}
+
+                            {filteredComplaints.length}{" "}
+
+                            of{" "}
+
+                            {totalElements}{" "}
+
+                            complaints
+
+                        </span>
 
 
-                    <div className="pagination-buttons">
+                        <div className="pagination-buttons">
 
-                        <button
-                            type="button"
-                            className="page-btn active"
-                        >
-                            1
-                        </button>
+                            {/* PREVIOUS */}
 
-                        <button
-                            type="button"
-                            className="page-btn"
-                        >
-                            2
-                        </button>
+                            <button
+                                type="button"
+                                className="page-btn"
+                                disabled={page === 0}
+                                onClick={previousPage}
+                            >
 
-                        <button
-                            type="button"
-                            className="page-btn"
-                        >
-                            3
-                        </button>
+                                Previous
+
+                            </button>
+
+
+                            {/* PAGE NUMBERS */}
+
+                            {Array.from(
+                                {
+                                    length: totalPages
+                                },
+                                (_, index) => (
+
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        className={`page-btn ${
+                                            page === index
+                                                ? "active"
+                                                : ""
+                                        }`}
+                                        onClick={() =>
+                                            goToPage(index)
+                                        }
+                                    >
+
+                                        {index + 1}
+
+                                    </button>
+
+                                )
+                            )}
+
+
+                            {/* NEXT */}
+
+                            <button
+                                type="button"
+                                className="page-btn"
+                                disabled={
+                                    page === totalPages - 1
+                                }
+                                onClick={nextPage}
+                            >
+
+                                Next
+
+                            </button>
+
+                        </div>
 
                     </div>
 
-                </div>
+                )}
 
             </div>
 
         </div>
+
     );
+
 }
 
 export default MyComplaints;

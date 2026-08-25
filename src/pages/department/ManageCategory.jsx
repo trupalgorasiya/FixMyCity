@@ -1,4 +1,5 @@
-import  { useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
     FaPlus,
     FaSearch,
@@ -15,57 +16,39 @@ import {
     FaClipboardList
 } from "react-icons/fa";
 
+import axios from "axios";
+
 import "./ManageCategory.css";
 
-const initialCategories = [
-    {
-        id: 1,
-        name: "Potholes",
-        description: "Complaints related to potholes and damaged road surfaces.",
-        complaints: 42,
-        status: "Active",
-        icon: "road"
-    },
-    {
-        id: 2,
-        name: "Broken Footpath",
-        description: "Complaints about damaged or broken pedestrian footpaths.",
-        complaints: 18,
-        status: "Active",
-        icon: "road"
-    },
-    {
-        id: 3,
-        name: "Road Damage",
-        description: "General complaints related to damaged roads.",
-        complaints: 25,
-        status: "Active",
-        icon: "road"
-    },
-    {
-        id: 4,
-        name: "Traffic Sign Damage",
-        description: "Damaged or missing traffic signs and road signs.",
-        complaints: 11,
-        status: "Inactive",
-        icon: "road"
-    }
-];
 
 function DepartmentCategory() {
 
-    /*
-        In your real project, replace this with the
-        logged-in department received from login/API/context.
+    /* =====================================================
+       API BASE URL
+    ===================================================== */
 
-        Example:
-        const departmentName = loggedInUser.department;
-    */
+    const API_BASE_URL =
+        "http://localhost:8085";
 
-    const departmentName = "Road & Infrastructure";
+
+    /* =====================================================
+       DEPARTMENT ID
+
+       For now using department ID 1.
+
+       Later you can replace this with the
+       department ID from logged-in user.
+    ===================================================== */
+
+    const departmentId = 1;
+
+
+    /* =====================================================
+       STATES
+    ===================================================== */
 
     const [categories, setCategories] =
-        useState(initialCategories);
+        useState([]);
 
     const [search, setSearch] =
         useState("");
@@ -79,37 +62,283 @@ function DepartmentCategory() {
     const [editingCategory, setEditingCategory] =
         useState(null);
 
+    const [loading, setLoading] =
+        useState(false);
+
+    const [saving, setSaving] =
+        useState(false);
+
+    const [deleting, setDeleting] =
+        useState(false);
+
+    const [error, setError] =
+        useState("");
+
+
+    /* =====================================================
+       FORM DATA
+    ===================================================== */
+
     const [formData, setFormData] = useState({
         name: "",
-        description: "",
-        icon: "road",
-        status: "Active"
+        description: ""
     });
+
+
+    /* =====================================================
+       POPUP
+    ===================================================== */
+
+    const [popup, setPopup] = useState({
+        show: false,
+        type: "success",
+        message: ""
+    });
+
+
+    /* =====================================================
+       DEPARTMENT INFORMATION
+    ===================================================== */
+
+    const [departmentName, setDepartmentName] =
+        useState("");
+
+
+    /* =====================================================
+       SHOW POPUP
+    ===================================================== */
+
+    const showPopup = (
+        message,
+        type = "success"
+    ) => {
+
+        setPopup({
+            show: true,
+            type,
+            message
+        });
+
+    };
+
+
+    /* =====================================================
+       CLOSE POPUP
+    ===================================================== */
+
+    const closePopup = () => {
+
+        setPopup({
+            show: false,
+            type: "success",
+            message: ""
+        });
+
+    };
+
+
+    /* =====================================================
+       GET TOKEN
+    ===================================================== */
+
+    const getToken = () => {
+
+        return localStorage.getItem("token");
+
+    };
+
+
+    /* =====================================================
+       GET AUTH HEADERS
+    ===================================================== */
+
+    const getHeaders = () => {
+
+        const token =
+            getToken();
+
+        return {
+            Authorization:
+                `Bearer ${token}`
+        };
+
+    };
+
+
+    /* =====================================================
+       FETCH DEPARTMENT CATEGORIES
+    ===================================================== */
+
+    const fetchCategories = async () => {
+
+        try {
+
+            setLoading(true);
+
+            setError("");
+
+
+            const token =
+                getToken();
+
+
+            if (!token) {
+
+                showPopup(
+                    "You are not logged in. Please login again.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            const response =
+                await axios.get(
+                    `${API_BASE_URL}/api/categories/department/${departmentId}`,
+                    {
+                        headers: getHeaders()
+                    }
+                );
+
+
+            console.log(
+                "Department Categories:",
+                response.data
+            );
+
+
+            const data =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
+
+
+            setCategories(data);
+
+
+            /* -----------------------------------------
+               GET DEPARTMENT NAME
+            ----------------------------------------- */
+
+            if (data.length > 0) {
+
+                setDepartmentName(
+                    data[0].departmentName ||
+                    "Department"
+                );
+
+            } else {
+
+                setDepartmentName(
+                    "Department"
+                );
+
+            }
+
+
+        } catch (err) {
+
+            console.error(
+                "Fetch Categories Error:",
+                err
+            );
+
+
+            if (
+                err.response?.status === 401
+            ) {
+
+                showPopup(
+                    "Your session has expired. Please login again.",
+                    "error"
+                );
+
+            } else if (
+                err.response?.status === 403
+            ) {
+
+                showPopup(
+                    "You are not authorized to view these categories.",
+                    "error"
+                );
+
+            } else {
+
+                setError(
+                    err.response?.data?.message ||
+                    "Unable to load categories."
+                );
+
+            }
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+
+    /* =====================================================
+       LOAD DATA
+    ===================================================== */
+
+    useEffect(() => {
+
+        fetchCategories();
+
+    }, []);
 
 
     /* =====================================================
        FILTER
     ===================================================== */
 
-    const filteredCategories = categories.filter((category) => {
+    const filteredCategories =
+        categories.filter((category) => {
 
-        const searchText = search.toLowerCase();
+            const searchText =
+                search.toLowerCase();
 
-        const matchesSearch =
-            category.name
-                .toLowerCase()
-                .includes(searchText) ||
 
-            category.description
-                .toLowerCase()
-                .includes(searchText);
+            const categoryName =
+                category.name?.toLowerCase() ||
+                "";
 
-        const matchesStatus =
-            statusFilter === "All" ||
-            category.status === statusFilter;
 
-        return matchesSearch && matchesStatus;
-    });
+            const description =
+                category.description?.toLowerCase() ||
+                "";
+
+
+            const matchesSearch =
+                categoryName.includes(searchText) ||
+                description.includes(searchText);
+
+
+            /*
+                Your current API response does NOT contain
+                category status.
+
+                Therefore status filtering cannot actually
+                work with the current API.
+
+                We keep "All" only.
+            */
+
+            const matchesStatus =
+                statusFilter === "All";
+
+
+            return (
+                matchesSearch &&
+                matchesStatus
+            );
+
+        });
 
 
     /* =====================================================
@@ -119,47 +348,88 @@ function DepartmentCategory() {
     const totalCategories =
         categories.length;
 
+
+    /*
+       Current API does not provide status.
+       Therefore Active/Inactive cannot be calculated.
+    */
+
     const activeCategories =
-        categories.filter(
-            category => category.status === "Active"
-        ).length;
+        categories.length;
+
 
     const inactiveCategories =
-        categories.filter(
-            category => category.status === "Inactive"
-        ).length;
+        0;
+
+
+    /*
+       Current category API does not provide complaint count.
+
+       Therefore this value cannot be calculated from
+       the supplied API response.
+    */
 
     const totalComplaints =
-        categories.reduce(
-            (total, category) =>
-                total + category.complaints,
-            0
-        );
+        0;
 
 
     /* =====================================================
        ICON
+
+       Backend does not currently return icon.
+
+       We select an icon based on category name.
     ===================================================== */
 
-    const getCategoryIcon = (icon) => {
+    const getCategoryIcon = (name) => {
 
-        switch (icon) {
+        const categoryName =
+            name?.toLowerCase() || "";
 
-            case "garbage":
-                return <FaTrashAlt />;
 
-            case "water":
-                return <FaTint />;
+        if (
+            categoryName.includes("water") ||
+            categoryName.includes("leakage")
+        ) {
 
-            case "light":
-                return <FaLightbulb />;
+            return <FaTint />;
 
-            case "drainage":
-                return <FaWater />;
-
-            default:
-                return <FaRoad />;
         }
+
+
+        if (
+            categoryName.includes("light") ||
+            categoryName.includes("electric") ||
+            categoryName.includes("signal")
+        ) {
+
+            return <FaLightbulb />;
+
+        }
+
+
+        if (
+            categoryName.includes("drain") ||
+            categoryName.includes("sewer")
+        ) {
+
+            return <FaWater />;
+
+        }
+
+
+        if (
+            categoryName.includes("garbage") ||
+            categoryName.includes("waste")
+        ) {
+
+            return <FaTrashAlt />;
+
+        }
+
+
+        return <FaRoad />;
+
     };
 
 
@@ -169,16 +439,22 @@ function DepartmentCategory() {
 
     const openAddModal = () => {
 
+        /*
+           POST API was not provided.
+
+           So currently we only show the form.
+           Once you provide the POST API, we can connect it.
+        */
+
         setEditingCategory(null);
 
         setFormData({
             name: "",
-            description: "",
-            icon: "road",
-            status: "Active"
+            description: ""
         });
 
         setShowModal(true);
+
     };
 
 
@@ -191,13 +467,15 @@ function DepartmentCategory() {
         setEditingCategory(category);
 
         setFormData({
-            name: category.name,
-            description: category.description,
-            icon: category.icon,
-            status: category.status
+            name:
+                category.name || "",
+
+            description:
+                category.description || ""
         });
 
         setShowModal(true);
+
     };
 
 
@@ -207,9 +485,20 @@ function DepartmentCategory() {
 
     const closeModal = () => {
 
+        if (saving) {
+            return;
+        }
+
+
         setShowModal(false);
 
         setEditingCategory(null);
+
+        setFormData({
+            name: "",
+            description: ""
+        });
+
     };
 
 
@@ -224,146 +513,382 @@ function DepartmentCategory() {
             value
         } = e.target;
 
-        setFormData(prev => ({
-            ...prev,
+
+        setFormData((previous) => ({
+            ...previous,
             [name]: value
         }));
+
     };
 
 
     /* =====================================================
-       SAVE CATEGORY
+       UPDATE CATEGORY
     ===================================================== */
 
-    const handleSubmit = (e) => {
+    const updateCategory = async () => {
 
-        e.preventDefault();
-
-        if (!formData.name.trim()) {
-
-            alert("Please enter category name.");
-
+        if (!editingCategory) {
             return;
         }
 
 
-        /* EDIT */
+        if (!formData.name.trim()) {
 
-        if (editingCategory) {
+            showPopup(
+                "Please enter category name.",
+                "error"
+            );
 
-            setCategories(prev =>
-                prev.map(category =>
-                    category.id === editingCategory.id
+            return;
+
+        }
+
+
+        try {
+
+            setSaving(true);
+
+
+            const requestData = {
+
+                name:
+                    formData.name.trim(),
+
+                description:
+                    formData.description.trim(),
+
+                departmentId:
+                    departmentId
+
+            };
+
+
+            console.log(
+                "Update Category Request:",
+                requestData
+            );
+
+
+            const response =
+                await axios.put(
+
+                    `${API_BASE_URL}/api/categories/${editingCategory.categoryId}`,
+
+                    requestData,
+
+                    {
+                        headers: {
+                            ...getHeaders(),
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+
+                );
+
+
+            console.log(
+                "Update Category Response:",
+                response.data
+            );
+
+
+            /* -----------------------------------------
+               UPDATE LOCAL DATA
+            ----------------------------------------- */
+
+            setCategories((previous) =>
+                previous.map((category) =>
+                    category.categoryId ===
+                    editingCategory.categoryId
                         ? {
                             ...category,
-                            ...formData
+
+                            name:
+                                response.data?.name ||
+                                requestData.name,
+
+                            description:
+                                response.data?.description ||
+                                requestData.description,
+
+                            departmentId:
+                                response.data?.departmentId ||
+                                departmentId,
+
+                            departmentName:
+                                response.data?.departmentName ||
+                                category.departmentName
                         }
                         : category
                 )
             );
 
+
+            closeModal();
+
+
+            showPopup(
+                "Category updated successfully.",
+                "success"
+            );
+
+
+        } catch (err) {
+
+            console.error(
+                "Update Category Error:",
+                err
+            );
+
+
+            const backendMessage =
+                err.response?.data?.message;
+
+
+            if (backendMessage) {
+
+                showPopup(
+                    backendMessage,
+                    "error"
+                );
+
+            } else if (
+                typeof err.response?.data === "string"
+            ) {
+
+                showPopup(
+                    err.response.data,
+                    "error"
+                );
+
+            } else if (
+                err.response?.status === 401
+            ) {
+
+                showPopup(
+                    "Your session has expired. Please login again.",
+                    "error"
+                );
+
+            } else if (
+                err.response?.status === 403
+            ) {
+
+                showPopup(
+                    "You are not authorized to update this category.",
+                    "error"
+                );
+
+            } else {
+
+                showPopup(
+                    "Unable to update category. Please try again.",
+                    "error"
+                );
+
+            }
+
+        } finally {
+
+            setSaving(false);
+
         }
 
-
-        /* ADD */
-
-        else {
-
-            const newCategory = {
-
-                id: Date.now(),
-
-                name: formData.name,
-
-                description:
-                    formData.description,
-
-                complaints: 0,
-
-                status:
-                    formData.status,
-
-                icon:
-                    formData.icon
-            };
-
-            setCategories(prev => [
-                ...prev,
-                newCategory
-            ]);
-        }
-
-        closeModal();
     };
 
 
     /* =====================================================
-       DELETE
+       CREATE CATEGORY
     ===================================================== */
 
-    const deleteCategory = (id) => {
+    const createCategory = async () => {
+
+        /*
+           IMPORTANT:
+
+           You have not provided the POST API.
+
+           We cannot safely call an unknown endpoint.
+
+           Once you provide something like:
+
+           POST /api/categories
+
+           we can implement this here.
+        */
+
+        showPopup(
+            "Add category API is not provided yet. Please provide the POST API endpoint.",
+            "error"
+        );
+
+    };
+
+
+    /* =====================================================
+       SUBMIT FORM
+    ===================================================== */
+
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+
+        if (!formData.name.trim()) {
+
+            showPopup(
+                "Please enter category name.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if (editingCategory) {
+
+            await updateCategory();
+
+        } else {
+
+            await createCategory();
+
+        }
+
+    };
+
+
+    /* =====================================================
+       DELETE CATEGORY
+    ===================================================== */
+
+    const deleteCategory = async (categoryId) => {
 
         const confirmation =
             window.confirm(
                 "Are you sure you want to delete this category?"
             );
 
+
         if (!confirmation) {
             return;
         }
 
-        setCategories(prev =>
-            prev.filter(
-                category => category.id !== id
-            )
-        );
+
+        try {
+
+            setDeleting(true);
+
+
+            console.log(
+                "Deleting Category:",
+                categoryId
+            );
+
+
+            await axios.delete(
+
+                `${API_BASE_URL}/api/categories/${categoryId}`,
+
+                {
+                    headers: getHeaders()
+                }
+
+            );
+
+
+            /* -----------------------------------------
+               REMOVE FROM UI
+            ----------------------------------------- */
+
+            setCategories((previous) =>
+                previous.filter(
+                    (category) =>
+                        category.categoryId !== categoryId
+                )
+            );
+
+
+            showPopup(
+                "Category deleted successfully.",
+                "success"
+            );
+
+
+        } catch (err) {
+
+            console.error(
+                "Delete Category Error:",
+                err
+            );
+
+
+            const backendMessage =
+                err.response?.data?.message;
+
+
+            if (backendMessage) {
+
+                showPopup(
+                    backendMessage,
+                    "error"
+                );
+
+            } else if (
+                typeof err.response?.data === "string"
+            ) {
+
+                showPopup(
+                    err.response.data,
+                    "error"
+                );
+
+            } else if (
+                err.response?.status === 401
+            ) {
+
+                showPopup(
+                    "Your session has expired. Please login again.",
+                    "error"
+                );
+
+            } else if (
+                err.response?.status === 403
+            ) {
+
+                showPopup(
+                    "You are not authorized to delete this category.",
+                    "error"
+                );
+
+            } else {
+
+                showPopup(
+                    "Unable to delete category. Please try again.",
+                    "error"
+                );
+
+            }
+
+        } finally {
+
+            setDeleting(false);
+
+        }
+
     };
 
+
+    /* =====================================================
+       JSX
+    ===================================================== */
 
     return (
 
         <div className="dept-category-page">
-
-
-            {/* =================================================
-                HEADER
-            ================================================= */}
-
-            <div className="dept-category-header">
-
-                <div className="dept-category-header-left">
-
-                    <div className="dept-category-header-icon">
-                        <FaLayerGroup />
-                    </div>
-
-                    <div>
-
-                        <h1>
-                            Category Management
-                        </h1>
-
-                        <p>
-                            Manage complaint categories for your department.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <button
-                    className="dept-category-add-button"
-                    onClick={openAddModal}
-                >
-
-                    <FaPlus />
-
-                    Add Category
-
-                </button>
-
-            </div>
 
 
             {/* =================================================
@@ -375,8 +900,11 @@ function DepartmentCategory() {
                 <div className="dept-category-banner-left">
 
                     <div className="dept-category-banner-icon">
+
                         <FaLayerGroup />
+
                     </div>
+
 
                     <div>
 
@@ -385,7 +913,8 @@ function DepartmentCategory() {
                         </span>
 
                         <h2>
-                            {departmentName}
+                            {departmentName ||
+                                `Department ${departmentId}`}
                         </h2>
 
                     </div>
@@ -411,11 +940,16 @@ function DepartmentCategory() {
             <div className="dept-category-stat-grid">
 
 
+                {/* TOTAL */}
+
                 <div className="dept-category-stat-card">
 
                     <div className="dept-category-stat-icon blue">
+
                         <FaLayerGroup />
+
                     </div>
+
 
                     <div>
 
@@ -432,11 +966,16 @@ function DepartmentCategory() {
                 </div>
 
 
+                {/* ACTIVE */}
+
                 <div className="dept-category-stat-card">
 
                     <div className="dept-category-stat-icon green">
+
                         <FaCheck />
+
                     </div>
+
 
                     <div>
 
@@ -453,11 +992,16 @@ function DepartmentCategory() {
                 </div>
 
 
+                {/* INACTIVE */}
+
                 <div className="dept-category-stat-card">
 
                     <div className="dept-category-stat-icon orange">
+
                         <FaTimes />
+
                     </div>
+
 
                     <div>
 
@@ -474,11 +1018,16 @@ function DepartmentCategory() {
                 </div>
 
 
+                {/* COMPLAINTS */}
+
                 <div className="dept-category-stat-card">
 
                     <div className="dept-category-stat-icon purple">
+
                         <FaClipboardList />
+
                     </div>
+
 
                     <div>
 
@@ -503,6 +1052,7 @@ function DepartmentCategory() {
 
             <div className="dept-category-toolbar">
 
+
                 <div className="dept-category-search">
 
                     <FaSearch />
@@ -522,7 +1072,9 @@ function DepartmentCategory() {
                 <select
                     value={statusFilter}
                     onChange={(e) =>
-                        setStatusFilter(e.target.value)
+                        setStatusFilter(
+                            e.target.value
+                        )
                     }
                 >
 
@@ -559,7 +1111,9 @@ function DepartmentCategory() {
                         </h2>
 
                         <p>
-                            {filteredCategories.length} categories available
+                            {filteredCategories.length}
+                            {" "}
+                            categories available
                         </p>
 
                     </div>
@@ -579,197 +1133,266 @@ function DepartmentCategory() {
                 </div>
 
 
-                {/* TABLE */}
+                {/* =================================================
+                    LOADING
+                ================================================= */}
 
-                <div className="dept-category-table-wrapper">
+                {loading ? (
 
-                    <table className="dept-category-table">
+                    <div
+                        className="dept-category-empty"
+                    >
 
-                        <thead>
+                        <h3>
+                            Loading categories...
+                        </h3>
 
-                            <tr>
+                    </div>
 
-                                <th>
-                                    Category
-                                </th>
+                ) : error ? (
 
-                                <th>
-                                    Description
-                                </th>
+                    <div
+                        className="dept-category-empty"
+                    >
 
-                                <th>
-                                    Complaints
-                                </th>
+                        <h3>
+                            {error}
+                        </h3>
 
-                                <th>
-                                    Status
-                                </th>
+                        <button
+                            onClick={fetchCategories}
+                        >
+                            Try Again
+                        </button>
 
-                                <th>
-                                    Actions
-                                </th>
+                    </div>
 
-                            </tr>
+                ) : (
 
-                        </thead>
+                    /* =================================================
+                       TABLE
+                    ================================================= */
 
+                    <div className="dept-category-table-wrapper">
 
-                        <tbody>
+                        <table className="dept-category-table">
 
-                            {filteredCategories.length > 0 ? (
+                            <thead>
 
-                                filteredCategories.map(category => (
+                                <tr>
 
-                                    <tr key={category.id}>
+                                    <th>
+                                        Category
+                                    </th>
 
+                                    <th>
+                                        Description
+                                    </th>
 
-                                        {/* CATEGORY */}
+                                    <th>
+                                        Complaints
+                                    </th>
 
-                                        <td>
+                                    <th>
+                                        Status
+                                    </th>
 
-                                            <div className="dept-category-name">
+                                    <th>
+                                        Actions
+                                    </th>
 
-                                                <div className="dept-category-item-icon">
+                                </tr>
 
-                                                    {getCategoryIcon(
-                                                        category.icon
-                                                    )}
-
-                                                </div>
-
-                                                <div>
-
-                                                    <strong>
-                                                        {category.name}
-                                                    </strong>
-
-                                                    <span>
-                                                        {departmentName}
-                                                    </span>
-
-                                                </div>
-
-                                            </div>
-
-                                        </td>
+                            </thead>
 
 
-                                        {/* DESCRIPTION */}
+                            <tbody>
 
-                                        <td>
+                                {filteredCategories.length > 0 ? (
 
-                                            <span className="dept-category-description">
+                                    filteredCategories.map(
+                                        (category) => (
 
-                                                {category.description}
-
-                                            </span>
-
-                                        </td>
-
-
-                                        {/* COMPLAINTS */}
-
-                                        <td>
-
-                                            <span className="dept-category-complaint-number">
-
-                                                {category.complaints}
-
-                                            </span>
-
-                                        </td>
-
-
-                                        {/* STATUS */}
-
-                                        <td>
-
-                                            <span
-                                                className={
-                                                    category.status === "Active"
-                                                        ? "dept-category-status active"
-                                                        : "dept-category-status inactive"
+                                            <tr
+                                                key={
+                                                    category.categoryId
                                                 }
                                             >
 
-                                                {category.status}
 
-                                            </span>
+                                                {/* CATEGORY */}
 
-                                        </td>
+                                                <td>
 
+                                                    <div className="dept-category-name">
 
-                                        {/* ACTIONS */}
+                                                        <div className="dept-category-item-icon">
 
-                                        <td>
+                                                            {
+                                                                getCategoryIcon(
+                                                                    category.name
+                                                                )
+                                                            }
 
-                                            <div className="dept-category-actions">
-
-                                                <button
-                                                    className="dept-category-edit"
-                                                    title="Edit Category"
-                                                    onClick={() =>
-                                                        openEditModal(category)
-                                                    }
-                                                >
-
-                                                    <FaEdit />
-
-                                                </button>
+                                                        </div>
 
 
-                                                <button
-                                                    className="dept-category-delete"
-                                                    title="Delete Category"
-                                                    onClick={() =>
-                                                        deleteCategory(
-                                                            category.id
-                                                        )
-                                                    }
-                                                >
+                                                        <div>
 
-                                                    <FaTrash />
+                                                            <strong>
 
-                                                </button>
+                                                                {
+                                                                    category.name
+                                                                }
 
-                                            </div>
+                                                            </strong>
+
+                                                            <span>
+
+                                                                {
+                                                                    category.departmentName
+                                                                }
+
+                                                            </span>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                {/* DESCRIPTION */}
+
+                                                <td>
+
+                                                    <span className="dept-category-description">
+
+                                                        {
+                                                            category.description ||
+                                                            "-"
+                                                        }
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                {/* COMPLAINTS */}
+
+                                                <td>
+
+                                                    <span className="dept-category-complaint-number">
+
+                                                        -
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                {/* STATUS */}
+
+                                                <td>
+
+                                                    <span className="dept-category-status active">
+
+                                                        Active
+
+                                                    </span>
+
+                                                </td>
+
+
+                                                {/* ACTIONS */}
+
+                                                <td>
+
+                                                    <div className="dept-category-actions">
+
+
+                                                        {/* EDIT */}
+
+                                                        <button
+                                                            className="dept-category-edit"
+                                                            title="Edit Category"
+                                                            onClick={() =>
+                                                                openEditModal(
+                                                                    category
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                saving ||
+                                                                deleting
+                                                            }
+                                                        >
+
+                                                            <FaEdit />
+
+                                                        </button>
+
+
+                                                        {/* DELETE */}
+
+                                                        <button
+                                                            className="dept-category-delete"
+                                                            title="Delete Category"
+                                                            onClick={() =>
+                                                                deleteCategory(
+                                                                    category.categoryId
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                saving ||
+                                                                deleting
+                                                            }
+                                                        >
+
+                                                            <FaTrash />
+
+                                                        </button>
+
+                                                    </div>
+
+                                                </td>
+
+                                            </tr>
+
+                                        )
+                                    )
+
+                                ) : (
+
+                                    <tr>
+
+                                        <td
+                                            colSpan="5"
+                                            className="dept-category-empty"
+                                        >
+
+                                            <FaLayerGroup />
+
+                                            <h3>
+                                                No Categories Found
+                                            </h3>
+
+                                            <p>
+                                                Try changing your search.
+                                            </p>
 
                                         </td>
 
                                     </tr>
 
-                                ))
+                                )}
 
-                            ) : (
+                            </tbody>
 
-                                <tr>
+                        </table>
 
-                                    <td
-                                        colSpan="5"
-                                        className="dept-category-empty"
-                                    >
+                    </div>
 
-                                        <FaLayerGroup />
-
-                                        <h3>
-                                            No Categories Found
-                                        </h3>
-
-                                        <p>
-                                            Try changing your search or status filter.
-                                        </p>
-
-                                    </td>
-
-                                </tr>
-
-                            )}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
+                )}
 
             </div>
 
@@ -801,7 +1424,12 @@ function DepartmentCategory() {
                                 </h2>
 
                                 <p>
-                                    Add a complaint category for your department.
+
+                                    {editingCategory
+                                        ? "Update category information."
+                                        : "Add a complaint category for your department."
+                                    }
+
                                 </p>
 
                             </div>
@@ -810,6 +1438,7 @@ function DepartmentCategory() {
                             <button
                                 className="dept-category-modal-close"
                                 onClick={closeModal}
+                                disabled={saving}
                             >
 
                                 <FaTimes />
@@ -835,13 +1464,19 @@ function DepartmentCategory() {
                                     Department
                                 </label>
 
+
                                 <div className="dept-category-readonly-department">
 
                                     <FaLayerGroup />
 
+
                                     <span>
-                                        {departmentName}
+
+                                        {departmentName ||
+                                            `Department ${departmentId}`}
+
                                     </span>
+
 
                                     <small>
                                         Current Department
@@ -857,9 +1492,15 @@ function DepartmentCategory() {
                             <div className="dept-category-form-group">
 
                                 <label>
+
                                     Category Name
-                                    <span>*</span>
+
+                                    <span>
+                                        *
+                                    </span>
+
                                 </label>
+
 
                                 <input
                                     type="text"
@@ -881,6 +1522,7 @@ function DepartmentCategory() {
                                     Description
                                 </label>
 
+
                                 <textarea
                                     name="description"
                                     rows="4"
@@ -892,77 +1534,30 @@ function DepartmentCategory() {
                             </div>
 
 
-                            {/* FORM ROW */}
+                            {/* =================================================
+                                NOTE
+                            ================================================= */}
 
-                            <div className="dept-category-form-row">
+                            {!editingCategory && (
 
+                                <div
+                                    style={{
+                                        padding: "12px",
+                                        marginBottom: "15px",
+                                        borderRadius: "8px",
+                                        background: "#fff3cd",
+                                        color: "#856404",
+                                        fontSize: "14px"
+                                    }}
+                                >
 
-                                {/* ICON */}
-
-                                <div className="dept-category-form-group">
-
-                                    <label>
-                                        Category Icon
-                                    </label>
-
-                                    <select
-                                        name="icon"
-                                        value={formData.icon}
-                                        onChange={handleInputChange}
-                                    >
-
-                                        <option value="road">
-                                            Road
-                                        </option>
-
-                                        <option value="garbage">
-                                            Garbage
-                                        </option>
-
-                                        <option value="water">
-                                            Water
-                                        </option>
-
-                                        <option value="light">
-                                            Street Light
-                                        </option>
-
-                                        <option value="drainage">
-                                            Drainage
-                                        </option>
-
-                                    </select>
+                                    Add category cannot be saved yet because
+                                    the POST category API endpoint has not
+                                    been provided.
 
                                 </div>
 
-
-                                {/* STATUS */}
-
-                                <div className="dept-category-form-group">
-
-                                    <label>
-                                        Status
-                                    </label>
-
-                                    <select
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleInputChange}
-                                    >
-
-                                        <option value="Active">
-                                            Active
-                                        </option>
-
-                                        <option value="Inactive">
-                                            Inactive
-                                        </option>
-
-                                    </select>
-
-                                </div>
-
-                            </div>
+                            )}
 
 
                             {/* BUTTONS */}
@@ -973,21 +1568,28 @@ function DepartmentCategory() {
                                     type="button"
                                     className="dept-category-cancel"
                                     onClick={closeModal}
+                                    disabled={saving}
                                 >
+
                                     Cancel
+
                                 </button>
 
 
                                 <button
                                     type="submit"
                                     className="dept-category-save"
+                                    disabled={saving}
                                 >
 
                                     <FaCheck />
 
-                                    {editingCategory
-                                        ? "Update Category"
-                                        : "Save Category"
+
+                                    {saving
+                                        ? "Saving..."
+                                        : editingCategory
+                                            ? "Update Category"
+                                            : "Save Category"
                                     }
 
                                 </button>
@@ -1002,8 +1604,71 @@ function DepartmentCategory() {
 
             )}
 
+
+            {/* =================================================
+                POPUP
+            ================================================= */}
+
+            {popup.show && (
+
+                <div
+                    className="dept-category-popup-overlay"
+                    onClick={closePopup}
+                >
+
+                    <div
+                        className={`dept-category-popup ${
+                            popup.type === "error"
+                                ? "error"
+                                : "success"
+                        }`}
+                        onClick={(e) =>
+                            e.stopPropagation()
+                        }
+                    >
+
+                        <div className="dept-category-popup-icon">
+
+                            {popup.type === "error"
+                                ? "!"
+                                : "✓"}
+
+                        </div>
+
+
+                        <h3>
+
+                            {popup.type === "error"
+                                ? "Error"
+                                : "Success"}
+
+                        </h3>
+
+
+                        <p>
+                            {popup.message}
+                        </p>
+
+
+                        <button
+                            type="button"
+                            onClick={closePopup}
+                        >
+
+                            OK
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            )}
+
         </div>
+
     );
+
 }
 
 export default DepartmentCategory;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./ComplaintManagement.css";
 
 import {
@@ -15,46 +15,14 @@ import {
 } from "react-icons/fa";
 
 function ComplaintManagement() {
+
   const [currentPage, setCurrentPage] = useState(1);
 
-const complaintsPerPage = 5;
+  const complaintsPerPage = 5;
 
-  const [complaints] = useState([
+  const [complaints, setComplaints] = useState([]);
 
-    {
-      id: "CMP001",
-      citizen: "Rahul Patel",
-      title: "Large pothole on main road",
-      department: "Road Department",
-      priority: "High",
-      status: "Pending",
-      engineer: "Not Assigned",
-      date: "19 Jul 2026"
-    },
-
-    {
-      id: "CMP002",
-      citizen: "Amit Shah",
-      title: "Water leakage near society",
-      department: "Water Department",
-      priority: "Medium",
-      status: "Assigned",
-      engineer: "Rahul Sharma",
-      date: "18 Jul 2026"
-    },
-
-    {
-      id: "CMP003",
-      citizen: "Neha Patel",
-      title: "Street light not working",
-      department: "Street Light Department",
-      priority: "Low",
-      status: "Resolved",
-      engineer: "Amit Patel",
-      date: "17 Jul 2026"
-    }
-
-  ]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
 
@@ -70,68 +38,396 @@ const complaintsPerPage = 5;
 
   const [showAssignModal, setShowAssignModal] = useState(false);
 
-  const filteredComplaints = complaints.filter((item) => {
 
-    const matchSearch =
-      item.id.toLowerCase().includes(search.toLowerCase()) ||
-      item.citizen.toLowerCase().includes(search.toLowerCase()) ||
-      item.title.toLowerCase().includes(search.toLowerCase());
+  /* =====================================================
+     GET JWT TOKEN
+  ===================================================== */
 
-    const matchDepartment =
-      department === "All" ||
-      item.department === department;
-
-    const matchStatus =
-      status === "All" ||
-      item.status === status;
-
-    const matchPriority =
-      priority === "All" ||
-      item.priority === priority;
+  const getToken = () => {
 
     return (
-      matchSearch &&
-      matchDepartment &&
-      matchStatus &&
-      matchPriority
+      localStorage.getItem("token") ||
+      localStorage.getItem("jwt") ||
+      localStorage.getItem("accessToken")
     );
 
-  });
-  const totalPages = Math.ceil(
-  filteredComplaints.length / complaintsPerPage
-);
+  };
 
-const indexOfLast =
-  currentPage * complaintsPerPage;
 
-const indexOfFirst =
-  indexOfLast - complaintsPerPage;
+  /* =====================================================
+     GET ASSIGNED COMPLAINTS
+  ===================================================== */
 
-const currentComplaints =
-  filteredComplaints.slice(
-    indexOfFirst,
-    indexOfLast
-  );
+  useEffect(() => {
 
-const paginate = (page) =>
-  setCurrentPage(page);
+    const fetchComplaints = async () => {
 
-const previousPage = () => {
-  if (currentPage > 1)
-    setCurrentPage((prev) => prev - 1);
-};
+      try {
 
-const nextPage = () => {
-  if (currentPage < totalPages)
-    setCurrentPage((prev) => prev + 1);
-};
+        setLoading(true);
+
+        const token = getToken();
+
+        if (!token) {
+
+          console.error("JWT token not found");
+
+          setComplaints([]);
+
+          return;
+
+        }
+
+
+        const response = await fetch(
+          "http://localhost:8085/api/complaint/assigned",
+          {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+
+        if (!response.ok) {
+
+          const errorText = await response.text();
+
+          console.error(
+            "Failed to load complaints:",
+            response.status,
+            errorText
+          );
+
+          throw new Error(
+            `Failed to load complaints: ${response.status}`
+          );
+
+        }
+
+
+        const data = await response.json();
+
+        console.log(
+          "Assigned Complaint Response:",
+          data
+        );
+
+
+        setComplaints(
+          (data.content || []).map((item) => ({
+
+            ...item,
+
+            id: item.complaintNumber,
+
+            citizen:
+              `${item.firstName || ""} ${item.lastName || ""}`
+                .trim() || "Unknown Citizen",
+
+            title:
+              item.title || "Untitled Complaint",
+
+            department:
+              item.department || "Not Assigned",
+
+            priority:
+              item.priority || "UNKNOWN",
+
+            status:
+              item.status || "UNKNOWN",
+
+            engineer:
+              item.engineerFirstName
+                ? `${item.engineerFirstName} ${item.engineerLastName || ""}`.trim()
+                : "Not Assigned",
+
+            date:
+              item.createdAt
+                ? new Date(item.createdAt).toLocaleDateString(
+                    "en-IN",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric"
+                    }
+                  )
+                : "N/A"
+
+          }))
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Error loading complaints:",
+          error
+        );
+
+        setComplaints([]);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+    fetchComplaints();
+
+  }, []);
+
+
+  /* =====================================================
+     SUMMARY
+  ===================================================== */
+
+  const totalComplaints =
+    complaints.length;
+
+  const pendingComplaints =
+    complaints.filter(
+      (item) => item.status === "PENDING"
+    ).length;
+
+  const assignedComplaints =
+    complaints.filter(
+      (item) => item.status === "ASSIGNED"
+    ).length;
+
+  const inProgressComplaints =
+    complaints.filter(
+      (item) => item.status === "IN_PROGRESS"
+    ).length;
+
+  const resolvedComplaints =
+    complaints.filter(
+      (item) => item.status === "RESOLVED"
+    ).length;
+
+  const rejectedComplaints =
+    complaints.filter(
+      (item) => item.status === "REJECTED"
+    ).length;
+
+
+  /* =====================================================
+     DEPARTMENT OPTIONS
+  ===================================================== */
+
+  const departments = [
+    ...new Set(
+      complaints
+        .map((item) => item.department)
+        .filter(Boolean)
+    )
+  ];
+
+
+  /* =====================================================
+     SEARCH + FILTER
+  ===================================================== */
+
+  const filteredComplaints =
+    complaints.filter((item) => {
+
+      const keyword =
+        search.toLowerCase().trim();
+
+
+      const matchSearch =
+
+        (item.complaintNumber || "")
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        (item.firstName || "")
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        (item.lastName || "")
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        (item.email || "")
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        (item.title || "")
+          .toLowerCase()
+          .includes(keyword)
+
+        ||
+
+        (item.description || "")
+          .toLowerCase()
+          .includes(keyword);
+
+
+      const matchDepartment =
+        department === "All" ||
+        item.department === department;
+
+
+      const matchStatus =
+        status === "All" ||
+        item.status === status;
+
+
+      const matchPriority =
+        priority === "All" ||
+        item.priority === priority;
+
+
+      return (
+        matchSearch &&
+        matchDepartment &&
+        matchStatus &&
+        matchPriority
+      );
+
+    });
+
+
+  /* =====================================================
+     PAGINATION
+  ===================================================== */
+
+  const totalPages =
+    Math.ceil(
+      filteredComplaints.length /
+      complaintsPerPage
+    );
+
+
+  const indexOfLast =
+    currentPage * complaintsPerPage;
+
+
+  const indexOfFirst =
+    indexOfLast - complaintsPerPage;
+
+
+  const currentComplaints =
+    filteredComplaints.slice(
+      indexOfFirst,
+      indexOfLast
+    );
+
+
+  const paginate = (page) => {
+
+    if (
+      page < 1 ||
+      page > totalPages
+    ) {
+      return;
+    }
+
+    setCurrentPage(page);
+
+  };
+
+
+  const previousPage = () => {
+
+    if (currentPage > 1) {
+
+      setCurrentPage(
+        (prev) => prev - 1
+      );
+
+    }
+
+  };
+
+
+  const nextPage = () => {
+
+    if (currentPage < totalPages) {
+
+      setCurrentPage(
+        (prev) => prev + 1
+      );
+
+    }
+
+  };
+
+
+  /* =====================================================
+     SEARCH RESET PAGE
+  ===================================================== */
+
+  const handleSearch = (value) => {
+
+    setSearch(value);
+
+    setCurrentPage(1);
+
+  };
+
+
+  /* =====================================================
+     DEPARTMENT FILTER
+  ===================================================== */
+
+  const handleDepartment = (value) => {
+
+    setDepartment(value);
+
+    setCurrentPage(1);
+
+  };
+
+
+  /* =====================================================
+     STATUS FILTER
+  ===================================================== */
+
+  const handleStatus = (value) => {
+
+    setStatus(value);
+
+    setCurrentPage(1);
+
+  };
+
+
+  /* =====================================================
+     PRIORITY FILTER
+  ===================================================== */
+
+  const handlePriority = (value) => {
+
+    setPriority(value);
+
+    setCurrentPage(1);
+
+  };
+
+
   return (
 
     <div className="complaint-page">
 
-      {/* ============================
-            PAGE HEADER
-      ============================ */}
+
+      {/* =====================================================
+          PAGE HEADER
+      ===================================================== */}
 
       <div className="page-header">
 
@@ -142,29 +438,33 @@ const nextPage = () => {
           </h1>
 
           <p>
-
             Manage, assign, monitor and resolve
             citizen complaints efficiently.
-
           </p>
 
         </div>
 
       </div>
 
-      {/* ============================
-            SUMMARY CARDS
-      ============================ */}
+
+      {/* =====================================================
+          SUMMARY CARDS
+      ===================================================== */}
 
       <div className="summary-grid">
+
 
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>Total Complaints</h4>
+            <h4>
+              Total Complaints
+            </h4>
 
-            <h2>248</h2>
+            <h2>
+              {totalComplaints}
+            </h2>
 
           </div>
 
@@ -176,13 +476,18 @@ const nextPage = () => {
 
         </div>
 
+
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>Pending</h4>
+            <h4>
+              Pending
+            </h4>
 
-            <h2>38</h2>
+            <h2>
+              {pendingComplaints}
+            </h2>
 
           </div>
 
@@ -194,13 +499,18 @@ const nextPage = () => {
 
         </div>
 
+
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>Assigned</h4>
+            <h4>
+              Assigned
+            </h4>
 
-            <h2>54</h2>
+            <h2>
+              {assignedComplaints}
+            </h2>
 
           </div>
 
@@ -212,13 +522,18 @@ const nextPage = () => {
 
         </div>
 
+
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>In Progress</h4>
+            <h4>
+              In Progress
+            </h4>
 
-            <h2>42</h2>
+            <h2>
+              {inProgressComplaints}
+            </h2>
 
           </div>
 
@@ -230,13 +545,18 @@ const nextPage = () => {
 
         </div>
 
+
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>Resolved</h4>
+            <h4>
+              Resolved
+            </h4>
 
-            <h2>101</h2>
+            <h2>
+              {resolvedComplaints}
+            </h2>
 
           </div>
 
@@ -248,13 +568,18 @@ const nextPage = () => {
 
         </div>
 
+
         <div className="summary-card">
 
           <div className="summary-info">
 
-            <h4>Rejected</h4>
+            <h4>
+              Rejected
+            </h4>
 
-            <h2>7</h2>
+            <h2>
+              {rejectedComplaints}
+            </h2>
 
           </div>
 
@@ -266,13 +591,16 @@ const nextPage = () => {
 
         </div>
 
+
       </div>
 
-      {/* ============================
-            FILTER TOOLBAR
-      ============================ */}
+
+      {/* =====================================================
+          FILTER TOOLBAR
+      ===================================================== */}
 
       <div className="toolbar">
+
 
         <div className="search-box">
 
@@ -282,61 +610,100 @@ const nextPage = () => {
             type="text"
             placeholder="Search complaint..."
             value={search}
-            onChange={(e) => {
-  setSearch(e.target.value);
-  setCurrentPage(1);
-}}
+            onChange={(e) =>
+              handleSearch(e.target.value)
+            }
           />
 
         </div>
 
+
         <select
           value={department}
-          onChange={(e) => {
-  setDepartment(e.target.value);
-  setCurrentPage(1);
-}}
+          onChange={(e) =>
+            handleDepartment(e.target.value)
+          }
         >
 
-          <option>All</option>
-          <option>Road Department</option>
-          <option>Water Department</option>
-          <option>Garbage Department</option>
-          <option>Street Light Department</option>
+          <option value="All">
+            All Departments
+          </option>
+
+          {departments.map(
+            (dept) => (
+
+              <option
+                key={dept}
+                value={dept}
+              >
+                {dept}
+              </option>
+
+            )
+          )}
 
         </select>
+
 
         <select
           value={status}
-          onChange={(e) => {
-  setStatus(e.target.value);
-  setCurrentPage(1);
-}}
+          onChange={(e) =>
+            handleStatus(e.target.value)
+          }
         >
 
-          <option>All</option>
-          <option>Pending</option>
-          <option>Assigned</option>
-          <option>In Progress</option>
-          <option>Resolved</option>
-          <option>Rejected</option>
+          <option value="All">
+            All Status
+          </option>
+
+          <option value="PENDING">
+            Pending
+          </option>
+
+          <option value="ASSIGNED">
+            Assigned
+          </option>
+
+          <option value="IN_PROGRESS">
+            In Progress
+          </option>
+
+          <option value="RESOLVED">
+            Resolved
+          </option>
+
+          <option value="REJECTED">
+            Rejected
+          </option>
 
         </select>
+
 
         <select
           value={priority}
-          onChange={(e) => {
-  setPriority(e.target.value);
-  setCurrentPage(1);
-}}
+          onChange={(e) =>
+            handlePriority(e.target.value)
+          }
         >
 
-          <option>All</option>
-          <option>High</option>
-          <option>Medium</option>
-          <option>Low</option>
+          <option value="All">
+            All Priority
+          </option>
+
+          <option value="HIGH">
+            High
+          </option>
+
+          <option value="MEDIUM">
+            Medium
+          </option>
+
+          <option value="LOW">
+            Low
+          </option>
 
         </select>
+
 
         <button className="filter-btn">
 
@@ -346,12 +713,16 @@ const nextPage = () => {
 
         </button>
 
+
       </div>
-            {/* ==========================================
-                 COMPLAINT TABLE
-      ========================================== */}
+
+
+      {/* =====================================================
+          COMPLAINT TABLE
+      ===================================================== */}
 
       <div className="table-card">
+
 
         <div className="card-header">
 
@@ -362,12 +733,19 @@ const nextPage = () => {
             </h2>
 
             <p>
-              Monitor and manage all registered complaints.
+
+              Showing{" "}
+              {currentComplaints.length}
+              {" "}of{" "}
+              {filteredComplaints.length}
+              {" "}complaints.
+
             </p>
 
           </div>
 
         </div>
+
 
         <div className="table-container">
 
@@ -377,125 +755,223 @@ const nextPage = () => {
 
               <tr>
 
-                <th>ID</th>
-                <th>Citizen</th>
-                <th>Complaint</th>
-                <th>Department</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Engineer</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Citizen
+                </th>
+
+                <th>
+                  Complaint
+                </th>
+
+                <th>
+                  Department
+                </th>
+
+                <th>
+                  Priority
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Engineer
+                </th>
+
+                <th>
+                  Date
+                </th>
+
+                <th>
+                  Actions
+                </th>
 
               </tr>
 
             </thead>
 
+
             <tbody>
 
-              {filteredComplaints.length > 0 ? (
 
-                filteredComplaints.map((item) => (
+              {loading ? (
 
-                  <tr key={item.id}>
+                <tr className="empty-row">
 
-                    <td>
-                      {item.id}
-                    </td>
+                  <td colSpan="9">
 
-                    <td>
-                      {item.citizen}
-                    </td>
+                    Loading complaints...
 
-                    <td>
-                      {item.title}
-                    </td>
+                  </td>
 
-                    <td>
-                      {item.department}
-                    </td>
+                </tr>
 
-                    <td>
+              ) : currentComplaints.length > 0 ? (
 
-                      <span
-                        className={`priority ${item.priority.toLowerCase()}`}
-                      >
-                        {item.priority}
-                      </span>
+                currentComplaints.map(
+                  (item) => (
 
-                    </td>
+                    <tr
+                      key={item.complaintId}
+                    >
 
-                    <td>
 
-                      <span
-                        className={`status ${item.status
-                          .toLowerCase()
-                          .replace(/\s/g, "-")}`}
-                      >
+                      <td>
 
-                        {item.status}
+                        {item.complaintNumber}
 
-                      </span>
+                      </td>
 
-                    </td>
 
-                    <td>
+                      <td>
 
-                      {item.engineer}
+                        {item.firstName}{" "}
+                        {item.lastName}
 
-                    </td>
+                      </td>
 
-                    <td>
 
-                      {item.date}
+                      <td>
 
-                    </td>
+                        {item.title}
 
-                    <td>
+                      </td>
 
-                      <div className="action-buttons">
 
-                        <button
-                          className="view-btn"
-                          onClick={() => {
+                      <td>
 
-                            setSelectedComplaint(item);
+                        {item.department}
 
-                            setShowViewModal(true);
+                      </td>
 
-                          }}
+
+                      <td>
+
+                        <span
+                          className={`priority ${
+                            (item.priority || "")
+                              .toLowerCase()
+                          }`}
                         >
-                          View
-                        </button>
 
-                        <button
-                          className="assign-btn"
-                          onClick={() => {
+                          {item.priority}
 
-                            setSelectedComplaint(item);
+                        </span>
 
-                            setShowAssignModal(true);
+                      </td>
 
-                          }}
+
+                      <td>
+
+                        <span
+                          className={`status ${
+                            (item.status || "")
+                              .toLowerCase()
+                              .replace(/\s/g, "-")
+                          }`}
                         >
-                          Assign
-                        </button>
 
-                      </div>
+                          {item.status}
 
-                    </td>
+                        </span>
 
-                  </tr>
+                      </td>
 
-                ))
+
+                      <td>
+
+                        {item.engineerFirstName
+                          ? `${item.engineerFirstName} ${
+                              item.engineerLastName || ""
+                            }`
+                          : "Not Assigned"}
+
+                      </td>
+
+
+                      <td>
+
+                        {item.createdAt
+                          ? new Date(
+                              item.createdAt
+                            ).toLocaleDateString(
+                              "en-IN",
+                              {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric"
+                              }
+                            )
+                          : "N/A"}
+
+                      </td>
+
+
+                      <td>
+
+                        <div className="action-buttons">
+
+
+                          <button
+                            className="view-btn"
+                            onClick={() => {
+
+                              setSelectedComplaint(
+                                item
+                              );
+
+                              setShowViewModal(
+                                true
+                              );
+
+                            }}
+                          >
+
+                            View
+
+                          </button>
+
+
+                          <button
+                            className="assign-btn"
+                            onClick={() => {
+
+                              setSelectedComplaint(
+                                item
+                              );
+
+                              setShowAssignModal(
+                                true
+                              );
+
+                            }}
+                          >
+
+                            Assign
+
+                          </button>
+
+
+                        </div>
+
+                      </td>
+
+
+                    </tr>
+
+                  )
+                )
 
               ) : (
 
                 <tr className="empty-row">
 
-                  <td
-                    colSpan="9"
-                  >
+                  <td colSpan="9">
 
                     No complaints found.
 
@@ -505,67 +981,91 @@ const nextPage = () => {
 
               )}
 
+
             </tbody>
 
           </table>
 
         </div>
 
-       {/* ==========================================
-                    PAGINATION
-      ========================================== */}
 
-     
       </div>
- {filteredComplaints.length > complaintsPerPage && (
 
-  <div className="pagination-wrapper">
 
-    <button
-      onClick={previousPage}
-      disabled={currentPage === 1}
-    >
-      <FaChevronLeft />
-      Previous
-    </button>
+      {/* =====================================================
+          PAGINATION
+      ===================================================== */}
 
-    <div className="page-numbers">
+      {filteredComplaints.length >
+        complaintsPerPage && (
 
-      {[...Array(totalPages)].map((_, index) => (
+        <div className="pagination-wrapper">
 
-        <button
-          key={index}
-          onClick={() => paginate(index + 1)}
-          className={
-            currentPage === index + 1
-              ? "active-page"
-              : ""
-          }
-        >
-          {index + 1}
-        </button>
 
-      ))}
+          <button
+            onClick={previousPage}
+            disabled={currentPage === 1}
+          >
 
-    </div>
+            <FaChevronLeft />
 
-    <button
-      onClick={nextPage}
-      disabled={currentPage === totalPages}
-    >
-      Next
-      <FaChevronRight />
-    </button>
+            Previous
 
-  </div>
+          </button>
 
-)}
-     
-            {/* ==========================================
-              VIEW COMPLAINT MODAL
-      ========================================== */}
 
-      {showViewModal && selectedComplaint && (
+          <div className="page-numbers">
+
+            {[...Array(totalPages)].map(
+              (_, index) => (
+
+                <button
+                  key={index}
+                  onClick={() =>
+                    paginate(index + 1)
+                  }
+                  className={
+                    currentPage === index + 1
+                      ? "active-page"
+                      : ""
+                  }
+                >
+
+                  {index + 1}
+
+                </button>
+
+              )
+            )}
+
+          </div>
+
+
+          <button
+            onClick={nextPage}
+            disabled={
+              currentPage === totalPages
+            }
+          >
+
+            Next
+
+            <FaChevronRight />
+
+          </button>
+
+
+        </div>
+
+      )}
+
+
+      {/* =====================================================
+          VIEW COMPLAINT MODAL
+      ===================================================== */}
+
+      {showViewModal &&
+        selectedComplaint && (
 
         <div className="modal-overlay">
 
@@ -594,11 +1094,10 @@ const nextPage = () => {
 
               </button>
 
-
             </div>
 
 
-            {/* Complaint Information */}
+            {/* COMPLAINT INFORMATION */}
 
             <div className="details-section">
 
@@ -611,28 +1110,54 @@ const nextPage = () => {
 
 
                 <div>
+
                   <label>
                     Complaint ID
                   </label>
 
                   <p>
-                    {selectedComplaint.id}
+                    {selectedComplaint.complaintNumber}
                   </p>
+
                 </div>
 
 
                 <div>
+
+                  <label>
+                    Complaint ID
+                  </label>
+
+                  <p>
+                    {selectedComplaint.complaintId}
+                  </p>
+
+                </div>
+
+
+                <div>
+
                   <label>
                     Date
                   </label>
 
                   <p>
-                    {selectedComplaint.date}
+
+                    {selectedComplaint.createdAt
+                      ? new Date(
+                          selectedComplaint.createdAt
+                        ).toLocaleString(
+                          "en-IN"
+                        )
+                      : "N/A"}
+
                   </p>
+
                 </div>
 
 
                 <div>
+
                   <label>
                     Title
                   </label>
@@ -640,10 +1165,25 @@ const nextPage = () => {
                   <p>
                     {selectedComplaint.title}
                   </p>
+
                 </div>
 
 
                 <div>
+
+                  <label>
+                    Category
+                  </label>
+
+                  <p>
+                    {selectedComplaint.category}
+                  </p>
+
+                </div>
+
+
+                <div>
+
                   <label>
                     Department
                   </label>
@@ -651,10 +1191,12 @@ const nextPage = () => {
                   <p>
                     {selectedComplaint.department}
                   </p>
+
                 </div>
 
 
                 <div>
+
                   <label>
                     Priority
                   </label>
@@ -662,7 +1204,12 @@ const nextPage = () => {
                   <p>
 
                     <span
-                      className={`priority ${selectedComplaint.priority.toLowerCase()}`}
+                      className={`priority ${
+                        (
+                          selectedComplaint.priority ||
+                          ""
+                        ).toLowerCase()
+                      }`}
                     >
 
                       {selectedComplaint.priority}
@@ -675,6 +1222,7 @@ const nextPage = () => {
 
 
                 <div>
+
                   <label>
                     Status
                   </label>
@@ -682,9 +1230,14 @@ const nextPage = () => {
                   <p>
 
                     <span
-                      className={`status ${selectedComplaint.status
-                        .toLowerCase()
-                        .replace(/\s/g,"-")}`}
+                      className={`status ${
+                        (
+                          selectedComplaint.status ||
+                          ""
+                        )
+                          .toLowerCase()
+                          .replace(/\s/g, "-")
+                      }`}
                     >
 
                       {selectedComplaint.status}
@@ -696,18 +1249,41 @@ const nextPage = () => {
                 </div>
 
 
-              </div>
+                <div>
 
+                  <label>
+                    Description
+                  </label>
+
+                  <p>
+                    {selectedComplaint.description}
+                  </p>
+
+                </div>
+
+
+                <div>
+
+                  <label>
+                    Engineer Work Note
+                  </label>
+
+                  <p>
+                    {selectedComplaint.engineerWorkNote ||
+                      "No work note available"}
+                  </p>
+
+                </div>
+
+
+              </div>
 
             </div>
 
 
-
-            {/* Citizen Information */}
-
+            {/* CITIZEN INFORMATION */}
 
             <div className="details-section">
-
 
               <h3>
                 Citizen Information
@@ -724,7 +1300,10 @@ const nextPage = () => {
                   </label>
 
                   <p>
-                    {selectedComplaint.citizen}
+
+                    {selectedComplaint.firstName}{" "}
+                    {selectedComplaint.lastName}
+
                   </p>
 
                 </div>
@@ -737,7 +1316,8 @@ const nextPage = () => {
                   </label>
 
                   <p>
-                    9876543210
+                    {selectedComplaint.contact ||
+                      "N/A"}
                   </p>
 
                 </div>
@@ -750,7 +1330,8 @@ const nextPage = () => {
                   </label>
 
                   <p>
-                    citizen@gmail.com
+                    {selectedComplaint.email ||
+                      "N/A"}
                   </p>
 
                 </div>
@@ -759,11 +1340,54 @@ const nextPage = () => {
                 <div>
 
                   <label>
-                    Location
+                    Address
                   </label>
 
                   <p>
-                    Ahmedabad, Gujarat
+                    {selectedComplaint.address ||
+                      "N/A"}
+                  </p>
+
+                </div>
+
+
+                <div>
+
+                  <label>
+                    Pincode
+                  </label>
+
+                  <p>
+                    {selectedComplaint.pincode ||
+                      "N/A"}
+                  </p>
+
+                </div>
+
+
+                <div>
+
+                  <label>
+                    Latitude
+                  </label>
+
+                  <p>
+                    {selectedComplaint.latitude ||
+                      "N/A"}
+                  </p>
+
+                </div>
+
+
+                <div>
+
+                  <label>
+                    Longitude
+                  </label>
+
+                  <p>
+                    {selectedComplaint.longitude ||
+                      "N/A"}
                   </p>
 
                 </div>
@@ -771,16 +1395,12 @@ const nextPage = () => {
 
               </div>
 
-
             </div>
 
 
-
-            {/* Engineer Information */}
-
+            {/* ENGINEER INFORMATION */}
 
             <div className="details-section">
-
 
               <h3>
                 Assigned Engineer
@@ -797,7 +1417,14 @@ const nextPage = () => {
                   </label>
 
                   <p>
-                    {selectedComplaint.engineer}
+
+                    {selectedComplaint.engineerFirstName
+                      ? `${selectedComplaint.engineerFirstName} ${
+                          selectedComplaint.engineerLastName ||
+                          ""
+                        }`
+                      : "Not Assigned"}
+
                   </p>
 
                 </div>
@@ -818,17 +1445,12 @@ const nextPage = () => {
 
               </div>
 
-
             </div>
 
 
-
-
-            {/* Timeline */}
-
+            {/* TIMELINE */}
 
             <div className="details-section">
-
 
               <h3>
                 Complaint Timeline
@@ -849,7 +1471,15 @@ const nextPage = () => {
                     </h4>
 
                     <p>
-                      Citizen submitted complaint
+
+                      {selectedComplaint.createdAt
+                        ? new Date(
+                            selectedComplaint.createdAt
+                          ).toLocaleString(
+                            "en-IN"
+                          )
+                        : "N/A"}
+
                     </p>
 
                   </div>
@@ -857,55 +1487,142 @@ const nextPage = () => {
                 </div>
 
 
+                {selectedComplaint.assignedAt && (
 
-                <div className="timeline-item">
+                  <div className="timeline-item">
 
-                  <span></span>
+                    <span></span>
 
-                  <div>
+                    <div>
 
-                    <h4>
-                      Verification Pending
-                    </h4>
+                      <h4>
+                        Engineer Assigned
+                      </h4>
 
-                    <p>
-                      Admin review required
-                    </p>
+                      <p>
 
-                  </div>
+                        {new Date(
+                          selectedComplaint.assignedAt
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
 
-                </div>
+                      </p>
 
-
-
-                <div className="timeline-item">
-
-                  <span></span>
-
-                  <div>
-
-                    <h4>
-                      Engineer Assignment
-                    </h4>
-
-                    <p>
-                      Waiting for engineer allocation
-                    </p>
+                    </div>
 
                   </div>
 
-                </div>
+                )}
+
+
+                {selectedComplaint.updateAt && (
+
+                  <div className="timeline-item">
+
+                    <span></span>
+
+                    <div>
+
+                      <h4>
+                        Complaint Updated
+                      </h4>
+
+                      <p>
+
+                        {new Date(
+                          selectedComplaint.updateAt
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+                {selectedComplaint.resolveAt && (
+
+                  <div className="timeline-item">
+
+                    <span></span>
+
+                    <div>
+
+                      <h4>
+                        Complaint Resolved
+                      </h4>
+
+                      <p>
+
+                        {new Date(
+                          selectedComplaint.resolveAt
+                        ).toLocaleString(
+                          "en-IN"
+                        )}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                )}
 
 
               </div>
 
-
             </div>
 
 
+            {/* MEDIA */}
+
+            {selectedComplaint.media &&
+              selectedComplaint.media.length > 0 && (
+
+              <div className="details-section">
+
+                <h3>
+                  Complaint Media
+                </h3>
+
+
+                <div className="details-grid">
+
+                  {selectedComplaint.media.map(
+                    (media) => (
+
+                      <div
+                        key={media.mediaId}
+                      >
+
+                        <label>
+                          {media.mediaType === "AFTER"
+                            ? "After Image"
+                            : "Complaint Image"}
+                        </label>
+
+                        <p>
+                          {media.fileName}
+                        </p>
+
+                      </div>
+
+                    )
+                  )}
+
+                </div>
+
+              </div>
+
+            )}
+
 
             <div className="modal-footer">
-
 
               <button
                 className="cancel-btn"
@@ -922,39 +1639,29 @@ const nextPage = () => {
 
               </button>
 
-
             </div>
 
 
-
           </div>
-
 
         </div>
 
       )}
 
 
+      {/* =====================================================
+          ASSIGN ENGINEER MODAL
+      ===================================================== */}
 
-
-
-
-      {/* ==========================================
-              ASSIGN ENGINEER MODAL
-      ========================================== */}
-
-
-      {showAssignModal && selectedComplaint && (
-
+      {showAssignModal &&
+        selectedComplaint && (
 
         <div className="modal-overlay">
-
 
           <div className="modal">
 
 
             <div className="modal-header">
-
 
               <h2>
                 Assign Engineer
@@ -972,185 +1679,104 @@ const nextPage = () => {
 
               </button>
 
-
             </div>
-
-
 
 
             <div className="form-grid">
 
 
-
               <div className="form-group">
-
 
                 <label>
                   Complaint ID
                 </label>
 
-
                 <input
-                  value={selectedComplaint.id}
+                  value={
+                    selectedComplaint.complaintNumber
+                  }
                   disabled
                 />
-
 
               </div>
 
 
-
               <div className="form-group">
-
 
                 <label>
                   Department
                 </label>
 
-
-                <select>
-
-
-                  <option>
-                    Road Department
-                  </option>
-
-
-                  <option>
-                    Water Department
-                  </option>
-
-
-                  <option>
-                    Garbage Department
-                  </option>
-
-
-                  <option>
-                    Street Light Department
-                  </option>
-
-
-                </select>
-
+                <input
+                  value={
+                    selectedComplaint.department ||
+                    ""
+                  }
+                  disabled
+                />
 
               </div>
 
 
-
-
               <div className="form-group">
-
 
                 <label>
-                  Select Engineer
+                  Current Engineer
                 </label>
 
-
-                <select>
-
-
-                  <option>
-                    Rahul Sharma
-                  </option>
-
-
-                  <option>
-                    Amit Patel
-                  </option>
-
-
-                  <option>
-                    Raj Mehta
-                  </option>
-
-
-                </select>
-
+                <input
+                  value={
+                    selectedComplaint.engineerFirstName
+                      ? `${selectedComplaint.engineerFirstName} ${
+                          selectedComplaint.engineerLastName ||
+                          ""
+                        }`
+                      : "Not Assigned"
+                  }
+                  disabled
+                />
 
               </div>
 
 
-
-
-
               <div className="form-group">
-
 
                 <label>
                   Priority
                 </label>
 
-
-                <select>
-
-
-                  <option>
-                    High
-                  </option>
-
-
-                  <option>
-                    Medium
-                  </option>
-
-
-                  <option>
-                    Low
-                  </option>
-
-
-                </select>
-
+                <input
+                  value={
+                    selectedComplaint.priority ||
+                    ""
+                  }
+                  disabled
+                />
 
               </div>
-
-
-
 
 
               <div className="form-group">
 
-
                 <label>
-                  Due Date
+                  Status
                 </label>
 
-
                 <input
-                  type="date"
+                  value={
+                    selectedComplaint.status ||
+                    ""
+                  }
+                  disabled
                 />
 
-
               </div>
-
-
-
-              <div className="form-group">
-
-
-                <label>
-                  Remarks
-                </label>
-
-
-                <input
-                  type="text"
-                  placeholder="Add assignment note"
-                />
-
-
-              </div>
-
 
 
             </div>
 
 
-
-
             <div className="modal-footer">
-
 
               <button
                 className="cancel-btn"
@@ -1159,308 +1785,19 @@ const nextPage = () => {
                 }
               >
 
-                Cancel
+                Close
 
               </button>
-
-
-
-              <button
-                className="save-btn"
-              >
-
-                Assign Engineer
-
-              </button>
-
 
 
             </div>
-
 
 
           </div>
 
-
-        </div>
-
-
-      )}
-      
-      {/* ==========================================
-              DELETE CONFIRMATION MODAL
-      ========================================== */}
-
-
-      {false && (
-
-        <div className="modal-overlay">
-
-
-          <div className="delete-modal">
-
-
-            <h2>
-              Delete Complaint?
-            </h2>
-
-
-            <p>
-
-              Are you sure you want to delete this complaint?
-              This action cannot be undone.
-
-            </p>
-
-
-
-            <div className="delete-actions">
-
-
-              <button
-                className="cancel-btn"
-              >
-
-                Cancel
-
-              </button>
-
-
-
-              <button
-                className="delete-confirm-btn"
-              >
-
-                Delete
-
-              </button>
-
-
-            </div>
-
-
-
-          </div>
-
-
         </div>
 
       )}
-
-
-
-
-
-
-      {/* ==========================================
-              EDIT COMPLAINT MODAL
-      ========================================== */}
-
-
-      {false && (
-
-        <div className="modal-overlay">
-
-
-          <div className="modal">
-
-
-            <div className="modal-header">
-
-
-              <h2>
-                Update Complaint
-              </h2>
-
-
-
-              <button
-                className="close-btn"
-              >
-
-                ×
-
-              </button>
-
-
-
-            </div>
-
-
-
-
-            <div className="form-grid">
-
-
-
-              <div className="form-group">
-
-
-                <label>
-                  Complaint Title
-                </label>
-
-
-                <input
-                  type="text"
-                  placeholder="Complaint title"
-                />
-
-
-              </div>
-
-
-
-
-              <div className="form-group">
-
-
-                <label>
-                  Department
-                </label>
-
-
-                <select>
-
-
-                  <option>
-                    Road Department
-                  </option>
-
-
-                  <option>
-                    Water Department
-                  </option>
-
-
-                  <option>
-                    Garbage Department
-                  </option>
-
-
-                </select>
-
-
-              </div>
-
-
-
-
-
-              <div className="form-group">
-
-
-                <label>
-                  Priority
-                </label>
-
-
-                <select>
-
-
-                  <option>
-                    High
-                  </option>
-
-
-                  <option>
-                    Medium
-                  </option>
-
-
-                  <option>
-                    Low
-                  </option>
-
-
-                </select>
-
-
-              </div>
-
-
-
-
-
-              <div className="form-group">
-
-
-                <label>
-                  Status
-                </label>
-
-
-                <select>
-
-
-                  <option>
-                    Pending
-                  </option>
-
-
-                  <option>
-                    Assigned
-                  </option>
-
-
-                  <option>
-                    In Progress
-                  </option>
-
-
-                  <option>
-                    Resolved
-                  </option>
-
-
-                </select>
-
-
-              </div>
-
-
-
-            </div>
-
-
-
-
-
-            <div className="modal-footer">
-
-
-              <button
-                className="cancel-btn"
-              >
-
-                Cancel
-
-              </button>
-
-
-
-              <button
-                className="save-btn"
-              >
-
-                Update
-
-              </button>
-
-
-
-            </div>
-
-
-
-
-          </div>
-
-
-        </div>
-
-      )}
-
 
 
     </div>

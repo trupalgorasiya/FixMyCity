@@ -1,1071 +1,1286 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../../styles/ComplaintTracking.css";
 import { useNavigate, useParams } from "react-router-dom";
+import { getComplaintByNumber } from "../../api/citizenApi";
 
-function TrackComplaints() {
-  const navigate = useNavigate();
-  const { id } = useParams();
 
-  const [complaintId, setComplaintId] = useState(id || "");
+function MediaSection({ title, subtitle, media }) {
 
-  // ==========================================
-  // COMPLAINT DATA
-  // Later this data will come from Spring Boot API
-  // ==========================================
-
-  const complaint = {
-    id: complaintId || "FXM-2026-001",
-
-    title: "Large Pothole Near Main Road",
-
-    status: "In Progress",
-
-    priority: "High",
-
-    department: "Roads & Infrastructure",
-
-    category: "Pothole",
-
-    description:
-      "A large pothole has developed near the main road. It is causing difficulty for vehicles and can be dangerous for two-wheelers, especially during night time and rainy conditions.",
-
-    submittedDate: "09 July 2026",
-
-    submittedTime: "10:30 AM",
-
-    assignedDate: "11 July 2026",
-
-    expectedDate: "15 July 2026",
-
-    // ========================================
-    // CITIZEN
-    // ========================================
-
-    citizen: {
-      firstName: "Trupal",
-      lastName: "Patel",
-      email: "citizen@example.com",
-      contact: "+91 9876543210",
-    },
-
-    // ========================================
-    // LOCATION
-    // ========================================
-
-    location: {
-      address:
-        "Near C.G. Road, Navrangpura, Ahmedabad, Gujarat",
-
-      pincode: "380009",
-
-      latitude: "23.0365",
-
-      longitude: "72.5660",
-    },
-
-    // ========================================
-    // ASSIGNED ENGINEER
-    // ========================================
-
-    engineer: {
-      firstName: "Rahul",
-
-      lastName: "Sharma",
-
-      designation: "Civil Engineer",
-
-      department: "Roads & Infrastructure",
-
-      contact: "+91 9876543211",
-
-      email: "rahul.sharma@fixmycity.com",
-    },
-
-    // ========================================
-    // ATTACHMENTS
-    // ========================================
-
-    attachments: [
-      {
-        name: "road-damage.jpg",
-        type: "image",
-      },
-      {
-        name: "pothole-video.mp4",
-        type: "video",
-      },
-      {
-        name: "complaint-details.pdf",
-        type: "pdf",
-      },
-    ],
-
-    // ========================================
-    // LATEST UPDATE
-    // ========================================
-
-    latestUpdate: {
-      title: "Repair Work Started",
-
-      date: "12 July 2026",
-
-      time: "11:00 AM",
-
-      message:
-        "The assigned engineer has inspected the location and repair work has started. The damaged road section is currently being repaired.",
-    },
-
-    // ========================================
-    // RESOLUTION
-    // ========================================
-
-    resolution: {
-      status: "Pending",
-
-      date: null,
-
-      message: null,
-    },
-  };
-
-  // ==========================================
-  // TRACK COMPLAINT
-  // ==========================================
-
-  const handleTrack = () => {
-    if (!complaintId.trim()) {
-      alert("Please enter Complaint ID");
-      return;
+    if (!media || media.length === 0) {
+        return null;
     }
 
-    navigate(
-      `/user/complaint-tracking/${complaintId}`
-    );
-  };
+    return (
 
-  return (
-    <div className="tracking-page">
+        <div className="media-section">
 
-      <div className="tracking-container">
+            <div className="media-section-header">
 
-        {/* =====================================
-            HEADER
-        ====================================== */}
+                <div>
 
-        <div className="tracking-header">
+                    <h3>
+                        {title}
+                    </h3>
 
-          <h1>
-            Track Complaint
-          </h1>
+                    <p>
+                        {subtitle}
+                    </p>
 
-          <p>
-            Track the real-time progress of your
-            complaint using the Complaint ID provided
-            during registration. Stay informed about
-            every update from submission to final
-            resolution.
-          </p>
+                </div>
+
+                <span className="media-section-count">
+                    {media.length}
+                </span>
+
+            </div>
+
+
+            <div className="media-grid">
+
+                {media.map((file) => {
+
+                    const mediaUrl =
+                        file.fileUrl?.startsWith("http")
+                            ? file.fileUrl
+                            : `http://localhost:8085/api/citizen/media/${file.mediaId}`;
+
+                    const fileType =
+                        file.fileType?.toLowerCase() || "";
+
+                    const isImage =
+                        fileType.startsWith("image/");
+
+                    const isVideo =
+                        fileType.startsWith("video/");
+
+                    const isPdf =
+                        fileType === "application/pdf";
+
+
+                    return (
+
+                        <div
+                            className="media-card"
+                            key={file.mediaId}
+                        >
+
+                            {/* MEDIA PREVIEW */}
+
+                            <div className="media-preview">
+
+                                {isImage && (
+
+                                    <img
+                                        src={mediaUrl}
+                                        alt={file.fileName}
+                                        className="media-image"
+                                    />
+
+                                )}
+
+
+                                {isVideo && (
+
+                                    <video
+                                        controls
+                                        className="media-video"
+                                    >
+
+                                        <source
+                                            src={mediaUrl}
+                                            type={file.fileType}
+                                        />
+
+                                        Your browser does not support
+                                        video playback.
+
+                                    </video>
+
+                                )}
+
+
+                                {isPdf && (
+
+                                    <iframe
+                                        src={mediaUrl}
+                                        title={file.fileName}
+                                        className="media-pdf"
+                                    />
+
+                                )}
+
+
+                                {!isImage &&
+                                    !isVideo &&
+                                    !isPdf && (
+
+                                    <div className="unknown-media">
+
+                                        <div className="unknown-icon">
+                                            📄
+                                        </div>
+
+                                        <p>
+                                            Preview not available
+                                        </p>
+
+                                    </div>
+
+                                )}
+
+                            </div>
+
+
+                            {/* FILE INFORMATION */}
+
+                            <div className="media-info">
+
+                                <div className="media-file-icon">
+
+                                    {isImage && "🖼️"}
+
+                                    {isVideo && "🎥"}
+
+                                    {isPdf && "📄"}
+
+                                    {!isImage &&
+                                        !isVideo &&
+                                        !isPdf &&
+                                        "📎"}
+
+                                </div>
+
+
+                                <div className="media-details">
+
+                                    <h4 title={file.fileName}>
+                                        {file.fileName}
+                                    </h4>
+
+                                    <span>
+                                        {isImage && "IMAGE"}
+
+                                        {isVideo && "VIDEO"}
+
+                                        {isPdf && "PDF"}
+
+                                        {!isImage &&
+                                            !isVideo &&
+                                            !isPdf &&
+                                            "FILE"}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            {/* VIEW BUTTON */}
+
+                            <div className="media-actions">
+
+                                <button
+                                    type="button"
+                                    className="view-attachment"
+                                    onClick={() =>
+                                        window.open(
+                                            mediaUrl,
+                                            "_blank"
+                                        )
+                                    }
+                                >
+                                    View
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    );
+
+                })}
+
+            </div>
 
         </div>
 
-        {/* =====================================
-            SEARCH
-        ====================================== */}
+    );
+}
 
-        {!id && (
-          <div className="search-card">
 
-            <div className="search-box">
+function TrackComplaints() {
 
-              <input
-                type="text"
-                placeholder="Enter Complaint ID (Example : FXM-2026-001)"
-                value={complaintId}
-                onChange={(e) =>
-                  setComplaintId(
-                    e.target.value
-                  )
+    const navigate = useNavigate();
+    const { id } = useParams();
+
+    const [complaint, setComplaint] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const [complaintId, setComplaintId] = useState(id || "");
+
+    // ==========================================
+    // FETCH COMPLAINT
+    // ==========================================
+
+    useEffect(() => {
+
+        if (!id) {
+            setLoading(false);
+            return;
+        }
+
+        const fetchComplaint = async () => {
+
+            try {
+
+                setLoading(true);
+                setError("");
+
+                const response =
+                    await getComplaintByNumber(id);
+
+                setComplaint(response.data);
+
+            } catch (err) {
+
+                console.error(
+                    "Complaint Fetch Error:",
+                    err
+                );
+
+                if (err.response?.data?.message) {
+
+                    setError(
+                        err.response.data.message
+                    );
+
+                } else if (err.response?.data) {
+
+                    setError(
+                        typeof err.response.data === "string"
+                            ? err.response.data
+                            : "Complaint not found."
+                    );
+
+                } else {
+
+                    setError(
+                        "Unable to fetch complaint details."
+                    );
                 }
-              />
 
-              <button
-                onClick={handleTrack}
-              >
-                🔍 Track Complaint
-              </button>
+            } finally {
 
-            </div>
+                setLoading(false);
 
-          </div>
-        )}
+            }
+        };
 
-        {/* =====================================
-            COMPLAINT DETAILS
-        ====================================== */}
+        fetchComplaint();
 
-        {id && (
+    }, [id]);
 
-          <div className="tracking-content">
+    // ==========================================
+    // SEARCH / TRACK
+    // ==========================================
 
-            {/* =================================
-                COMPLAINT INFORMATION
-            ================================== */}
+    const handleTrack = () => {
 
-            <div className="card">
+        if (!complaintId.trim()) {
 
-              <div className="card-title">
+            setError(
+                "Please enter Complaint ID."
+            );
 
-                <div>
+            return;
+        }
 
-                  <h2>
-                    Complaint Information
-                  </h2>
+        navigate(
+            `/user/complaint-tracking/${complaintId.trim()}`
+        );
+    };
 
-                  <p className="card-subtitle">
-                    Complaint #{complaint.id}
-                  </p>
+    // ==========================================
+    // FORMAT DATE
+    // ==========================================
 
-                </div>
+    const formatDate = (date) => {
 
-                <span className="status progress">
-                  {complaint.status}
-                </span>
+        if (!date) {
+            return "-";
+        }
 
-              </div>
+        return new Date(date).toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
+    };
 
-              <div className="details-grid">
+    // ==========================================
+    // FORMAT DATE + TIME
+    // ==========================================
 
-                <div className="detail-item">
+    const formatDateTime = (date) => {
 
-                  <label>
-                    Complaint ID
-                  </label>
+        if (!date) {
+            return "-";
+        }
 
-                  <h4>
-                    {complaint.id}
-                  </h4>
+        return new Date(date).toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+    };
 
-                </div>
+    // ==========================================
+    // STATUS CLASS
+    // ==========================================
 
-                <div className="detail-item">
+    const getStatusClass = (status) => {
 
-                  <label>
-                    Complaint Title
-                  </label>
+        return String(status || "")
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+    };
 
-                  <h4>
-                    {complaint.title}
-                  </h4>
+    // ==========================================
+    // LOADING
+    // ==========================================
 
-                </div>
+    if (loading) {
 
-                <div className="detail-item">
+        return (
 
-                  <label>
-                    Department
-                  </label>
+            <div className="tracking-page">
 
-                  <h4>
-                    {complaint.department}
-                  </h4>
+                <div className="tracking-container">
 
-                </div>
+                    <div className="card">
 
-                <div className="detail-item">
+                        <div className="no-data-content">
 
-                  <label>
-                    Category
-                  </label>
+                            <h3>
+                                Loading Complaint...
+                            </h3>
 
-                  <h4>
-                    {complaint.category}
-                  </h4>
+                            <p>
+                                Please wait while we fetch
+                                your complaint details.
+                            </p>
 
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Priority
-                  </label>
-
-                  <h4 className="priority high">
-                    {complaint.priority}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Submitted On
-                  </label>
-
-                  <h4>
-                    {complaint.submittedDate}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Assigned On
-                  </label>
-
-                  <h4>
-                    {complaint.assignedDate}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Expected Resolution
-                  </label>
-
-                  <h4>
-                    {complaint.expectedDate}
-                  </h4>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                CITIZEN INFORMATION
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Citizen Information
-                </h2>
-
-              </div>
-
-              <div className="details-grid">
-
-                <div className="detail-item">
-
-                  <label>
-                    First Name
-                  </label>
-
-                  <h4>
-                    {complaint.citizen.firstName}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Last Name
-                  </label>
-
-                  <h4>
-                    {complaint.citizen.lastName}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Email Address
-                  </label>
-
-                  <h4>
-                    {complaint.citizen.email}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Contact Number
-                  </label>
-
-                  <h4>
-                    {complaint.citizen.contact}
-                  </h4>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                COMPLAINT DESCRIPTION
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Complaint Description
-                </h2>
-
-              </div>
-
-              <div className="description-box">
-
-                <h3>
-                  {complaint.title}
-                </h3>
-
-                <p>
-                  {complaint.description}
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                COMPLAINT LOCATION
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Complaint Location
-                </h2>
-
-              </div>
-
-              <div className="details-grid">
-
-                <div className="detail-item full-width">
-
-                  <label>
-                    Address
-                  </label>
-
-                  <h4>
-                    {complaint.location.address}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Pincode
-                  </label>
-
-                  <h4>
-                    {complaint.location.pincode}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Latitude
-                  </label>
-
-                  <h4>
-                    {complaint.location.latitude}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Longitude
-                  </label>
-
-                  <h4>
-                    {complaint.location.longitude}
-                  </h4>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                ASSIGNED ENGINEER
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <div>
-
-                  <h2>
-                    Assigned Engineer
-                  </h2>
-
-                  <p className="card-subtitle">
-                    Engineer responsible for
-                    resolving this complaint
-                  </p>
-
-                </div>
-
-              </div>
-
-              <div className="details-grid">
-
-                <div className="detail-item">
-
-                  <label>
-                    First Name
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.firstName}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Last Name
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.lastName}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Designation
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.designation}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Department
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.department}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Contact Number
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.contact}
-                  </h4>
-
-                </div>
-
-                <div className="detail-item">
-
-                  <label>
-                    Email Address
-                  </label>
-
-                  <h4>
-                    {complaint.engineer.email}
-                  </h4>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                STATUS PROGRESS
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Status Progress
-                </h2>
-
-              </div>
-
-              <div className="status-progress">
-
-                <div className="progress-line"></div>
-
-                {/* Submitted */}
-
-                <div className="progress-step completed">
-
-                  <div className="progress-circle">
-                    ✓
-                  </div>
-
-                  <h4>
-                    Submitted
-                  </h4>
-
-                  <span>
-                    09 Jul 2026
-                  </span>
-
-                </div>
-
-                {/* Under Review */}
-
-                <div className="progress-step completed">
-
-                  <div className="progress-circle">
-                    ✓
-                  </div>
-
-                  <h4>
-                    Under Review
-                  </h4>
-
-                  <span>
-                    10 Jul 2026
-                  </span>
-
-                </div>
-
-                {/* Assigned */}
-
-                <div className="progress-step completed">
-
-                  <div className="progress-circle">
-                    ✓
-                  </div>
-
-                  <h4>
-                    Assigned
-                  </h4>
-
-                  <span>
-                    11 Jul 2026
-                  </span>
-
-                </div>
-
-                {/* In Progress */}
-
-                <div className="progress-step current">
-
-                  <div className="progress-circle">
-                    ⏳
-                  </div>
-
-                  <h4>
-                    In Progress
-                  </h4>
-
-                  <span>
-                    Current
-                  </span>
-
-                </div>
-
-                {/* Resolved */}
-
-                <div className="progress-step">
-
-                  <div className="progress-circle">
-                    5
-                  </div>
-
-                  <h4>
-                    Resolved
-                  </h4>
-
-                  <span>
-                    Pending
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                LATEST UPDATE
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Latest Update
-                </h2>
-
-                <span className="status progress">
-                  Current
-                </span>
-
-              </div>
-
-              <div className="update-box">
-
-                <h3>
-                  {complaint.latestUpdate.title}
-                </h3>
-
-                <p className="update-date">
-                  {complaint.latestUpdate.date}
-                  {" • "}
-                  {complaint.latestUpdate.time}
-                </p>
-
-                <p>
-                  {complaint.latestUpdate.message}
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* =================================
-                COMPLAINT EVIDENCE
-            ================================== */}
-
-            <div className="card">
-
-              <div className="card-title">
-
-                <h2>
-                  Complaint Evidence
-                </h2>
-
-              </div>
-
-              <div className="attachment-list">
-
-                {complaint.attachments.map(
-                  (file, index) => (
-
-                    <div
-                      className="attachment-item"
-                      key={index}
-                    >
-
-                      <div className="attachment-icon">
-
-                        {file.type ===
-                          "image" &&
-                          "🖼️"}
-
-                        {file.type ===
-                          "video" &&
-                          "🎥"}
-
-                        {file.type ===
-                          "pdf" &&
-                          "📄"}
-
-                      </div>
-
-                      <div className="attachment-info">
-
-                        <h4>
-                          {file.name}
-                        </h4>
-
-                        <span>
-                          {file.type.toUpperCase()}
-                        </span>
-
-                      </div>
-
-                      <button
-                        type="button"
-                        className="view-attachment"
-                      >
-                        View
-                      </button>
+                        </div>
 
                     </div>
 
-                  )
+                </div>
+
+            </div>
+
+        );
+    }
+
+    return (
+
+        <div className="tracking-page">
+
+            <div className="tracking-container">
+
+                {/* =====================================
+                    HEADER
+                ====================================== */}
+
+                <div className="tracking-header">
+
+                    <h1>
+                        Track Complaint
+                    </h1>
+
+                    <p>
+                        Track the real-time progress of your
+                        complaint from submission to final
+                        resolution.
+                    </p>
+
+                </div>
+
+
+                {/* =====================================
+                    SEARCH
+                ====================================== */}
+
+                {!id && (
+
+                    <div className="search-card">
+
+                        <div className="search-box">
+
+                            <input
+                                type="text"
+                                placeholder="Enter Complaint ID"
+                                value={complaintId}
+                                onChange={(e) =>
+                                    setComplaintId(
+                                        e.target.value
+                                    )
+                                }
+                            />
+
+                            <button
+                                onClick={handleTrack}
+                            >
+                                🔍 Track Complaint
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 )}
 
-              </div>
 
-            </div>
+                {/* =====================================
+                    ERROR
+                ====================================== */}
 
-            {/* =================================
-                STATUS HISTORY
-            ================================== */}
+                {error && (
 
-            <div className="card">
+                    <div className="card">
 
-              <div className="card-title">
+                        <div className="no-data-content">
 
-                <h2>
-                  Status History
-                </h2>
+                            <h3>
+                                Complaint Not Found
+                            </h3>
 
-              </div>
+                            <p>
+                                {error}
+                            </p>
 
-              <div className="history-container">
+                            <button
+                                type="button"
+                                className="reset-search-btn"
+                                onClick={() => {
+                                    setError("");
+                                    setComplaint(null);
+                                }}
+                            >
+                                Try Again
+                            </button>
 
-                {/* Submitted */}
+                        </div>
 
-                <div className="history-item">
+                    </div>
 
-                  <div className="history-icon completed">
-                    ✓
-                  </div>
+                )}
 
-                  <div className="history-box">
 
-                    <h4>
-                      Complaint Submitted
-                    </h4>
+                {/* =====================================
+                    COMPLAINT
+                ====================================== */}
 
-                    <p>
-                      09 July 2026 • 10:30 AM
-                    </p>
+                {complaint && (
 
-                    <span>
-                      Your complaint has been
-                      successfully submitted and
-                      registered in the system.
-                    </span>
+                    <div className="tracking-content">
 
-                  </div>
+                        {/* =================================
+                            COMPLAINT INFORMATION
+                        ================================== */}
 
-                </div>
+                        <div className="card">
 
-                {/* Under Review */}
+                            <div className="card-title">
 
-                <div className="history-item">
+                                <div>
 
-                  <div className="history-icon completed">
-                    ✓
-                  </div>
+                                    <h2>
+                                        Complaint Information
+                                    </h2>
 
-                  <div className="history-box">
+                                    <p className="card-subtitle">
+                                        Complaint #
+                                        {complaint.complaintNumber}
+                                    </p>
 
-                    <h4>
-                      Complaint Under Review
-                    </h4>
+                                </div>
 
-                    <p>
-                      10 July 2026 • 09:15 AM
-                    </p>
+                                <span
+                                    className={`status ${getStatusClass(
+                                        complaint.status
+                                    )}`}
+                                >
+                                    {complaint.status || "-"}
+                                </span>
 
-                    <span>
-                      The Roads & Infrastructure
-                      Department verified your
-                      complaint details.
-                    </span>
+                            </div>
 
-                  </div>
 
-                </div>
+                            <div className="details-grid">
 
-                {/* Engineer Assigned */}
+                                <div className="detail-item">
 
-                <div className="history-item">
+                                    <label>
+                                        Complaint ID
+                                    </label>
 
-                  <div className="history-icon completed">
-                    ✓
-                  </div>
+                                    <h4>
+                                        {complaint.complaintNumber}
+                                    </h4>
 
-                  <div className="history-box">
+                                </div>
 
-                    <h4>
-                      Engineer Assigned
-                    </h4>
 
-                    <p>
-                      11 July 2026 • 03:20 PM
-                    </p>
+                                <div className="detail-item">
 
-                    <span>
-                      Rahul Sharma has been assigned
-                      to inspect and resolve this
-                      issue.
-                    </span>
+                                    <label>
+                                        Complaint Title
+                                    </label>
 
-                  </div>
+                                    <h4>
+                                        {complaint.title || "-"}
+                                    </h4>
 
-                </div>
+                                </div>
 
-                {/* Repair Started */}
 
-                <div className="history-item active">
+                                <div className="detail-item">
 
-                  <div className="history-icon current">
-                    ⏳
-                  </div>
+                                    <label>
+                                        Department
+                                    </label>
 
-                  <div className="history-box">
+                                    <h4>
+                                        {complaint.department || "-"}
+                                    </h4>
 
-                    <h4>
-                      Repair Work Started
-                    </h4>
+                                </div>
 
-                    <p>
-                      12 July 2026 • 11:00 AM
-                    </p>
 
-                    <span>
-                      Repair work is currently in
-                      progress. Further updates
-                      will appear here automatically.
-                    </span>
+                                <div className="detail-item">
 
-                  </div>
+                                    <label>
+                                        Category
+                                    </label>
 
-                </div>
+                                    <h4>
+                                        {complaint.category || "-"}
+                                    </h4>
 
-              </div>
+                                </div>
 
-            </div>
 
-            {/* =================================
-                RESOLUTION DETAILS
-            ================================== */}
+                                <div className="detail-item">
 
-            <div className="card">
+                                    <label>
+                                        Priority
+                                    </label>
 
-              <div className="card-title">
+                                    <h4 className="priority high">
 
-                <h2>
-                  Resolution Details
-                </h2>
+                                        {complaint.priority || "-"}
 
-                <span className="status progress">
-                  {complaint.resolution.status}
-                </span>
+                                    </h4>
 
-              </div>
+                                </div>
 
-              {complaint.resolution.status ===
-                "Pending" ? (
 
-                <div className="resolution-pending">
+                                <div className="detail-item">
 
-                  <p>
-                    Your complaint has not been
-                    resolved yet. The assigned
-                    engineer is currently working
-                    on the issue.
-                  </p>
+                                    <label>
+                                        Submitted On
+                                    </label>
 
-                </div>
+                                    <h4>
+                                        {formatDateTime(
+                                            complaint.createdAt
+                                        )}
+                                    </h4>
 
-              ) : (
+                                </div>
 
-                <div className="resolution-complete">
 
-                  <p>
-                    {complaint.resolution.message}
-                  </p>
+                                <div className="detail-item">
 
-                  <span>
-                    Resolved on{" "}
-                    {complaint.resolution.date}
-                  </span>
+                                    <label>
+                                        Assigned On
+                                    </label>
 
-                </div>
+                                    <h4>
+                                        {formatDateTime(
+                                            complaint.assignedAt
+                                        )}
+                                    </h4>
 
-              )}
+                                </div>
 
-            </div>
 
-            {/* =================================
-                CITIZEN FEEDBACK
-            ================================== */}
+                                <div className="detail-item">
 
-            <div className="card feedback-card">
+                                    <label>
+                                        Resolved On
+                                    </label>
 
-              <div className="card-title">
+                                    <h4>
+                                        {formatDateTime(
+                                            complaint.resolveAt
+                                        )}
+                                    </h4>
 
-                <h2>
-                  Citizen Feedback
-                </h2>
+                                </div>
 
-              </div>
+                            </div>
 
-              <p className="feedback-text">
-                After your complaint is resolved,
-                you can share your experience and
-                provide feedback about the service.
-              </p>
+                        </div>
 
-              {complaint.status ===
-                "Resolved" ? (
 
-                <>
-                  <div className="rating">
-                    ★ ★ ★ ★ ★
-                  </div>
+                        {/* =================================
+                            CITIZEN INFORMATION
+                        ================================== */}
 
-                  <textarea
-                    placeholder="Write your feedback here..."
-                  ></textarea>
+                        <div className="card">
 
-                  <button
-                    className="feedback-button"
-                  >
-                    Submit Feedback
-                  </button>
-                </>
+                            <div className="card-title">
 
-              ) : (
+                                <h2>
+                                    Citizen Information
+                                </h2>
 
-                <div className="feedback-disabled">
+                            </div>
 
-                  <p>
-                    Feedback will be available
-                    after your complaint is
-                    resolved.
-                  </p>
 
-                </div>
+                            <div className="details-grid">
 
-              )}
+                                <div className="detail-item">
 
-            </div>
+                                    <label>
+                                        First Name
+                                    </label>
 
-            
+                                    <h4>
+                                        {complaint.firstName || "-"}
+                                    </h4>
 
-          </div>
+                                </div>
+
+
+                                <div className="detail-item">
+
+                                    <label>
+                                        Last Name
+                                    </label>
+
+                                    <h4>
+                                        {complaint.lastName || "-"}
+                                    </h4>
+
+                                </div>
+
+
+                                <div className="detail-item">
+
+                                    <label>
+                                        Email Address
+                                    </label>
+
+                                    <h4>
+                                        {complaint.email || "-"}
+                                    </h4>
+
+                                </div>
+
+
+                                <div className="detail-item">
+
+                                    <label>
+                                        Contact Number
+                                    </label>
+
+                                    <h4>
+                                        {complaint.contact || "-"}
+                                    </h4>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =================================
+                            DESCRIPTION
+                        ================================== */}
+
+                        <div className="card">
+
+                            <div className="card-title">
+
+                                <h2>
+                                    Complaint Description
+                                </h2>
+
+                            </div>
+
+
+                            <div className="description-box">
+
+                                <h3>
+                                    {complaint.title || "-"}
+                                </h3>
+
+                                <p>
+                                    {complaint.description || "-"}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =================================
+                            ASSIGNED ENGINEER
+                        ================================== */}
+
+                        <div className="card">
+
+                            <div className="card-title">
+
+                                <div>
+
+                                    <h2>
+                                        Assigned Engineer
+                                    </h2>
+
+                                    <p className="card-subtitle">
+                                        Engineer responsible for
+                                        resolving this complaint
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            {complaint.engineerFirstName ? (
+
+                                <div className="details-grid">
+
+                                    <div className="detail-item">
+
+                                        <label>
+                                            First Name
+                                        </label>
+
+                                        <h4>
+                                            {
+                                                complaint.engineerFirstName
+                                            }
+                                        </h4>
+
+                                    </div>
+
+
+                                    <div className="detail-item">
+
+                                        <label>
+                                            Last Name
+                                        </label>
+
+                                        <h4>
+                                            {
+                                                complaint.engineerLastName
+                                            }
+                                        </h4>
+
+                                    </div>
+
+
+                                    <div className="detail-item">
+
+                                        <label>
+                                            Department
+                                        </label>
+
+                                        <h4>
+                                            {
+                                                complaint.department
+                                            }
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            ) : (
+
+                                <div className="resolution-pending">
+
+                                    <p>
+                                        No engineer has been assigned
+                                        to this complaint yet.
+                                    </p>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+
+                        {/* =================================
+                            ENGINEER WORK NOTE
+                        ================================== */}
+
+                        <div className="card">
+
+                            <div className="card-title">
+
+                                <h2>
+                                    Latest Update
+                                </h2>
+
+                                <span
+                                    className={`status ${getStatusClass(
+                                        complaint.status
+                                    )}`}
+                                >
+                                    {complaint.status || "-"}
+                                </span>
+
+                            </div>
+
+
+                            <div className="update-box">
+
+                                <h3>
+                                    {complaint.status || "Complaint Update"}
+                                </h3>
+
+                                <p className="update-date">
+                                    {
+                                        formatDateTime(
+                                            complaint.updateAt
+                                        )
+                                    }
+                                </p>
+
+                                <p>
+                                    {
+                                        complaint.engineerWorkNote ||
+                                        "No work update has been provided yet."
+                                    }
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        {/* =================================
+                            STATUS PROGRESS
+                        ================================== */}
+
+                        <div className="card">
+
+                            <div className="card-title">
+
+                                <h2>
+                                    Status Progress
+                                </h2>
+
+                            </div>
+
+
+                            <div className="status-progress">
+
+                                <div className="progress-line"></div>
+
+
+                                {/* SUBMITTED */}
+
+                                <div className="progress-step completed">
+
+                                    <div className="progress-circle">
+                                        ✓
+                                    </div>
+
+                                    <h4>
+                                        Submitted
+                                    </h4>
+
+                                    <span>
+                                        {formatDate(
+                                            complaint.createdAt
+                                        )}
+                                    </span>
+
+                                </div>
+
+
+                                {/* ASSIGNED */}
+
+                                <div
+                                    className={`progress-step ${
+                                        complaint.assignedAt
+                                            ? "completed"
+                                            : ""
+                                    }`}
+                                >
+
+                                    <div className="progress-circle">
+
+                                        {complaint.assignedAt
+                                            ? "✓"
+                                            : "2"}
+
+                                    </div>
+
+                                    <h4>
+                                        Assigned
+                                    </h4>
+
+                                    <span>
+                                        {complaint.assignedAt
+                                            ? formatDate(
+                                                complaint.assignedAt
+                                            )
+                                            : "Pending"}
+                                    </span>
+
+                                </div>
+
+
+                                {/* IN PROGRESS */}
+
+                                <div
+                                    className={`progress-step ${
+                                        [
+                                            "IN_PROGRESS",
+                                            "In Progress"
+                                        ].includes(
+                                            complaint.status
+                                        )
+                                            ? "current"
+                                            : complaint.status ===
+                                              "RESOLVED"
+                                            ? "completed"
+                                            : ""
+                                    }`}
+                                >
+
+                                    <div className="progress-circle">
+
+                                        {complaint.status ===
+                                        "RESOLVED"
+                                            ? "✓"
+                                            : "⏳"}
+
+                                    </div>
+
+                                    <h4>
+                                        In Progress
+                                    </h4>
+
+                                    <span>
+                                        {[
+                                            "IN_PROGRESS",
+                                            "In Progress"
+                                        ].includes(
+                                            complaint.status
+                                        )
+                                            ? "Current"
+                                            : "-"}
+                                    </span>
+
+                                </div>
+
+
+                                {/* RESOLVED */}
+
+                                <div
+                                    className={`progress-step ${
+                                        complaint.status ===
+                                        "RESOLVED" ||
+                                        complaint.status ===
+                                        "Resolved"
+                                            ? "completed"
+                                            : ""
+                                    }`}
+                                >
+
+                                    <div className="progress-circle">
+
+                                        {complaint.status ===
+                                            "RESOLVED" ||
+                                        complaint.status ===
+                                            "Resolved"
+                                            ? "✓"
+                                            : "4"}
+
+                                    </div>
+
+                                    <h4>
+                                        Resolved
+                                    </h4>
+
+                                    <span>
+
+                                        {complaint.resolveAt
+                                            ? formatDate(
+                                                complaint.resolveAt
+                                            )
+                                            : "Pending"}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+{/* =================================
+    COMPLAINT MEDIA
+================================== */}
+
+<div className="card">
+
+    <div className="card-title">
+
+        <div>
+
+            <h2>
+                Complaint Media
+            </h2>
+
+            <p className="card-subtitle">
+                Images, videos and documents related to this complaint
+            </p>
+
+        </div>
+
+        {complaint.media &&
+            complaint.media.length > 0 && (
+
+            <span className="media-count">
+                {complaint.media.length} File
+                {complaint.media.length > 1 ? "s" : ""}
+            </span>
 
         )}
 
-      </div>
-
     </div>
-  );
+
+
+    {complaint.media &&
+    complaint.media.length > 0 ? (
+
+        <div className="complaint-media-container">
+
+            {/* =================================
+                COMPLAINT MEDIA
+            ================================== */}
+
+            <MediaSection
+                title="Complaint Media"
+                subtitle="Images, videos and documents submitted with the complaint"
+                media={complaint.media.filter(
+                    file =>
+                        !file.mediaType ||
+                        file.mediaType.trim() === ""
+                )}
+            />
+
+
+            {/* =================================
+                ENGINEER BEFORE MEDIA
+            ================================== */}
+
+            <MediaSection
+                title="Engineer Upload Before"
+                subtitle="Media uploaded by the engineer before work started"
+                media={complaint.media.filter(
+                    file =>
+                        file.mediaType?.toUpperCase() === "BEFORE"
+                )}
+            />
+
+
+            {/* =================================
+                ENGINEER AFTER MEDIA
+            ================================== */}
+
+            <MediaSection
+                title="Engineer Upload After"
+                subtitle="Media uploaded by the engineer after completing the work"
+                media={complaint.media.filter(
+                    file =>
+                        file.mediaType?.toUpperCase() === "AFTER"
+                )}
+            />
+
+        </div>
+
+    ) : (
+
+        <div className="no-media">
+
+            <div className="no-media-icon">
+                📎
+            </div>
+
+            <h3>
+                No Media Available
+            </h3>
+
+            <p>
+                No images, videos or documents have been
+                attached to this complaint.
+            </p>
+
+        </div>
+
+    )}
+
+</div>
+
+                        {/* =================================
+                            RESOLUTION DETAILS
+                        ================================== */}
+
+                        <div className="card">
+
+                            <div className="card-title">
+
+                                <h2>
+                                    Resolution Details
+                                </h2>
+
+                                <span
+                                    className={`status ${getStatusClass(
+                                        complaint.status
+                                    )}`}
+                                >
+                                    {complaint.status || "-"}
+                                </span>
+
+                            </div>
+
+
+                            {complaint.resolveAt ? (
+
+                                <div className="resolution-complete">
+
+                                    <p>
+                                        Your complaint has been
+                                        resolved successfully.
+                                    </p>
+
+                                    <span>
+                                        Resolved on{" "}
+                                        {formatDateTime(
+                                            complaint.resolveAt
+                                        )}
+                                    </span>
+
+                                </div>
+
+                            ) : (
+
+                                <div className="resolution-pending">
+
+                                    <p>
+                                        Your complaint has not been
+                                        resolved yet. The assigned
+                                        engineer is currently working
+                                        on the issue.
+                                    </p>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+
+                        {/* =================================
+                            FEEDBACK
+                        ================================== */}
+
+                        <div className="card feedback-card">
+
+                            <div className="card-title">
+
+                                <h2>
+                                    Citizen Feedback
+                                </h2>
+
+                            </div>
+
+
+                            <p className="feedback-text">
+
+                                After your complaint is resolved,
+                                you can share your experience and
+                                provide feedback about the service.
+
+                            </p>
+
+
+                            {complaint.status === "RESOLVED" ||
+                            complaint.status === "Resolved" ? (
+
+                                <>
+
+                                    <div className="rating">
+                                        ★ ★ ★ ★ ★
+                                    </div>
+
+                                    <textarea
+                                        placeholder="Write your feedback here..."
+                                    ></textarea>
+
+                                    <button
+                                        className="feedback-button"
+                                    >
+                                        Submit Feedback
+                                    </button>
+
+                                </>
+
+                            ) : (
+
+                                <div className="feedback-disabled">
+
+                                    <p>
+                                        Feedback will be available
+                                        after your complaint is
+                                        resolved.
+                                    </p>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                )}
+
+            </div>
+
+        </div>
+    );
 }
 
 export default TrackComplaints;

@@ -526,8 +526,9 @@
 
 // export default Dept_profile;
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Dept_profile.css";
 
 import {
@@ -543,50 +544,344 @@ import {
     FaCamera
 } from "react-icons/fa";
 
+import CustomPopup from "../../configure/CustomPopup";
+
 
 function Dept_profile() {
 
     const navigate = useNavigate();
 
-    // File input reference
+    // =========================================================
+    // FILE INPUT
+    // =========================================================
+
     const fileInputRef = useRef(null);
 
-    // Edit state
+
+    // =========================================================
+    // EDIT STATE
+    // =========================================================
+
     const [isEditing, setIsEditing] = useState(false);
 
-    // Department data
+
+    // =========================================================
+    // LOADING
+    // =========================================================
+
+    const [loading, setLoading] = useState(true);
+
+
+    // =========================================================
+    // DEPARTMENT DATA
+    // =========================================================
+
     const [department, setDepartment] = useState({
 
-        departmentName: "Sanitation Department",
+        departmentName: "",
 
-        email: "sanitation@fixmycity.com",
+        email: "",
 
-        contact: "9876543210",
+        contact: "",
 
-        address:
-            "Municipal Corporation, Main Road, Ahmedabad",
+        address: "",
 
-        description:
-            "The Sanitation Department is responsible for maintaining cleanliness, garbage collection, waste management and resolving sanitation-related complaints in the city.",
+        description: "",
 
         profilePhoto: null
 
     });
 
 
-    // Temporary edit data
+    // =========================================================
+    // TEMPORARY EDIT DATA
+    // =========================================================
+
     const [tempDepartment, setTempDepartment] =
         useState(department);
 
 
-    /* =====================================================
-       EDIT PROFILE
-    ===================================================== */
+    // =========================================================
+    // POPUP
+    // =========================================================
+
+    const [popup, setPopup] = useState({
+
+        show: false,
+
+        type: "error",
+
+        message: ""
+
+    });
+
+
+    // =========================================================
+    // SHOW POPUP
+    // =========================================================
+
+    const showPopup = (
+        message,
+        type = "error"
+    ) => {
+
+        setPopup({
+
+            show: true,
+
+            type,
+
+            message
+
+        });
+
+    };
+
+
+    // =========================================================
+    // CLOSE POPUP
+    // =========================================================
+
+    const closePopup = () => {
+
+        setPopup({
+
+            show: false,
+
+            type: "error",
+
+            message: ""
+
+        });
+
+    };
+
+
+    // =========================================================
+    // FETCH DEPARTMENT PROFILE
+    // =========================================================
+
+    const fetchProfile = async () => {
+
+        try {
+
+            setLoading(true);
+
+
+            // -------------------------------------------------
+            // GET TOKEN
+            // -------------------------------------------------
+
+            const token =
+                localStorage.getItem("token");
+
+
+            if (!token) {
+
+                showPopup(
+                    "You are not logged in. Please login again.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            // -------------------------------------------------
+            // API REQUEST
+            // -------------------------------------------------
+
+            const response =
+                await axios.get(
+
+                    "http://localhost:8085/api/auth/profile",
+
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+
+                );
+
+
+            console.log(
+                "Department Profile:",
+                response.data
+            );
+
+
+            const data =
+                response.data;
+
+
+            // -------------------------------------------------
+            // CHECK ROLE
+            // -------------------------------------------------
+
+            if (data.role !== "DEPARTMENT") {
+
+                showPopup(
+                    "This profile belongs to a different user role.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            // -------------------------------------------------
+            // ROLE DATA
+            // -------------------------------------------------
+
+            const roleData =
+                data.roleData || {};
+
+
+            // -------------------------------------------------
+            // CREATE DEPARTMENT OBJECT
+            // -------------------------------------------------
+
+            const departmentData = {
+
+                departmentName:
+                    roleData.departmentName || "",
+
+                email:
+                    data.email || "",
+
+                contact:
+                    data.contact || "",
+
+                address:
+                    roleData.address || "",
+
+                description:
+                    roleData.description || "",
+
+                profilePhoto:
+                    data.profileImage || null
+
+            };
+
+
+            // -------------------------------------------------
+            // SET DATA
+            // -------------------------------------------------
+
+            setDepartment(
+                departmentData
+            );
+
+
+            setTempDepartment(
+                departmentData
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Department Profile Error:",
+                error
+            );
+
+
+            // -------------------------------------------------
+            // BACKEND MESSAGE
+            // -------------------------------------------------
+
+            const backendMessage =
+                error.response?.data?.message;
+
+
+            if (backendMessage) {
+
+                showPopup(
+                    backendMessage,
+                    "error"
+                );
+
+            }
+
+            // -------------------------------------------------
+            // STRING RESPONSE
+            // -------------------------------------------------
+
+            else if (
+                typeof error.response?.data ===
+                "string"
+            ) {
+
+                showPopup(
+                    error.response.data,
+                    "error"
+                );
+
+            }
+
+            // -------------------------------------------------
+            // NETWORK ERROR
+            // -------------------------------------------------
+
+            else if (
+                error.request &&
+                !error.response
+            ) {
+
+                showPopup(
+                    "Unable to connect to the server. Please check whether the backend is running.",
+                    "error"
+                );
+
+            }
+
+            // -------------------------------------------------
+            // UNKNOWN ERROR
+            // -------------------------------------------------
+
+            else {
+
+                showPopup(
+                    "Unable to load department profile.",
+                    "error"
+                );
+
+            }
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+
+    // =========================================================
+    // FETCH PROFILE WHEN PAGE LOADS
+    // =========================================================
+
+    useEffect(() => {
+
+        fetchProfile();
+
+    }, []);
+
+
+    // =========================================================
+    // EDIT PROFILE
+    // =========================================================
 
     const handleEdit = () => {
 
         setTempDepartment({
+
             ...department
+
         });
 
         setIsEditing(true);
@@ -594,14 +889,16 @@ function Dept_profile() {
     };
 
 
-    /* =====================================================
-       CANCEL EDIT
-    ===================================================== */
+    // =========================================================
+    // CANCEL EDIT
+    // =========================================================
 
     const handleCancel = () => {
 
         setTempDepartment({
+
             ...department
+
         });
 
         setIsEditing(false);
@@ -609,25 +906,34 @@ function Dept_profile() {
     };
 
 
-    /* =====================================================
-       HANDLE INPUT CHANGE
-    ===================================================== */
+    // =========================================================
+    // HANDLE INPUT CHANGE
+    // =========================================================
 
     const handleChange = (e) => {
 
-        const { name, value } = e.target;
+        const {
+            name,
+            value
+        } = e.target;
 
-        setTempDepartment((prev) => ({
-            ...prev,
-            [name]: value
-        }));
+
+        setTempDepartment(
+            (previous) => ({
+
+                ...previous,
+
+                [name]: value
+
+            })
+        );
 
     };
 
 
-    /* =====================================================
-       OPEN PHOTO SELECTOR
-    ===================================================== */
+    // =========================================================
+    // OPEN PHOTO SELECTOR
+    // =========================================================
 
     const handleChangePhoto = () => {
 
@@ -640,67 +946,159 @@ function Dept_profile() {
     };
 
 
-    /* =====================================================
-       HANDLE PROFILE PHOTO
-    ===================================================== */
+    // =========================================================
+    // HANDLE PROFILE PHOTO
+    // =========================================================
 
     const handlePhotoChange = (e) => {
 
-        const file = e.target.files?.[0];
+        const file =
+            e.target.files?.[0];
+
 
         if (!file) {
-            return;
-        }
-
-        // Allow only image files
-        if (!file.type.startsWith("image/")) {
-
-            alert("Please select a valid image file.");
 
             return;
 
         }
 
-        // Create preview URL
-        const imageUrl = URL.createObjectURL(file);
 
-        setTempDepartment((prev) => ({
-            ...prev,
-            profilePhoto: imageUrl
-        }));
+        // -----------------------------------------------------
+        // IMAGE VALIDATION
+        // -----------------------------------------------------
+
+        if (
+            !file.type.startsWith("image/")
+        ) {
+
+            showPopup(
+                "Please select a valid image file.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        // -----------------------------------------------------
+        // PREVIEW
+        // -----------------------------------------------------
+
+        const imageUrl =
+            URL.createObjectURL(file);
+
+
+        setTempDepartment(
+            (previous) => ({
+
+                ...previous,
+
+                profilePhoto: imageUrl
+
+            })
+        );
 
     };
 
 
-    /* =====================================================
-       SAVE CHANGES
-    ===================================================== */
+    // =========================================================
+    // SAVE CHANGES
+    // =========================================================
 
     const handleSave = () => {
 
+        /*
+         * Currently this only updates frontend state.
+         *
+         * We will connect this button to the backend
+         * once the Department Update Profile API is created.
+         */
+
         setDepartment({
+
             ...tempDepartment
+
         });
+
 
         setIsEditing(false);
 
+
+        showPopup(
+            "Profile changes saved locally.",
+            "success"
+        );
+
     };
 
 
-    /* =====================================================
-       CHANGE PASSWORD
-    ===================================================== */
+    // =========================================================
+    // CHANGE PASSWORD
+    // =========================================================
 
     const handleChangePassword = () => {
 
-        navigate("/change-password");
+        navigate(
+            "/change-password"
+        );
 
     };
 
+
+    // =========================================================
+    // LOADING SCREEN
+    // =========================================================
+
+    if (loading) {
+
+        return (
+
+            <div className="dept-profile-page">
+
+                <div className="dept-profile-card">
+
+                    <div className="dept-profile-loading">
+
+                        Loading department profile...
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    // =========================================================
+    // JSX
+    // =========================================================
 
     return (
 
         <div className="dept-profile-page">
+
+
+            {/* =================================================
+               POPUP
+            ================================================= */}
+
+            {popup.show && (
+
+                <CustomPopup
+
+                    type={popup.type}
+
+                    message={popup.message}
+
+                    onClose={closePopup}
+
+                />
+
+            )}
 
 
             {/* =================================================
@@ -711,7 +1109,7 @@ function Dept_profile() {
 
 
                 {/* =================================================
-                   EDIT PAGE HEADER
+                   HEADER
                 ================================================= */}
 
                 {isEditing ? (
@@ -726,21 +1124,21 @@ function Dept_profile() {
 
                 ) : (
 
-                    /* =================================================
-                       NORMAL PROFILE HEADER
-                    ================================================= */
-
                     <div className="dept-profile-header">
 
 
-                        {/* Profile Photo */}
+                        {/* =================================================
+                           PROFILE PHOTO
+                        ================================================= */}
 
                         <div className="dept-profile-icon-wrapper">
 
                             {department.profilePhoto ? (
 
                                 <img
-                                    src={department.profilePhoto}
+                                    src={
+                                        department.profilePhoto
+                                    }
                                     alt="Department Profile"
                                     className="dept-profile-photo"
                                 />
@@ -758,13 +1156,21 @@ function Dept_profile() {
                         </div>
 
 
-                        {/* Department Name */}
+                        {/* =================================================
+                           DEPARTMENT NAME
+                        ================================================= */}
 
                         <div className="dept-profile-header-content">
 
                             <h2>
-                                {department.departmentName}
+
+                                {
+                                    department.departmentName ||
+                                    "Department"
+                                }
+
                             </h2>
+
 
                             <span className="dept-profile-role">
 
@@ -788,14 +1194,16 @@ function Dept_profile() {
                     <div className="dept-profile-photo-section">
 
 
-                        {/* Profile Image */}
+                        {/* PROFILE IMAGE */}
 
                         <div className="dept-profile-edit-photo-wrapper">
 
                             {tempDepartment.profilePhoto ? (
 
                                 <img
-                                    src={tempDepartment.profilePhoto}
+                                    src={
+                                        tempDepartment.profilePhoto
+                                    }
                                     alt="Department Profile Preview"
                                     className="dept-profile-edit-photo"
                                 />
@@ -813,23 +1221,27 @@ function Dept_profile() {
                         </div>
 
 
-                        {/* Hidden File Input */}
+                        {/* HIDDEN FILE INPUT */}
 
                         <input
                             ref={fileInputRef}
                             type="file"
                             accept="image/*"
-                            onChange={handlePhotoChange}
+                            onChange={
+                                handlePhotoChange
+                            }
                             className="dept-profile-file-input"
                         />
 
 
-                        {/* Change Photo Button */}
+                        {/* CHANGE PHOTO BUTTON */}
 
                         <button
                             type="button"
                             className="dept-profile-change-photo-btn"
-                            onClick={handleChangePhoto}
+                            onClick={
+                                handleChangePhoto
+                            }
                         >
 
                             <FaCamera />
@@ -884,7 +1296,9 @@ function Dept_profile() {
                                 value={
                                     tempDepartment.departmentName
                                 }
-                                onChange={handleChange}
+                                onChange={
+                                    handleChange
+                                }
                                 className="dept-profile-input"
                                 placeholder="Enter department name"
                             />
@@ -893,7 +1307,10 @@ function Dept_profile() {
 
                             <div className="dept-profile-value">
 
-                                {department.departmentName}
+                                {
+                                    department.departmentName ||
+                                    "-"
+                                }
 
                             </div>
 
@@ -951,7 +1368,7 @@ function Dept_profile() {
 
 
                     {/* =================================================
-                       CONTACT NUMBER
+                       CONTACT
                     ================================================= */}
 
                     <div className="dept-profile-field">
@@ -975,7 +1392,9 @@ function Dept_profile() {
                                 value={
                                     tempDepartment.contact
                                 }
-                                onChange={handleChange}
+                                onChange={
+                                    handleChange
+                                }
                                 className="dept-profile-input"
                                 placeholder="Enter contact number"
                             />
@@ -984,7 +1403,10 @@ function Dept_profile() {
 
                             <div className="dept-profile-value">
 
-                                {department.contact}
+                                {
+                                    department.contact ||
+                                    "-"
+                                }
 
                             </div>
 
@@ -1017,7 +1439,9 @@ function Dept_profile() {
                                 value={
                                     tempDepartment.address
                                 }
-                                onChange={handleChange}
+                                onChange={
+                                    handleChange
+                                }
                                 className="dept-profile-textarea"
                                 placeholder="Enter department address"
                                 rows="3"
@@ -1027,7 +1451,10 @@ function Dept_profile() {
 
                             <div className="dept-profile-value dept-profile-address">
 
-                                {department.address}
+                                {
+                                    department.address ||
+                                    "-"
+                                }
 
                             </div>
 
@@ -1060,7 +1487,9 @@ function Dept_profile() {
                                 value={
                                     tempDepartment.description
                                 }
-                                onChange={handleChange}
+                                onChange={
+                                    handleChange
+                                }
                                 className="dept-profile-textarea dept-profile-description"
                                 placeholder="Enter department description"
                                 rows="5"
@@ -1070,7 +1499,10 @@ function Dept_profile() {
 
                             <div className="dept-profile-value dept-profile-description-view">
 
-                                {department.description}
+                                {
+                                    department.description ||
+                                    "-"
+                                }
 
                             </div>
 
@@ -1097,7 +1529,9 @@ function Dept_profile() {
                             <button
                                 type="button"
                                 className="dept-profile-edit-btn"
-                                onClick={handleEdit}
+                                onClick={
+                                    handleEdit
+                                }
                             >
 
                                 <FaUserEdit />
@@ -1114,7 +1548,9 @@ function Dept_profile() {
                             <button
                                 type="button"
                                 className="dept-profile-password-btn"
-                                onClick={handleChangePassword}
+                                onClick={
+                                    handleChangePassword
+                                }
                             >
 
                                 <FaLock />
@@ -1136,7 +1572,9 @@ function Dept_profile() {
                             <button
                                 type="button"
                                 className="dept-profile-cancel-btn"
-                                onClick={handleCancel}
+                                onClick={
+                                    handleCancel
+                                }
                             >
 
                                 <FaTimes />
@@ -1153,7 +1591,9 @@ function Dept_profile() {
                             <button
                                 type="button"
                                 className="dept-profile-save-btn"
-                                onClick={handleSave}
+                                onClick={
+                                    handleSave
+                                }
                             >
 
                                 <FaSave />

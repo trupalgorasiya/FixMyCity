@@ -1,0 +1,225 @@
+.status-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: popupOverlayIn 0.25s ease;
+}
+
+.status-popup {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 38px 35px 32px;
+  text-align: center;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
+  animation: popupIn 0.3s ease;
+}
+
+.status-popup-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.status-popup-close:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  transform: rotate(90deg);
+}
+
+.status-popup-icon {
+  width: 75px;
+  height: 75px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+}
+
+.status-popup h2 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.status-popup-message {
+  margin: 0 auto;
+  max-width: 360px;
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.status-popup-details {
+  margin-top: 20px;
+  padding: 15px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.status-popup-button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.status-popup-button:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+/* =========================
+   SUCCESS
+========================= */
+
+.status-success .status-popup-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status-success .status-popup-button {
+  background: #16a34a;
+}
+
+.status-success .status-popup-details {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.status-error .status-popup-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-error .status-popup-button {
+  background: #dc2626;
+}
+
+.status-error .status-popup-details {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+/* =========================
+   WARNING
+========================= */
+
+.status-warning .status-popup-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-warning .status-popup-button {
+  background: #d97706;
+}
+
+.status-warning .status-popup-details {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+/* =========================
+   INFO
+========================= */
+
+.status-info .status-popup-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-info .status-popup-button {
+  background: #2563eb;
+}
+
+.status-info .status-popup-details {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes popupOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 500px) {
+  .status-popup {
+    padding: 35px 22px 25px;
+    border-radius: 16px;
+  }
+
+  .status-popup h2 {
+    font-size: 21px;
+  }
+
+  .status-popup-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 38px;
+  }
+}

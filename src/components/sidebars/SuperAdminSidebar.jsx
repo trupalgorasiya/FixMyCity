@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink,useNavigate } from "react-router-dom";
 import {
     FaHome,
     FaUsers,
@@ -13,11 +13,15 @@ import {
     FaSignOutAlt
 } from "react-icons/fa";
 
-
+import { logout } from "../../api/auth";
 import "./Sidebar.css";
 
 function SuperAdminSidebar() {
-
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate("/login",{replace:true});
+    };
     return (
 
         <aside className="sidebar">
@@ -39,7 +43,8 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/dept-manage"><FaBuilding /><span>Departments</span></NavLink></li>
 
-                        {/* <li><NavLink to="/admin/department-admins"><FaUserTie /><span>Department Admins</span></NavLink></li> */}
+                        <li><NavLink to="/admin/category"><FaBuilding /><span>Category</span></NavLink></li>
+
 
                         <li><NavLink to="/admin/engineer-manage"><FaHardHat /><span>Engineers</span></NavLink></li>
 
@@ -48,8 +53,6 @@ function SuperAdminSidebar() {
                         <li><NavLink to="/admin/viewfeedback"><FaComments /><span>Feedback</span></NavLink></li>
 
                         <li><NavLink to="/admin/enginner-request"><FaUserTie  /><span>Engineers Applications</span></NavLink></li>
-
-                        <li><NavLink to="/admin/category"><FaUser /><span>Category</span></NavLink></li>
 
                         <li><NavLink to="/admin/report"><FaFileAlt /><span>Reports</span></NavLink></li>
 
@@ -63,10 +66,14 @@ function SuperAdminSidebar() {
 
             <div className="sidebar-footer">
 
-                <NavLink to="/logout">
+               <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="logout-btn"
+                >
                     <FaSignOutAlt />
                     <span>Logout</span>
-                </NavLink>
+                </button>
 
             </div>
 

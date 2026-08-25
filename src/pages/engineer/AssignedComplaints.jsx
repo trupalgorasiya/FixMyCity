@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import "./AssignedComplaints.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import {
   FaSearch,
   FaFilter,
@@ -9,152 +11,16 @@ import {
   FaChevronLeft,
   FaChevronRight
 } from "react-icons/fa";
+
 function AssignedComplaints() {
+
   const navigate = useNavigate();
-  const complaintData = [
-    {
-      id: "CMP-1001",
-      username: "Rahul Patel",
-      email: "rahul@gmail.com",
-      phone: "9876543210",
-      priority: "High",
-      date: '21-03-2026',
-      status: "Assigned",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1002",
-      username: "Amit Shah",
-      email: "amit@gmail.com",
-      phone: "9876543211",
-      priority: "Medium",
-      date: '21-03-2026',
-      status: "In Progress",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1003",
-      username: "Neha Joshi",
-      email: "neha@gmail.com",
-      phone: "9876543212",
-      location: "Navrangpura, Ahmedabad",
-      priority: "Low",
-      date: '21-03-2026',
-      status: "Completed",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1004",
-      username: "Karan Mehta",
-      email: "karan@gmail.com",
-      phone: "9876543213",
-      location: "Bopal, Ahmedabad",
-      priority: "High",
-      date: '21-03-2026',
-      status: "Assigned",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1005",
-      username: "Priya Desai",
-      email: "priya@gmail.com",
-      phone: "9876543214",
-      location: "Naranpura, Ahmedabad",
-      priority: "Medium",
-      date: '21-03-2026',
-      status: "Pending",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1006",
-      username: "Jay Patel",
-      email: "jay@gmail.com",
-      phone: "9876543215",
-      location: "Gota, Ahmedabad",
-      priority: "Low",
-      date: '21-03-2026',
-      status: "Assigned",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1007",
-      username: "Riya Shah",
-      email: "riya@gmail.com",
-      phone: "9876543216",
-      location: "Chandkheda, Ahmedabad",
-      priority: "High",
-      date: '21-03-2026',
-      status: "Completed",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1008",
-      username: "Vivek Patel",
-      email: "vivek@gmail.com",
-      phone: "9876543217",
-      location: "CG Road, Ahmedabad",
-      priority: "Medium",
-      date: '21-03-2026',
-      status: "Assigned",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1009",
-      username: "Harsh Mehta",
-      email: "harsh@gmail.com",
-      phone: "9876543218",
-      location: "Paldi, Ahmedabad",
-      priority: "Low",
-      date: '21-03-2026',
-      status: "Pending",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    },
-    {
-      id: "CMP-1010",
-      username: "Krunal Patel",
-      email: "krunal@gmail.com",
-      phone: "9876543219",
-      location: "Vastrapur, Ahmedabad",
-      priority: "High",
-      date: '21-03-2026',
-      status: "Assigned",
-      address:"Satellite, Ahmedabad, Gujarat",
-      pincode:"380015",
-      latitude:"23.0225",
-      longitude:"72.5714"
-    }
-  ];
 
   // ==========================================
-  // States
+  // STATES
   // ==========================================
+
+  const [complaintData, setComplaintData] = useState([]);
 
   const [search, setSearch] = useState("");
 
@@ -164,95 +30,738 @@ function AssignedComplaints() {
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const [totalPages, setTotalPages] = useState(0);
+
+  const [totalElements, setTotalElements] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+  const [updatingStatus, setUpdatingStatus] = useState(null);
 
   const complaintsPerPage = 5;
 
+
   // ==========================================
-  // Search + Filter
+  // GET ENGINEER COMPLAINTS
   // ==========================================
 
-  const filteredComplaints = useMemo(() => {
+  const fetchComplaints = async () => {
 
-    return complaintData.filter((item) => {
+    try {
 
-      const matchesSearch =
-        item.id.toLowerCase().includes(search.toLowerCase()) ||
-        item.username.toLowerCase().includes(search.toLowerCase()) ||
-        item.email.toLowerCase().includes(search.toLowerCase());
+      setLoading(true);
+      setError("");
 
-      const matchesPriority =
-        priorityFilter === "All" ||
-        item.priority === priorityFilter;
+      const token = localStorage.getItem("token");
 
-      const matchesStatus =
-        statusFilter === "All" ||
-        item.status === statusFilter;
+      if (!token) {
 
-      return (
-        matchesSearch &&
-        matchesPriority &&
-        matchesStatus
+        setError(
+          "You are not logged in. Please login again."
+        );
+
+        return;
+      }
+
+      const response = await axios.get(
+        "http://localhost:8085/api/engineer/complaints",
+        {
+          params: {
+            page: currentPage,
+            size: complaintsPerPage,
+            search: search.trim() || undefined,
+            sortBy: "createdAt",
+            direction: "desc"
+          },
+
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
 
-    });
+      console.log(
+        "Engineer Complaints Response:",
+        response.data
+      );
 
-  }, [search, priorityFilter, statusFilter]);
+      const data = response.data;
+
+      /*
+       * ==========================================
+       * ONLY ACTIVE COMPLAINTS
+       * ==========================================
+       *
+       * RESOLVED and CANCELLED complaints
+       * should not appear on Assigned Complaints.
+       */
+
+      const activeComplaints =
+        (data.content || []).filter(
+          (item) =>
+            item.status !== "RESOLVED" &&
+            item.status !== "CANCELLED"
+        );
+
+      setComplaintData(
+        activeComplaints
+      );
+
+      /*
+       * Backend pagination information
+       */
+      setTotalPages(
+        data.totalPages || 0
+      );
+
+      setTotalElements(
+        data.totalElements || 0
+      );
+
+    } catch (err) {
+
+      console.error(
+        "Engineer Complaint Fetch Error:",
+        err
+      );
+
+      const backendMessage =
+        err.response?.data?.message;
+
+      if (backendMessage) {
+
+        setError(
+          backendMessage
+        );
+
+      } else if (
+        typeof err.response?.data === "string"
+      ) {
+
+        setError(
+          err.response.data
+        );
+
+      } else {
+
+        setError(
+          "Unable to load complaints. Please try again."
+        );
+
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
 
   // ==========================================
-  // Pagination
+  // FETCH COMPLAINTS
   // ==========================================
 
-  const totalPages = Math.ceil(
-    filteredComplaints.length / complaintsPerPage
-  );
+  useEffect(() => {
 
-  const indexOfLastComplaint =
-    currentPage * complaintsPerPage;
+    fetchComplaints();
 
-  const indexOfFirstComplaint =
-    indexOfLastComplaint - complaintsPerPage;
+  }, [
+    currentPage,
+    search
+  ]);
 
-  const currentComplaints =
-    filteredComplaints.slice(
-      indexOfFirstComplaint,
-      indexOfLastComplaint
+
+  // ==========================================
+  // STATUS ORDER
+  // ==========================================
+
+  /*
+   * Status workflow:
+   *
+   * ASSIGNED
+   *     ↓
+   * ACCEPTED
+   *     ↓
+   * IN_PROGRESS
+   *     ↓
+   * RESOLVED
+   *
+   * OR
+   *
+   * ASSIGNED
+   *     ↓
+   * CANCELLED
+   *
+   */
+
+  const statusOrder = {
+    ASSIGNED: 0,
+    ACCEPTED: 1,
+    IN_PROGRESS: 2,
+    RESOLVED: 3,
+    CANCELLED: 99
+  };
+
+
+  // ==========================================
+  // GET NEXT ALLOWED STATUS
+  // ==========================================
+
+  const getAllowedStatuses = (currentStatus) => {
+
+    switch (currentStatus) {
+
+      case "ASSIGNED":
+
+        return [
+          "ASSIGNED",
+          "ACCEPTED",
+          "CANCELLED"
+        ];
+
+      case "ACCEPTED":
+
+        return [
+          "ACCEPTED",
+          "IN_PROGRESS"
+        ];
+
+      case "IN_PROGRESS":
+
+        return [
+          "IN_PROGRESS",
+          "RESOLVED"
+        ];
+
+      case "RESOLVED":
+
+        return [
+          "RESOLVED"
+        ];
+
+      case "CANCELLED":
+
+        return [
+          "CANCELLED"
+        ];
+
+      default:
+
+        return [
+          "ASSIGNED"
+        ];
+
+    }
+
+  };
+
+
+  // ==========================================
+  // CHECK STATUS TRANSITION
+  // ==========================================
+
+  const isValidStatusChange = (
+    currentStatus,
+    newStatus
+  ) => {
+
+    /*
+     * Same status is allowed
+     */
+    if (
+      currentStatus === newStatus
+    ) {
+
+      return true;
+
+    }
+
+
+    /*
+     * Cancelled cannot move anywhere
+     */
+    if (
+      currentStatus === "CANCELLED"
+    ) {
+
+      return false;
+
+    }
+
+
+    /*
+     * Resolved cannot move anywhere
+     */
+    if (
+      currentStatus === "RESOLVED"
+    ) {
+
+      return false;
+
+    }
+
+
+    /*
+     * Cancellation is only possible
+     * before resolution.
+     */
+    if (
+      newStatus === "CANCELLED"
+    ) {
+
+      return (
+        currentStatus === "ASSIGNED"
+      );
+
+    }
+
+
+    /*
+     * Normal forward workflow
+     */
+    return (
+      statusOrder[newStatus] >
+      statusOrder[currentStatus]
     );
+
+  };
+
+
+  // ==========================================
+  // STATUS UPDATE
+  // ==========================================
+
+  const updateStatus = async (
+    complaintNumber,
+    currentStatus,
+    newStatus
+  ) => {
+
+    /*
+     * Prevent invalid status transition
+     */
+
+    if (
+      !isValidStatusChange(
+        currentStatus,
+        newStatus
+      )
+    ) {
+
+      alert(
+        `Invalid status change.\n\n${formatStatus(
+          currentStatus
+        )} cannot be changed to ${formatStatus(
+          newStatus
+        )}.`
+      );
+
+      return;
+
+    }
+
+
+    /*
+     * Nothing to update
+     */
+
+    if (
+      currentStatus === newStatus
+    ) {
+
+      return;
+
+    }
+
+
+    /*
+     * Confirmation before changing status
+     */
+
+    const confirmed = window.confirm(
+      `Change complaint ${complaintNumber} from ${formatStatus(
+        currentStatus
+      )} to ${formatStatus(
+        newStatus
+      )}?`
+    );
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const token =
+        localStorage.getItem("token");
+
+      if (!token) {
+
+        alert(
+          "You are not logged in. Please login again."
+        );
+
+        return;
+
+      }
+
+
+      setUpdatingStatus(
+        complaintNumber
+      );
+
+
+      /*
+       * PUT API
+       */
+
+      const response =
+        await axios.put(
+
+          `http://localhost:8085/api/engineer/${complaintNumber}/work`,
+
+          {
+            status: newStatus
+          },
+
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              "Content-Type":
+                "application/json"
+            }
+          }
+
+        );
+
+
+      console.log(
+        "Status Update Response:",
+        response.data
+      );
+
+
+      /*
+       * ==========================================
+       * RESOLVED / CANCELLED
+       * ==========================================
+       *
+       * Remove the complaint from Assigned page.
+       */
+
+      if (
+        newStatus === "RESOLVED" ||
+        newStatus === "CANCELLED"
+      ) {
+
+        setComplaintData(
+          (previousComplaints) =>
+            previousComplaints.filter(
+              (item) =>
+                item.complaintNumber !==
+                complaintNumber
+            )
+        );
+
+
+        /*
+         * Update total count
+         */
+
+        setTotalElements(
+          (previous) =>
+            Math.max(
+              0,
+              previous - 1
+            )
+        );
+
+
+        /*
+         * If current page becomes empty,
+         * move to previous page.
+         */
+
+        if (
+          complaintData.length === 1 &&
+          currentPage > 0
+        ) {
+
+          setCurrentPage(
+            (previous) =>
+              previous - 1
+          );
+
+        }
+
+      } else {
+
+        /*
+         * ==========================================
+         * NORMAL STATUS UPDATE
+         * ==========================================
+         */
+
+        setComplaintData(
+          (previousComplaints) =>
+
+            previousComplaints.map(
+              (item) =>
+
+                item.complaintNumber ===
+                complaintNumber
+
+                  ? {
+                      ...item,
+                      status:
+                        newStatus
+                    }
+
+                  : item
+            )
+
+        );
+
+      }
+
+    } catch (err) {
+
+      console.error(
+        "Status Update Error:",
+        err
+      );
+
+
+      const backendMessage =
+        err.response?.data?.message;
+
+      let message;
+
+
+      if (backendMessage) {
+
+        message =
+          backendMessage;
+
+      } else if (
+        typeof err.response?.data ===
+        "string"
+      ) {
+
+        message =
+          err.response.data;
+
+      } else {
+
+        message =
+          "Unable to update complaint status.";
+
+      }
+
+
+      alert(message);
+
+    } finally {
+
+      setUpdatingStatus(null);
+
+    }
+
+  };
+
+
+  // ==========================================
+  // STATUS FILTER
+  // ==========================================
+
+  const filteredComplaints =
+    complaintData.filter(
+      (item) => {
+
+        const matchesPriority =
+          priorityFilter === "All" ||
+          item.priority ===
+            priorityFilter;
+
+
+        const matchesStatus =
+          statusFilter === "All" ||
+          item.status ===
+            statusFilter;
+
+
+        return (
+          matchesPriority &&
+          matchesStatus
+        );
+
+      }
+    );
+
+
+  // ==========================================
+  // FORMAT STATUS
+  // ==========================================
+
+  const formatStatus = (
+    status
+  ) => {
+
+    if (!status) {
+
+      return "-";
+
+    }
+
+
+    return status
+      .toLowerCase()
+      .replaceAll(
+        "_",
+        " "
+      )
+      .replace(
+        /\b\w/g,
+        (letter) =>
+          letter.toUpperCase()
+      );
+
+  };
+
+
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
+  const formatDate = (
+    date
+  ) => {
+
+    if (!date) {
+
+      return "-";
+
+    }
+
+
+    const parsedDate =
+      new Date(date);
+
+
+    if (
+      Number.isNaN(
+        parsedDate.getTime()
+      )
+    ) {
+
+      return date;
+
+    }
+
+
+    return parsedDate.toLocaleDateString(
+      "en-GB",
+      {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }
+    );
+
+  };
+
+
+  // ==========================================
+  // NEXT PAGE
+  // ==========================================
 
   const nextPage = () => {
 
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+    if (
+      currentPage <
+      totalPages - 1
+    ) {
+
+      setCurrentPage(
+        (previous) =>
+          previous + 1
+      );
+
     }
 
   };
+
+
+  // ==========================================
+  // PREVIOUS PAGE
+  // ==========================================
 
   const previousPage = () => {
 
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+    if (
+      currentPage > 0
+    ) {
+
+      setCurrentPage(
+        (previous) =>
+          previous - 1
+      );
+
     }
 
   };
 
+
   // ==========================================
-  // Status Update
+  // PAGE CHANGE
   // ==========================================
 
-  const updateStatus = (id, value) => {
+  const changePage = (
+    page
+  ) => {
 
-    alert(`Complaint ${id} updated to ${value}`);
+    setCurrentPage(
+      page
+    );
 
   };
 
+
   // ==========================================
-  // JSX Start
+  // OPEN LOCATION
+  // ==========================================
+
+  const openLocation = (
+    complaint
+  ) => {
+
+    setSelectedLocation(
+      complaint
+    );
+
+  };
+
+
+  // ==========================================
+  // JSX
   // ==========================================
 
   return (
 
     <div className="assigned-page">
-            {/* ==========================================
+
+      {/* ==========================================
           PAGE HEADER
       ========================================== */}
 
@@ -260,16 +769,19 @@ function AssignedComplaints() {
 
         <div>
 
-          <h1>Assigned Complaints</h1>
+          <h1>
+            Assigned Complaints
+          </h1>
 
           <p>
-            View assigned complaints, update complaint status,
-            and access complaint locations.
+            View assigned complaints, update complaint
+            status, and access complaint locations.
           </p>
 
         </div>
 
       </div>
+
 
       {/* ==========================================
           SEARCH & FILTER
@@ -286,58 +798,103 @@ function AssignedComplaints() {
             placeholder="Search by ID, Username or Email..."
             value={search}
             onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
+
+              setSearch(
+                e.target.value
+              );
+
+              setCurrentPage(0);
+
             }}
           />
 
         </div>
 
+
         <div className="toolbar-right">
 
-          {/* Priority */}
+          {/* ==========================================
+              PRIORITY
+          ========================================== */}
 
           <div className="filter-box">
 
             <FaFilter />
 
             <select
-              value={priorityFilter}
+              value={
+                priorityFilter
+              }
               onChange={(e) => {
-                setPriorityFilter(e.target.value);
-                setCurrentPage(1);
+
+                setPriorityFilter(
+                  e.target.value
+                );
+
               }}
             >
 
-              <option>All</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
+              <option value="All">
+                All
+              </option>
+
+              <option value="HIGH">
+                High
+              </option>
+
+              <option value="MEDIUM">
+                Medium
+              </option>
+
+              <option value="LOW">
+                Low
+              </option>
 
             </select>
 
           </div>
 
-          {/* Status */}
+
+          {/* ==========================================
+              STATUS
+          ========================================== */}
 
           <div className="filter-box">
 
             <FaFilter />
 
             <select
-              value={statusFilter}
+              value={
+                statusFilter
+              }
               onChange={(e) => {
-                setStatusFilter(e.target.value);
-                setCurrentPage(1);
+
+                setStatusFilter(
+                  e.target.value
+                );
+
               }}
             >
 
-              <option>All</option>
-              <option>Assigned</option>
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-              <option>Rejected</option>
+              <option value="All">
+                All
+              </option>
+
+              <option value="ASSIGNED">
+                Assigned
+              </option>
+
+              <option value="ACCEPTED">
+                Accepted
+              </option>
+
+              <option value="IN_PROGRESS">
+                In Progress
+              </option>
+
+              <option value="PENDING">
+                Pending
+              </option>
 
             </select>
 
@@ -346,6 +903,22 @@ function AssignedComplaints() {
         </div>
 
       </div>
+
+
+      {/* ==========================================
+          ERROR
+      ========================================== */}
+
+      {error && (
+
+        <div className="error-message">
+
+          {error}
+
+        </div>
+
+      )}
+
 
       {/* ==========================================
           COMPLAINT TABLE
@@ -359,7 +932,16 @@ function AssignedComplaints() {
             Assigned Complaint List
           </h2>
 
+          {!loading 
+          // && (
+          //   <span>
+          //     Total: {totalElements}
+          //   </span>
+          // )
+          }
+
         </div>
+
 
         <div className="table-wrapper">
 
@@ -369,148 +951,284 @@ function AssignedComplaints() {
 
               <tr>
 
-                <th>ID</th>
+                <th>
+                  ID
+                </th>
 
-                <th>Username</th>
+                <th>
+                  Username
+                </th>
 
-                <th>Email</th>
+                <th>
+                  Email
+                </th>
 
-                <th>Number</th>
+                <th>
+                  Number
+                </th>
 
-                {/* <th>Location</th> */}
+                <th>
+                  Priority
+                </th>
 
-                <th>Priority</th>
-                <th>Date</th>
+                <th>
+                  Date
+                </th>
 
-                <th>Status</th>
-                <th>Action</th>
+                <th>
+                  Status
+                </th>
+
+                <th>
+                  Action
+                </th>
 
               </tr>
 
             </thead>
 
+
             <tbody>
 
-              {currentComplaints.length === 0 ? (
+              {/* ==========================================
+                  LOADING
+              ========================================== */}
+
+              {loading ? (
 
                 <tr>
 
                   <td
-                    colSpan="7"
+                    colSpan="8"
                     className="empty-row"
                   >
-                    No complaints found.
+
+                    Loading complaints...
+
+                  </td>
+
+                </tr>
+
+              ) : filteredComplaints.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan="8"
+                    className="empty-row"
+                  >
+
+                    No active complaints found.
+
                   </td>
 
                 </tr>
 
               ) : (
 
-                currentComplaints.map((item) => (
+                filteredComplaints.map(
+                  (item) => (
 
-                  <tr key={item.id}>
-
-                    <td className="complaint-id">
-
-                      {item.id}
-
-                    </td>
-
-                    <td>
-
-                      {item.username}
-
-                    </td>
-
-                    <td>
-
-                      {item.email}
-
-                    </td>
-
-                    <td>
-
-                      {item.phone}
-
-                    </td>
-
-                    {/* <td>
-
-                      <button
-                        className="location-btn"
-                        onClick={() =>
-                          setSelectedLocation(item)
-                        }
-                      >
-
-                        <FaMapMarkerAlt />
-
-                        View Location
-
-                      </button>
-
-                    </td> */}
-
-                    <td>
-
-                      <span
-                        className={`priority ${item.priority.toLowerCase()}`}
-                      >
-
-                        {item.priority}
-                    
-                      </span>
-                     
-
-                    </td>
-                    <td>
-                        {item.date}
-                      </td>
-                    <td>
-
-                      <select
-                        className="status-dropdown"
-                        value={item.status}
-                        onChange={(e) =>
-                          updateStatus(
-                            item.id,
-                            e.target.value
-                          )
-                        }
-                      >
-
-                        <option>Assigned</option>
-
-                        <option>Pending</option>
-
-                        <option>Accepted</option>
-
-                        <option>In Progress</option>
-
-                        <option>Completed</option>
-
-                        <option>Rejected</option>
-
-                      </select>
-
-                    </td>
-                    <td>
-                      <button className="work-btn"
-                      onClick={()=>
-                      navigate(`/engineer/work/${item.id}`,
-                        {
-                          state:item
-                        }
-                      )
+                    <tr
+                      key={
+                        item.complaintId
                       }
-                      >
-                      Open Work
-                      </button>
-                    </td>
+                    >
 
-                  </tr>
+                      {/* ==================================
+                          ID
+                      ================================== */}
 
-                ))
+                      <td className="complaint-id">
+
+                        {item.complaintNumber}
+
+                      </td>
+
+
+                      {/* ==================================
+                          USERNAME
+                      ================================== */}
+
+                      <td>
+
+                        <strong>
+
+                          {item.firstName}{" "}
+
+                          {item.lastName}
+
+                        </strong>
+
+                      </td>
+
+
+                      {/* ==================================
+                          EMAIL
+                      ================================== */}
+
+                      <td>
+
+                        {item.email}
+
+                      </td>
+
+
+                      {/* ==================================
+                          PHONE
+                      ================================== */}
+
+                      <td>
+
+                        {item.contact}
+
+                      </td>
+
+
+                      {/* ==================================
+                          PRIORITY
+                      ================================== */}
+
+                      <td>
+
+                        <span
+                          className={`priority ${
+                            item.priority
+                              ?.toLowerCase()
+                          }`}
+                        >
+
+                          {formatStatus(
+                            item.priority
+                          )}
+
+                        </span>
+
+                      </td>
+
+
+                      {/* ==================================
+                          DATE
+                      ================================== */}
+
+                      <td>
+
+                        {formatDate(
+                          item.createdAt
+                        )}
+
+                      </td>
+
+
+                      {/* ==================================
+                          STATUS
+                      ================================== */}
+
+                      <td>
+
+                        <select
+                          className="status-dropdown"
+
+                          value={
+                            item.status ||
+                            "ASSIGNED"
+                          }
+
+                          disabled={
+                            updatingStatus ===
+                            item.complaintNumber
+                          }
+
+                          onChange={(e) => {
+
+                            updateStatus(
+
+                              item.complaintNumber,
+
+                              item.status,
+
+                              e.target.value
+
+                            );
+
+                          }}
+                        >
+
+                          {/* ==================================
+                              CURRENT / NEXT STATUS OPTIONS
+                          ================================== */}
+
+                          {getAllowedStatuses(
+                            item.status
+                          ).map(
+                            (status) => (
+
+                              <option
+                                key={
+                                  status
+                                }
+                                value={
+                                  status
+                                }
+                              >
+
+                                {formatStatus(
+                                  status
+                                )}
+
+                              </option>
+
+                            )
+                          )}
+
+                        </select>
+
+
+                        {updatingStatus ===
+                          item.complaintNumber && (
+
+                          <small>
+
+                            Updating...
+
+                          </small>
+
+                        )}
+
+                      </td>
+
+
+                      {/* ==================================
+                          ACTION
+                      ================================== */}
+
+                      <td>
+
+                        <button
+                          className="work-btn"
+
+                          onClick={() =>
+
+                            navigate(
+                              `/engineer/work/${item.complaintNumber}`,
+                              {
+                                state: item
+                              }
+                            )
+
+                          }
+                        >
+
+                          Open Work
+
+                        </button>
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )
 
               )}
 
@@ -521,31 +1239,56 @@ function AssignedComplaints() {
         </div>
 
       </div>
-            {/* ==========================================
+
+
+      {/* ==========================================
           LOCATION MODAL
       ========================================== */}
 
       {selectedLocation && (
 
-        <div className="modal-overlay">
+        <div
+          className="modal-overlay"
+          onClick={() =>
+            setSelectedLocation(
+              null
+            )
+          }
+        >
 
-          <div className="location-modal">
+          <div
+            className="location-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
 
             <div className="modal-header">
 
               <h2>
+
                 <FaMapMarkerAlt />
+
                 Complaint Location
+
               </h2>
 
               <button
                 className="close-btn"
-                onClick={() => setSelectedLocation(null)}
+
+                onClick={() =>
+                  setSelectedLocation(
+                    null
+                  )
+                }
               >
+
                 <FaTimes />
+
               </button>
 
             </div>
+
 
             <div className="modal-body">
 
@@ -553,37 +1296,119 @@ function AssignedComplaints() {
 
                 <div className="location-item">
 
-                  <label>Complaint ID</label>
+                  <label>
+                    Complaint ID
+                  </label>
 
-                  <span>{selectedLocation.id}</span>
+                  <span>
 
-                </div>
+                    {
+                      selectedLocation.complaintNumber
+                    }
 
-                <div className="location-item">
-
-                  <label>Citizen</label>
-
-                  <span>{selectedLocation.username}</span>
-
-                </div>
-
-                <div className="location-item">
-
-                  <label>Email</label>
-
-                  <span>{selectedLocation.email}</span>
+                  </span>
 
                 </div>
 
+
                 <div className="location-item">
 
-                  <label>Phone</label>
+                  <label>
+                    Citizen
+                  </label>
 
-                  <span>{selectedLocation.phone}</span>
+                  <span>
+
+                    {
+                      selectedLocation.firstName
+                    }{" "}
+
+                    {
+                      selectedLocation.lastName
+                    }
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Email
+                  </label>
+
+                  <span>
+
+                    {
+                      selectedLocation.email
+                    }
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Phone
+                  </label>
+
+                  <span>
+
+                    {
+                      selectedLocation.contact
+                    }
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Priority
+                  </label>
+
+                  <span>
+
+                    {
+                      formatStatus(
+                        selectedLocation.priority
+                      )
+                    }
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Status
+                  </label>
+
+                  <span>
+
+                    {
+                      formatStatus(
+                        selectedLocation.status
+                      )
+                    }
+
+                  </span>
 
                 </div>
 
               </div>
+
+
+              {/* ==================================
+                  ADDRESS
+              ================================== */}
 
               <div className="address-box">
 
@@ -597,24 +1422,95 @@ function AssignedComplaints() {
 
                 <p>
 
-                  {selectedLocation.location}
+                  {
+                    selectedLocation.address
+                  }
 
                 </p>
 
               </div>
 
-              {/* Google Map Placeholder */}
+
+              {/* ==================================
+                  PINCODE
+              ================================== */}
+
+              <div className="address-box">
+
+                <h4>
+                  Pincode
+                </h4>
+
+                <p>
+
+                  {
+                    selectedLocation.pincode
+                  }
+
+                </p>
+
+              </div>
+
+
+              {/* ==================================
+                  COORDINATES
+              ================================== */}
+
+              <div className="location-info">
+
+                <div className="location-item">
+
+                  <label>
+                    Latitude
+                  </label>
+
+                  <span>
+
+                    {
+                      selectedLocation.latitude
+                    }
+
+                  </span>
+
+                </div>
+
+
+                <div className="location-item">
+
+                  <label>
+                    Longitude
+                  </label>
+
+                  <span>
+
+                    {
+                      selectedLocation.longitude
+                    }
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              {/* ==================================
+                  MAP
+              ================================== */}
 
               <div className="map-placeholder">
 
                 <FaMapMarkerAlt />
 
-                <h3>Google Map</h3>
+                <h3>
+                  Google Map
+                </h3>
 
                 <p>
 
-                  Google Map integration can be added here
-                  using Google Maps API or Leaflet.
+                  Google Map integration can be
+                  added here using Google Maps API
+                  or Leaflet.
 
                 </p>
 
@@ -628,17 +1524,23 @@ function AssignedComplaints() {
 
       )}
 
+
       {/* ==========================================
           PAGINATION
       ========================================== */}
 
-      {filteredComplaints.length > complaintsPerPage && (
+      {totalPages > 1 && (
 
         <div className="pagination-wrapper">
 
           <button
-            onClick={previousPage}
-            disabled={currentPage === 1}
+            onClick={
+              previousPage
+            }
+
+            disabled={
+              currentPage === 0
+            }
           >
 
             <FaChevronLeft />
@@ -647,33 +1549,45 @@ function AssignedComplaints() {
 
           </button>
 
+
           <div className="page-numbers">
 
-            {[...Array(totalPages)].map((_, index) => (
+            {[...Array(totalPages)].map(
+              (_, index) => (
 
-              <button
-                key={index}
-                className={
-                  currentPage === index + 1
-                    ? "active-page"
-                    : ""
-                }
-                onClick={() =>
-                  setCurrentPage(index + 1)
-                }
-              >
+                <button
+                  key={index}
 
-                {index + 1}
+                  className={
+                    currentPage === index
+                      ? "active-page"
+                      : ""
+                  }
 
-              </button>
+                  onClick={() =>
+                    changePage(index)
+                  }
+                >
 
-            ))}
+                  {index + 1}
+
+                </button>
+
+              )
+            )}
 
           </div>
 
+
           <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages}
+            onClick={
+              nextPage
+            }
+
+            disabled={
+              currentPage ===
+              totalPages - 1
+            }
           >
 
             Next

@@ -629,684 +629,210 @@
 // }
 
 // export default EngineerManagement;
-
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./EngineerManagement.css";
 
 import {
-  FaUserCog,
-  FaUserCheck,
-  FaBuilding,
-  FaClipboardList,
+  FaSearch,
   FaChevronLeft,
   FaChevronRight,
-  FaSearch,
-  FaTimes
 } from "react-icons/fa";
 
 function EngineerManagement() {
 
   /* ==========================================================
-     PAGINATION
+     STATES
   ========================================================== */
+
+  const [engineers, setEngineers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
   const engineersPerPage = 5;
 
-  const [currentPage, setCurrentPage] = useState(1);
 
   /* ==========================================================
-     DEPARTMENTS
+     GET ADMIN JWT
   ========================================================== */
 
-  const [departments, setDepartments] = useState([
-    "Road Department",
-    "Water Department",
-    "Garbage Department",
-    "Street Light Department"
-  ]);
-
-  const [newDepartment, setNewDepartment] = useState("");
-
-  /* ==========================================================
-     ENGINEERS
-
-     IMPORTANT:
-     Every engineer MUST have a unique ID.
-  ========================================================== */
-
-  const [engineers, setEngineers] = useState([
-    {
-      id: "ENG001",
-      fname: "Rahul",
-      lname: "Patel",
-      name: "Rahul Patel",
-      email: "rahul@gmail.com",
-      mobile: "9876543210",
-      department: "Road Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG002",
-      fname: "Amit",
-      lname: "Sharma",
-      name: "Amit Sharma",
-      email: "amit@gmail.com",
-      mobile: "9876543211",
-      department: "Water Department",
-      role: "Senior Engineer"
-    },
-    {
-      id: "ENG003",
-      fname: "Rahul",
-      lname: "Sharma",
-      name: "Rahul Sharma",
-      email: "rahulsharma@gmail.com",
-      mobile: "9876543212",
-      department: "Road Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG004",
-      fname: "Priya",
-      lname: "Patel",
-      name: "Priya Patel",
-      email: "priya@gmail.com",
-      mobile: "9876543213",
-      department: "Garbage Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG005",
-      fname: "Vikas",
-      lname: "Mehta",
-      name: "Vikas Mehta",
-      email: "vikas@gmail.com",
-      mobile: "9876543214",
-      department: "Street Light Department",
-      role: "Senior Engineer"
-    },
-    {
-      id: "ENG006",
-      fname: "Neha",
-      lname: "Shah",
-      name: "Neha Shah",
-      email: "neha@gmail.com",
-      mobile: "9876543215",
-      department: "Water Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG007",
-      fname: "Karan",
-      lname: "Joshi",
-      name: "Karan Joshi",
-      email: "karan@gmail.com",
-      mobile: "9876543216",
-      department: "Road Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG008",
-      fname: "Mehul",
-      lname: "Desai",
-      name: "Mehul Desai",
-      email: "mehul@gmail.com",
-      mobile: "9876543217",
-      department: "Garbage Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG009",
-      fname: "Pooja",
-      lname: "Trivedi",
-      name: "Pooja Trivedi",
-      email: "pooja@gmail.com",
-      mobile: "9876543218",
-      department: "Water Department",
-      role: "Engineer"
-    },
-    {
-      id: "ENG010",
-      fname: "Jay",
-      lname: "Patel",
-      name: "Jay Patel",
-      email: "jay@gmail.com",
-      mobile: "9876543219",
-      department: "Street Light Department",
-      role: "Engineer"
-    }
-  ]);
-
-  /* ==========================================================
-     SEARCH
-  ========================================================== */
-
-  const [search, setSearch] = useState("");
-
-  /* ==========================================================
-     MODAL
-  ========================================================== */
-
-  const [showModal, setShowModal] = useState(false);
-
-  const [isEditMode, setIsEditMode] = useState(false);
-
-  const [formData, setFormData] = useState({
-    id: "",
-    fname: "",
-    lname: "",
-    name: "",
-    email: "",
-    mobile: "",
-    department: "Road Department",
-    role: "Engineer"
-  });
-
-  /* ==========================================================
-     TEXT NORMALIZATION
-
-     This makes search:
-
-     Rahul
-     RAHUL
-     rahul
-
-     all equivalent.
-
-     It also removes unnecessary spaces
-     and special characters.
-  ========================================================== */
-
-  const normalizeText = (value) => {
-    return String(value ?? "")
-      .toLowerCase()
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  };
-
-  /* ==========================================================
-     COMPACT SEARCH
-
-     Allows:
-
-     Rahul Patel
-     RahulPatel
-     rahul-patel
-
-     to match the same engineer.
-  ========================================================== */
-
-  const compactText = (value) => {
-    return normalizeText(value).replace(/\s/g, "");
-  };
-
-  /* ==========================================================
-     ADD DEPARTMENT
-  ========================================================== */
-
-  const handleAddDepartment = () => {
-
-    const dept = newDepartment.trim();
-
-    if (!dept) {
-      alert("Please enter a department name.");
-      return;
-    }
-
-    const exists = departments.some(
-      (item) =>
-        normalizeText(item) === normalizeText(dept)
-    );
-
-    if (exists) {
-      alert("Department already exists.");
-      return;
-    }
-
-    setDepartments((prev) => [
-      ...prev,
-      dept
-    ]);
-
-    setNewDepartment("");
-
-    alert("Department added successfully!");
-  };
-
-  /* ==========================================================
-     INPUT CHANGE
-  ========================================================== */
-
-  const handleChange = (e) => {
-
-    const { name, value } = e.target;
-
-    setFormData((prev) => {
-
-      const updated = {
-        ...prev,
-        [name]: value
-      };
-
-      /* Automatically create full name */
-
-      if (
-        name === "fname" ||
-        name === "lname"
-      ) {
-
-        const firstName =
-          name === "fname"
-            ? value
-            : prev.fname;
-
-        const lastName =
-          name === "lname"
-            ? value
-            : prev.lname;
-
-        updated.name =
-          `${firstName} ${lastName}`.trim();
-      }
-
-      return updated;
-    });
-  };
-
-  /* ==========================================================
-     OPEN ADD MODAL
-  ========================================================== */
-
-  const openAddModal = () => {
-
-    setIsEditMode(false);
-
-    setFormData({
-      id: "",
-      fname: "",
-      lname: "",
-      name: "",
-      email: "",
-      mobile: "",
-      department: departments[0] || "",
-      role: "Engineer"
-    });
-
-    setShowModal(true);
-  };
-
-  /* ==========================================================
-     OPEN EDIT MODAL
-  ========================================================== */
-
-  const openEditModal = (engineer) => {
-
-    setIsEditMode(true);
-
-    setFormData({
-      id: engineer.id || "",
-      fname: engineer.fname || "",
-      lname: engineer.lname || "",
-      name: engineer.name || "",
-      email: engineer.email || "",
-      mobile: engineer.mobile || "",
-      department: engineer.department || "",
-      role: engineer.role || "Engineer"
-    });
-
-    setShowModal(true);
-  };
-
-  /* ==========================================================
-     SAVE ENGINEER
-  ========================================================== */
-
-  const handleSave = () => {
-
-    /* Validation */
-
-    if (
-      !formData.fname.trim() ||
-      !formData.lname.trim() ||
-      !formData.email.trim() ||
-      !formData.mobile.trim()
-    ) {
-      alert("Please fill all required fields.");
-      return;
-    }
-
-    const fullName =
-      `${formData.fname.trim()} ${formData.lname.trim()}`
-        .replace(/\s+/g, " ")
-        .trim();
-
-    if (isEditMode) {
-
-      /* UPDATE */
-
-      setEngineers((prev) =>
-        prev.map((eng) =>
-          eng.id === formData.id
-            ? {
-                ...eng,
-
-                department:
-                  formData.department,
-
-                role:
-                  formData.role
-              }
-            : eng
-        )
-      );
-
-      alert("Engineer updated successfully!");
-
-    } else {
-
-      /* ADD */
-
-      const newEngineer = {
-        id: `ENG${Date.now()}`,
-
-        fname:
-          formData.fname.trim(),
-
-        lname:
-          formData.lname.trim(),
-
-        name:
-          fullName,
-
-        email:
-          formData.email.trim(),
-
-        mobile:
-          formData.mobile.trim(),
-
-        department:
-          formData.department,
-
-        role:
-          formData.role
-      };
-
-      setEngineers((prev) => [
-        ...prev,
-        newEngineer
-      ]);
-
-      alert("Engineer added successfully!");
-    }
-
-    setShowModal(false);
-  };
-
-  /* ==========================================================
-     DELETE ENGINEER
-  ========================================================== */
-
-  const handleDelete = (id) => {
-
-    const confirmDelete =
-      window.confirm(
-        "Are you sure you want to delete this engineer?"
-      );
-
-    if (!confirmDelete) {
-      return;
-    }
-
-    setEngineers((prev) =>
-      prev.filter(
-        (engineer) =>
-          engineer.id !== id
-      )
+  const getToken = () => {
+    return (
+      localStorage.getItem("token") ||
+      localStorage.getItem("jwt") ||
+      localStorage.getItem("accessToken")
     );
   };
 
-  /* ==========================================================
-     SEARCH
-
-     SEARCHES ALL FIELDS:
-
-     1. ID
-     2. First Name
-     3. Last Name
-     4. Full Name
-     5. Email
-     6. Mobile
-     7. Department
-     8. Role
-  ========================================================== */
-
-  const filteredEngineers = engineers.filter(
-    (engineer) => {
-
-      /* Empty search = show everything */
-
-      if (!search.trim()) {
-        return true;
-      }
-
-      const searchText =
-        normalizeText(search);
-
-      const compactSearch =
-        compactText(search);
-
-      /* Individual fields */
-
-      const id =
-        normalizeText(engineer.id);
-
-      const fname =
-        normalizeText(engineer.fname);
-
-      const lname =
-        normalizeText(engineer.lname);
-
-      const name =
-        normalizeText(engineer.name);
-
-      const email =
-        normalizeText(engineer.email);
-
-      const mobile =
-        normalizeText(engineer.mobile);
-
-      const department =
-        normalizeText(engineer.department);
-
-      const role =
-        normalizeText(engineer.role);
-
-      /*
-        Combine all fields.
-      */
-
-      const allFields = [
-        id,
-        fname,
-        lname,
-        name,
-        email,
-        mobile,
-        department,
-        role
-      ];
-
-      /*
-        --------------------------------------------------
-        DIRECT SEARCH
-        --------------------------------------------------
-
-        Example:
-
-        Search: rahul
-
-        Finds:
-        Rahul Patel
-        Rahul Sharma
-      */
-
-      const directMatch =
-        allFields.some((field) =>
-          field.includes(searchText)
-        );
-
-      if (directMatch) {
-        return true;
-      }
-
-      /*
-        --------------------------------------------------
-        COMPACT SEARCH
-        --------------------------------------------------
-
-        Example:
-
-        Search:
-        rahulpatel
-
-        Matches:
-        Rahul Patel
-      */
-
-      const compactFields =
-        allFields.map((field) =>
-          field.replace(/\s/g, "")
-        );
-
-      const compactMatch =
-        compactFields.some((field) =>
-          field.includes(compactSearch)
-        );
-
-      if (compactMatch) {
-        return true;
-      }
-
-      /*
-        --------------------------------------------------
-        MULTI-WORD SEARCH
-        --------------------------------------------------
-
-        Example:
-
-        "rahul road"
-
-        Every word must be present
-        somewhere in the engineer's data.
-      */
-
-      const words =
-        searchText
-          .split(" ")
-          .filter(Boolean);
-
-      return words.every((word) =>
-        allFields.some((field) =>
-          field.includes(word)
-        )
-      );
-    }
-  );
 
   /* ==========================================================
-     RESET PAGE WHEN SEARCH CHANGES
+     GET ALL ENGINEERS
   ========================================================== */
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [search]);
+
+    const fetchEngineers = async () => {
+
+      try {
+
+        setLoading(true);
+
+        const token = getToken();
+
+        if (!token) {
+          console.error("Admin JWT not found");
+          setEngineers([]);
+          return;
+        }
+
+        const response = await fetch(
+          "http://localhost:8085/api/admin/engineers",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+
+          const errorText = await response.text();
+
+          console.error(
+            "Engineer API Error:",
+            response.status,
+            errorText
+          );
+
+          throw new Error(
+            `Failed to load engineers: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        console.log("Admin Engineer Response:", data);
+
+        setEngineers(data.content || []);
+
+      } catch (error) {
+
+        console.error(
+          "Error loading engineers:",
+          error
+        );
+
+        setEngineers([]);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchEngineers();
+
+  }, []);
+
+
+  /* ==========================================================
+     SEARCH
+  ========================================================== */
+
+  const filteredEngineers = useMemo(() => {
+
+    const keyword = search.toLowerCase().trim();
+
+    if (!keyword) {
+      return engineers;
+    }
+
+    return engineers.filter((engineer) => {
+
+      const fullName =
+        `${engineer.firstName || ""} ${engineer.lastName || ""}`
+          .toLowerCase();
+
+      return (
+        String(engineer.engineerId || "")
+          .toLowerCase()
+          .includes(keyword) ||
+
+        fullName.includes(keyword) ||
+
+        String(engineer.email || "")
+          .toLowerCase()
+          .includes(keyword) ||
+
+        String(engineer.contact || "")
+          .toLowerCase()
+          .includes(keyword) ||
+
+        String(engineer.department || "")
+          .toLowerCase()
+          .includes(keyword)
+      );
+
+    });
+
+  }, [engineers, search]);
+
 
   /* ==========================================================
      PAGINATION
   ========================================================== */
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filteredEngineers.length /
-        engineersPerPage
-      )
-    );
+  const totalPages = Math.ceil(
+    filteredEngineers.length / engineersPerPage
+  );
 
-  /*
-    Make sure current page
-    never goes beyond total pages.
-  */
+  const indexOfLastEngineer =
+    currentPage * engineersPerPage;
 
-  const safeCurrentPage =
-    Math.min(
-      currentPage,
-      totalPages
-    );
-
-  const indexOfLast =
-    safeCurrentPage *
-    engineersPerPage;
-
-  const indexOfFirst =
-    indexOfLast -
-    engineersPerPage;
+  const indexOfFirstEngineer =
+    indexOfLastEngineer - engineersPerPage;
 
   const currentEngineers =
     filteredEngineers.slice(
-      indexOfFirst,
-      indexOfLast
+      indexOfFirstEngineer,
+      indexOfLastEngineer
     );
 
-  /* ==========================================================
-     PAGINATION
-  ========================================================== */
 
   const paginate = (page) => {
 
-    if (
-      page >= 1 &&
-      page <= totalPages
-    ) {
-      setCurrentPage(page);
+    if (page < 1 || page > totalPages) {
+      return;
     }
+
+    setCurrentPage(page);
+
   };
 
-  const previousPage = () => {
-
-    if (safeCurrentPage > 1) {
-      setCurrentPage(
-        safeCurrentPage - 1
-      );
-    }
-  };
-
-  const nextPage = () => {
-
-    if (safeCurrentPage < totalPages) {
-      setCurrentPage(
-        safeCurrentPage + 1
-      );
-    }
-  };
 
   /* ==========================================================
-     CLEAR SEARCH
+     SUMMARY
   ========================================================== */
 
-  const clearSearch = () => {
+  const totalEngineers = engineers.length;
 
-    setSearch("");
+  const activeEngineers =
+    engineers.filter(
+      (engineer) => engineer.isActive === true
+    ).length;
 
-    setCurrentPage(1);
-  };
+  const availableEngineers =
+    engineers.filter(
+      (engineer) => engineer.isAvailable === true
+    ).length;
+
 
   /* ==========================================================
-     RETURN
+     JSX
   ========================================================== */
 
   return (
@@ -1314,7 +840,7 @@ function EngineerManagement() {
     <div className="engineer-page">
 
       {/* ======================================================
-          HEADER
+          PAGE HEADER
       ====================================================== */}
 
       <div className="page-header">
@@ -1322,24 +848,24 @@ function EngineerManagement() {
         <div>
 
           <h1>
-            Engineer Management
+            Engineer Information
           </h1>
 
           <p>
-            Manage engineers, departments and roles
+            View and monitor all registered engineers
+            across departments.
           </p>
 
         </div>
 
       </div>
 
+
       {/* ======================================================
-          STATS
+          SUMMARY
       ====================================================== */}
 
       <div className="summary-grid">
-
-        {/* Total Engineers */}
 
         <div className="summary-card">
 
@@ -1350,18 +876,13 @@ function EngineerManagement() {
             </h4>
 
             <h2>
-              {engineers.length}
+              {totalEngineers}
             </h2>
 
           </div>
 
-          <div className="summary-icon">
-            <FaUserCog />
-          </div>
-
         </div>
 
-        {/* Active Engineers */}
 
         <div className="summary-card">
 
@@ -1372,328 +893,303 @@ function EngineerManagement() {
             </h4>
 
             <h2>
-              {engineers.length}
+              {activeEngineers}
             </h2>
 
           </div>
 
-          <div className="summary-icon">
-            <FaUserCheck />
-          </div>
-
         </div>
 
-        {/* Departments */}
 
         <div className="summary-card">
 
           <div className="summary-info">
 
             <h4>
-              Total Departments
+              Available Engineers
             </h4>
 
             <h2>
-              {departments.length}
+              {availableEngineers}
             </h2>
 
           </div>
 
-          <div className="summary-icon">
-            <FaBuilding />
-          </div>
-
         </div>
 
-        {/* Complaints */}
 
         <div className="summary-card">
 
           <div className="summary-info">
 
             <h4>
-              Assigned Complaints
+              Departments
             </h4>
 
             <h2>
-              245
+              {
+                new Set(
+                  engineers
+                    .map(
+                      (engineer) =>
+                        engineer.department
+                    )
+                    .filter(Boolean)
+                ).size
+              }
             </h2>
 
-          </div>
-
-          <div className="summary-icon">
-            <FaClipboardList />
           </div>
 
         </div>
 
       </div>
 
+
       {/* ======================================================
-          SEARCH BAR
+          SEARCH
       ====================================================== */}
 
-      <div className="top-bar">
+      <div className="complaint-toolbar">
 
-        <div
-          className="search-wrapper"
-          style={{
-            position: "relative",
-            width: "100%"
-          }}
-        >
+        <div className="search-box">
 
-          {/* Search Icon */}
-
-          <FaSearch
-            style={{
-              position: "absolute",
-              left: "18px",
-              top: "50%",
-              transform:
-                "translateY(-50%)",
-              color: "#94a3b8",
-              pointerEvents: "none",
-              zIndex: 2
-            }}
-          />
+          <FaSearch />
 
           <input
             type="text"
-            placeholder="Search by ID, name, email, mobile, department or role..."
+            placeholder="Search engineer by ID, name, email or department..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-            autoComplete="off"
-            style={{
-              width: "100%",
-              paddingLeft: "48px",
-              paddingRight: search
-                ? "45px"
-                : "18px"
+            onChange={(e) => {
+
+              setSearch(e.target.value);
+
+              setCurrentPage(1);
+
             }}
           />
-
-          {/* Clear Button */}
-
-          {search && (
-
-            <button
-              type="button"
-              onClick={clearSearch}
-              title="Clear search"
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform:
-                  "translateY(-50%)",
-                border: "none",
-                background:
-                  "transparent",
-                cursor: "pointer",
-                color: "#64748b",
-                fontSize: "16px",
-                zIndex: 3
-              }}
-            >
-              <FaTimes />
-            </button>
-
-          )}
 
         </div>
 
       </div>
 
+
       {/* ======================================================
-          SEARCH RESULT COUNT
+          ENGINEER TABLE
       ====================================================== */}
 
-      {search.trim() && (
+      <div className="dashboard-box">
 
-        <div
-          style={{
-            marginTop: "-8px",
-            marginBottom: "15px",
-            color: "#64748b",
-            fontSize: "14px"
-          }}
-        >
+        <div className="card-header">
 
-          Showing{" "}
+          <div>
 
-          <strong>
-            {filteredEngineers.length}
-          </strong>{" "}
+            <h2>
+              Registered Engineers
+            </h2>
 
-          result
-          {filteredEngineers.length !== 1
-            ? "s"
-            : ""}
+            <p>
+              Showing {currentEngineers.length} of{" "}
+              {filteredEngineers.length} engineers.
+            </p>
 
-          {" "}for{" "}
-
-          <strong>
-            "{search}"
-          </strong>
+          </div>
 
         </div>
 
-      )}
 
-      {/* ======================================================
-          TABLE
-      ====================================================== */}
+        <div className="table-wrapper">
 
-      <div className="table-container">
+          <table className="dashboard-table">
 
-        <table>
+            <thead>
 
-          <thead>
+              <tr>
 
-            <tr>
+                <th>
+                  Engineer ID
+                </th>
 
-              <th>
-                ID
-              </th>
+                <th>
+                  Engineer Name
+                </th>
 
-              <th>
-                Name
-              </th>
+                <th>
+                  Email
+                </th>
 
-              <th>
-                Email
-              </th>
+                <th>
+                  Mobile
+                </th>
 
-              <th>
-                Mobile
-              </th>
+                <th>
+                  Department
+                </th>
 
-              <th>
-                Department
-              </th>
+                <th>
+                  Status
+                </th>
 
-              <th>
-                Role
-              </th>
+                <th>
+                  Availability
+                </th>
 
-              <th>
-                Actions
-              </th>
+              </tr>
 
-            </tr>
+            </thead>
 
-          </thead>
 
-          <tbody>
+            <tbody>
 
-            {currentEngineers.length > 0 ? (
+              {loading ? (
 
-              currentEngineers.map(
-                (engineer) => (
+                <tr>
+
+                  <td
+                    colSpan="7"
+                    className="empty-row"
+                  >
+                    Loading engineers...
+                  </td>
+
+                </tr>
+
+              ) : currentEngineers.length > 0 ? (
+
+                currentEngineers.map((engineer) => (
 
                   <tr
-                    key={engineer.id}
+                    key={engineer.engineerId}
                   >
 
-                    <td>
-                      {engineer.id}
-                    </td>
+                    {/* Engineer ID */}
 
                     <td>
-                      {engineer.name}
+                      {engineer.engineerId}
                     </td>
+
+
+                    {/* Name */}
 
                     <td>
-                      {engineer.email}
+
+                      <strong>
+
+                        {engineer.firstName || ""}{" "}
+
+                        {engineer.lastName || ""}
+
+                      </strong>
+
                     </td>
+
+
+                    {/* Email */}
 
                     <td>
-                      {engineer.mobile}
+                      {engineer.email || "-"}
                     </td>
+
+
+                    {/* Mobile */}
 
                     <td>
-                      {engineer.department}
+                      {engineer.contact || "-"}
                     </td>
+
+
+                    {/* Department */}
 
                     <td>
-                      {engineer.role}
+                      {engineer.department || "-"}
                     </td>
 
-                    <td className="action-buttons">
 
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          openEditModal(
-                            engineer
-                          )
+                    {/* Status */}
+
+                    <td>
+
+                      <span
+                        className={
+                          engineer.isActive
+                            ? "status active"
+                            : "status inactive"
                         }
                       >
-                        Edit
-                      </button>
 
-                      <button
-                        className="delete-btn"
-                        onClick={() =>
-                          handleDelete(
-                            engineer.id
-                          )
+                        {engineer.isActive
+                          ? "Active"
+                          : "Inactive"}
+
+                      </span>
+
+                    </td>
+
+
+                    {/* Availability */}
+
+                    <td>
+
+                      <span
+                        className={
+                          engineer.isAvailable
+                            ? "status available"
+                            : "status unavailable"
                         }
                       >
-                        Delete
-                      </button>
+
+                        {engineer.isAvailable
+                          ? "Available"
+                          : "Unavailable"}
+
+                      </span>
 
                     </td>
 
                   </tr>
 
-                )
-              )
+                ))
 
-            ) : (
+              ) : (
 
-              <tr>
+                <tr>
 
-                <td
-                  colSpan="7"
-                  className="empty-row"
-                >
+                  <td
+                    colSpan="7"
+                    className="empty-row"
+                  >
 
-                  {search.trim()
-                    ? `No engineers found for "${search}".`
-                    : "No engineers found."
-                  }
+                    No engineers found.
 
-                </td>
+                  </td>
 
-              </tr>
+                </tr>
 
-            )}
+              )}
 
-          </tbody>
+            </tbody>
 
-        </table>
+          </table>
+
+        </div>
 
       </div>
+
 
       {/* ======================================================
           PAGINATION
       ====================================================== */}
 
-      {filteredEngineers.length >
-        engineersPerPage && (
+      {filteredEngineers.length > engineersPerPage && (
 
         <div className="pagination-wrapper">
 
-          {/* Previous */}
-
           <button
-            onClick={previousPage}
+            onClick={() =>
+              paginate(currentPage - 1)
+            }
             disabled={
-              safeCurrentPage === 1
+              currentPage === 1
             }
           >
 
@@ -1703,24 +1199,19 @@ function EngineerManagement() {
 
           </button>
 
-          {/* Page Numbers */}
 
           <div className="page-numbers">
 
-            {Array.from(
-              {
-                length: totalPages
-              },
+            {[...Array(totalPages)].map(
               (_, index) => (
 
                 <button
-                  key={index + 1}
+                  key={index}
                   onClick={() =>
                     paginate(index + 1)
                   }
                   className={
-                    safeCurrentPage ===
-                    index + 1
+                    currentPage === index + 1
                       ? "active-page"
                       : ""
                   }
@@ -1735,13 +1226,13 @@ function EngineerManagement() {
 
           </div>
 
-          {/* Next */}
 
           <button
-            onClick={nextPage}
+            onClick={() =>
+              paginate(currentPage + 1)
+            }
             disabled={
-              safeCurrentPage ===
-              totalPages
+              currentPage === totalPages
             }
           >
 
@@ -1755,156 +1246,10 @@ function EngineerManagement() {
 
       )}
 
-      {/* ======================================================
-          MODAL
-      ====================================================== */}
-
-      {showModal && (
-
-        <div className="modal-overlay">
-
-          <div className="modal">
-
-            <h2>
-
-              {isEditMode
-                ? "Update Engineer"
-                : "Add Engineer"
-              }
-
-            </h2>
-
-            {/* First Name */}
-
-            <input
-              type="text"
-              name="fname"
-              placeholder="Engineer First Name"
-              value={formData.fname}
-              onChange={handleChange}
-              disabled={isEditMode}
-            />
-
-            {/* Last Name */}
-
-            <input
-              type="text"
-              name="lname"
-              placeholder="Engineer Last Name"
-              value={formData.lname}
-              onChange={handleChange}
-              disabled={isEditMode}
-            />
-
-            {/* Email */}
-
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isEditMode}
-            />
-
-            {/* Mobile */}
-
-            <input
-              type="text"
-              name="mobile"
-              placeholder="Mobile Number"
-              value={formData.mobile}
-              onChange={handleChange}
-              disabled={isEditMode}
-            />
-
-            {/* Department */}
-
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-            >
-
-              {departments.map(
-                (department) => (
-
-                  <option
-                    key={department}
-                    value={department}
-                  >
-                    {department}
-                  </option>
-
-                )
-              )}
-
-            </select>
-
-            {/* Role */}
-
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-            >
-
-              <option value="Engineer">
-                Engineer
-              </option>
-
-              <option value="Senior Engineer">
-                Senior Engineer
-              </option>
-
-              <option value="Team Lead">
-                Team Lead
-              </option>
-
-              <option value="Supervisor">
-                Supervisor
-              </option>
-
-            </select>
-
-            {/* Buttons */}
-
-            <div className="modal-buttons">
-
-              <button
-                type="button"
-                className="cancel-btn"
-                onClick={() =>
-                  setShowModal(false)
-                }
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                className="save-btn"
-                onClick={handleSave}
-              >
-
-                {isEditMode
-                  ? "Update"
-                  : "Add Engineer"
-                }
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
     </div>
+
   );
+
 }
 
 export default EngineerManagement;
-

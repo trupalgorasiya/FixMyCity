@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
     FaHome,
     FaClipboardCheck,
@@ -11,10 +11,17 @@ import {
     FaSignOutAlt
 } from "react-icons/fa";
 
+import { logout } from "../../api/auth";
 
 import "./Sidebar.css";
 
 function DepartmentSidebar() {
+
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
+    };
 
     return (
 
@@ -39,11 +46,11 @@ function DepartmentSidebar() {
 
                         <li><NavLink to="/department/engineer-manage"><FaUsers /><span>Engineers</span></NavLink></li>
 
+                        <li><NavLink to="/department/categories"><FaUser /><span>Category</span></NavLink></li>
+
                         <li><NavLink to="/department/view-feedback"><FaComments /><span>Feedback</span></NavLink></li>
 
                         <li><NavLink to="/department/view-enginner-request"><FaInbox /><span>Engineer Applications</span></NavLink></li>
-
-                        <li><NavLink to="/department/categories"><FaUser /><span>Category</span></NavLink></li>
 
                         <li><NavLink to="/department/department-report"><FaChartBar /><span>Reports</span></NavLink></li>
 
@@ -57,10 +64,14 @@ function DepartmentSidebar() {
 
             <div className="sidebar-footer">
 
-                <NavLink to="/logout">
+                <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="logout-btn"
+                >
                     <FaSignOutAlt />
                     <span>Logout</span>
-                </NavLink>
+                </button>
 
             </div>
 

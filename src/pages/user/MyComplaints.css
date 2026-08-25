@@ -122,7 +122,22 @@
 /* ==========================================
    SEARCH BOX
 ========================================== */
-
+.search-box button{
+    height: 49px;
+    padding: 0px 30px;
+    /* border: none; */
+    border-radius: 14px;
+    background: #88aaf3;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+    margin: 0 -19px;
+}
+.search-box button:hover {
+    color: #fff;
+}
 .search-box {
     flex: 1;
 

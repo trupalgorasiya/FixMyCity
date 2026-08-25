@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaSearch,
   FaPlus,
@@ -12,59 +12,34 @@ import "./DepartmentManagement.css";
 function DepartmentManagement() {
 
   /* ==========================================================
-      DUMMY DATA
+     API
   ========================================================== */
 
-  const [departments, setDepartments] = useState([
-    {
-      id: "D001",
-      name: "Road Department",
-      email: "road@gov.in",
-      contact: "9876543210",
-      createdOn: "12 Jul 2026",
-    },
-    {
-      id: "D002",
-      name: "Water Department",
-      email: "water@gov.in",
-      contact: "9898989898",
-      createdOn: "15 Jul 2026",
-    },
-    {
-      id: "D003",
-      name: "Electricity Department",
-      email: "electricity@gov.in",
-      contact: "9988776655",
-      createdOn: "10 Jul 2026",
-    },
-    {
-      id: "D004",
-      name: "Drainage Department",
-      email: "drainage@gov.in",
-      contact: "9090909090",
-      createdOn: "08 Jul 2026",
-    },
-    {
-      id: "D005",
-      name: "Street Light Department",
-      email: "streetlight@gov.in",
-      contact: "9812345678",
-      createdOn: "18 Jul 2026",
-    },
-    {
-      id: "D006",
-      name: "Sanitation Department",
-      email: "sanitation@gov.in",
-      contact: "9871234560",
-      createdOn: "20 Jul 2026",
-    },
-  ]);
+  const API_URL = "http://localhost:8085";
 
   /* ==========================================================
-      STATES
+     GET JWT
   ========================================================== */
 
+  const getToken = () => {
+    return (
+      localStorage.getItem("token") ||
+      localStorage.getItem("jwt") ||
+      localStorage.getItem("accessToken")
+    );
+  };
+
+  /* ==========================================================
+     STATES
+  ========================================================== */
+
+  const [departments, setDepartments] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
+
+  const [error, setError] = useState("");
 
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -74,112 +49,278 @@ function DepartmentManagement() {
 
   const [selectedDepartment, setSelectedDepartment] = useState(null);
 
-  const [formData, setFormData] = useState({
-    id: "",
-    name: "",
-    email: "",
-    contact: "",
-  });
-
-  /* ==========================================================
-      SEARCH FILTER
-  ========================================================== */
-
-  const filteredDepartments = useMemo(() => {
-    return departments.filter((dept) => {
-
-      const value = search.toLowerCase();
-
-      return (
-        dept.id.toLowerCase().includes(value) ||
-        dept.name.toLowerCase().includes(value) ||
-        dept.email.toLowerCase().includes(value) ||
-        dept.contact.includes(value) ||
-        dept.status.toLowerCase().includes(value)
-      );
-
-    });
-  }, [departments, search]);
-
-  /* ==========================================================
-      SUMMARY
-  ========================================================== */
-
-  const totalDepartments = departments.length;
-
-  const activeDepartments = departments.filter(
-    (dept) => dept.status === "Active"
-  ).length;
-
-  const inactiveDepartments = departments.filter(
-    (dept) => dept.status === "Inactive"
-  ).length;
-
-  const pendingDepartments = departments.filter(
-    (dept) => dept.status === "Pending"
-  ).length;
-
-  /* ==========================================================
-      PAGINATION
-  ========================================================== */
+  const [currentPage, setCurrentPage] = useState(1);
 
   const rowsPerPage = 5;
 
-  const [currentPage, setCurrentPage] = useState(1);
+  /* ==========================================================
+     ADD FORM
+  ========================================================== */
+
+  const [addFormData, setAddFormData] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    description: "",
+    address: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  /* ==========================================================
+     EDIT FORM
+  ========================================================== */
+
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    contact: "",
+    description: "",
+    address: "",
+    profileImage: null,
+  });
+
+  /* ==========================================================
+     GET ALL DEPARTMENTS
+  ========================================================== */
+
+  const fetchDepartments = async () => {
+
+    try {
+
+      setLoading(true);
+      setError("");
+
+      const token = getToken();
+
+      if (!token) {
+        throw new Error(
+          "JWT token not found. Please login again."
+        );
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/admin/departments`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const responseText = await response.text();
+
+      let data = {};
+
+      try {
+        data = responseText
+          ? JSON.parse(responseText)
+          : {};
+      } catch {
+        data = {};
+      }
+
+      if (!response.ok) {
+
+        console.error(
+          "Department API Error:",
+          response.status,
+          data
+        );
+
+        throw new Error(
+          data.message ||
+          `Failed to load departments: ${response.status}`
+        );
+      }
+
+      console.log(
+        "Department Response:",
+        data
+      );
+
+      setDepartments(
+        Array.isArray(data.content)
+          ? data.content
+          : []
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Error loading departments:",
+        error
+      );
+
+      setDepartments([]);
+
+      setError(error.message);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+  /* ==========================================================
+     LOAD DEPARTMENTS
+  ========================================================== */
+
+  useEffect(() => {
+
+    fetchDepartments();
+
+  }, []);
+
+  /* ==========================================================
+     SEARCH
+  ========================================================== */
+
+  const filteredDepartments = useMemo(() => {
+
+    const keyword = search
+      .toLowerCase()
+      .trim();
+
+    if (!keyword) {
+      return departments;
+    }
+
+    return departments.filter(
+      (department) => {
+
+        const departmentId =
+          String(
+            department.departmentId ?? ""
+          ).toLowerCase();
+
+        const name =
+          String(
+            department.name ?? ""
+          ).toLowerCase();
+
+        const email =
+          String(
+            department.email ?? ""
+          ).toLowerCase();
+
+        const contact =
+          String(
+            department.contact ?? ""
+          ).toLowerCase();
+
+        const description =
+          String(
+            department.description ?? ""
+          ).toLowerCase();
+
+        return (
+          departmentId.includes(keyword) ||
+          name.includes(keyword) ||
+          email.includes(keyword) ||
+          contact.includes(keyword) ||
+          description.includes(keyword)
+        );
+
+      }
+    );
+
+  }, [departments, search]);
+
+  /* ==========================================================
+     PAGINATION
+  ========================================================== */
 
   const totalPages = Math.ceil(
-    filteredDepartments.length / rowsPerPage
+    filteredDepartments.length /
+    rowsPerPage
   );
 
-  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfLastRow =
+    currentPage * rowsPerPage;
 
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const indexOfFirstRow =
+    indexOfLastRow - rowsPerPage;
 
-  const currentDepartments = filteredDepartments.slice(
-    indexOfFirstRow,
-    indexOfLastRow
-  );
+  const currentDepartments =
+    filteredDepartments.slice(
+      indexOfFirstRow,
+      indexOfLastRow
+    );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+
+    if (
+      pageNumber < 1 ||
+      pageNumber > totalPages
+    ) {
+      return;
+    }
+
+    setCurrentPage(pageNumber);
+
+  };
 
   const nextPage = () => {
+
     if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
+
+      setCurrentPage(
+        (prev) => prev + 1
+      );
+
     }
+
   };
 
   const previousPage = () => {
+
     if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
+
+      setCurrentPage(
+        (prev) => prev - 1
+      );
+
     }
+
   };
 
   /* ==========================================================
-      FORM INPUT
+     SUMMARY
   ========================================================== */
 
-  const handleChange = (e) => {
+  const totalDepartments =
+    departments.length;
 
-    const { name, value } = e.target;
+  const activeDepartments =
+    departments.filter(
+      (department) =>
+        department.isActive === true
+    ).length;
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-  };
+  const inactiveDepartments =
+    departments.filter(
+      (department) =>
+        department.isActive === false
+    ).length;
 
   /* ==========================================================
-      OPEN ADD MODAL
+     OPEN ADD MODAL
   ========================================================== */
 
   const openAddModal = () => {
 
-    setFormData({
-      id: `D00${departments.length + 1}`,
+    setAddFormData({
       name: "",
       email: "",
       contact: "",
+      description: "",
+      address: "",
+      password: "",
+      confirmPassword: "",
     });
 
     setShowAddModal(true);
@@ -187,182 +328,704 @@ function DepartmentManagement() {
   };
 
   /* ==========================================================
-      OPEN EDIT MODAL
+     ADD FORM CHANGE
+  ========================================================== */
+
+  const handleAddChange = (e) => {
+
+    const {
+      name,
+      value,
+    } = e.target;
+
+    setAddFormData(
+      (prev) => ({
+        ...prev,
+        [name]: value,
+      })
+    );
+
+  };
+
+  /* ==========================================================
+     ADD DEPARTMENT
+  ========================================================== */
+
+  const addDepartment = async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+      setError("");
+
+      const token = getToken();
+
+      if (!token) {
+        throw new Error(
+          "JWT token not found. Please login again."
+        );
+      }
+
+      if (
+        addFormData.password !==
+        addFormData.confirmPassword
+      ) {
+
+        alert(
+          "Password and Confirm Password do not match."
+        );
+
+        return;
+
+      }
+
+      const response = await fetch(
+        `${API_URL}/api/departments`,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+
+            name:
+              addFormData.name,
+
+            email:
+              addFormData.email,
+
+            contact:
+              addFormData.contact,
+
+            description:
+              addFormData.description,
+
+            address:
+              addFormData.address,
+
+            password:
+              addFormData.password,
+
+            confirmPassword:
+              addFormData.confirmPassword,
+
+          }),
+
+        }
+      );
+
+      const responseText =
+        await response.text();
+
+      let data = {};
+
+      try {
+
+        data = responseText
+          ? JSON.parse(responseText)
+          : {};
+
+      } catch {
+
+        data = {};
+
+      }
+
+      if (!response.ok) {
+
+        console.error(
+          "Add Department Error:",
+          response.status,
+          data
+        );
+
+        throw new Error(
+          data.message ||
+          `Failed to add department: ${response.status}`
+        );
+
+      }
+
+      console.log(
+        "Department Added:",
+        data
+      );
+
+      alert(
+        data.message ||
+        "Department added successfully."
+      );
+
+      setShowAddModal(false);
+
+      setAddFormData({
+        name: "",
+        email: "",
+        contact: "",
+        description: "",
+        address: "",
+        password: "",
+        confirmPassword: "",
+      });
+
+      await fetchDepartments();
+
+    } catch (error) {
+
+      console.error(
+        "Error adding department:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Failed to add department."
+      );
+
+    }
+
+  };
+
+  /* ==========================================================
+     OPEN EDIT MODAL
   ========================================================== */
 
   const openEditModal = (department) => {
 
-    setSelectedDepartment(department);
+    setSelectedDepartment(
+      department
+    );
 
-    setFormData(department);
+    setEditFormData({
+
+      name:
+        department.name || "",
+
+      contact:
+        department.contact || "",
+
+      description:
+        department.description || "",
+
+      address:
+        department.address || "",
+
+      profileImage:
+        null,
+
+    });
 
     setShowEditModal(true);
 
   };
 
   /* ==========================================================
-      OPEN DELETE MODAL
+     EDIT FORM CHANGE
   ========================================================== */
 
-  const openDeleteModal = (department) => {
+  const handleEditChange = (e) => {
 
-    setSelectedDepartment(department);
+    const {
+      name,
+      value,
+      type,
+      files,
+    } = e.target;
+
+    setEditFormData(
+      (prev) => ({
+        ...prev,
+
+        [name]:
+          type === "file"
+            ? files[0]
+            : value,
+      })
+    );
+
+  };
+
+  /* ==========================================================
+     UPDATE DEPARTMENT
+     
+     NEW API:
+     PUT /api/departments/update/{departmentId}
+  ========================================================== */
+
+  const updateDepartment = async (e) => {
+
+    e.preventDefault();
+
+    try {
+
+      setError("");
+
+      const token = getToken();
+
+      if (!token) {
+
+        throw new Error(
+          "JWT token not found. Please login again."
+        );
+
+      }
+
+      if (
+        !selectedDepartment ||
+        !selectedDepartment.departmentId
+      ) {
+
+        throw new Error(
+          "Department ID not found."
+        );
+
+      }
+
+      const departmentId =
+        selectedDepartment.departmentId;
+
+      console.log(
+        "Updating Department ID:",
+        departmentId
+      );
+
+      console.log(
+        "Update Data:",
+        editFormData
+      );
+
+      const response = await fetch(
+        `${API_URL}/api/departments/update/${departmentId}`,
+        {
+          method: "PUT",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+
+            name:
+              editFormData.name,
+
+            contact:
+              editFormData.contact,
+
+            description:
+              editFormData.description,
+
+            address:
+              editFormData.address,
+
+            profileImage:
+              null,
+
+          }),
+
+        }
+      );
+
+      const responseText =
+        await response.text();
+
+      console.log(
+        "Update Department Status:",
+        response.status
+      );
+
+      console.log(
+        "Update Department Response:",
+        responseText
+      );
+
+      let data = {};
+
+      try {
+
+        data = responseText
+          ? JSON.parse(responseText)
+          : {};
+
+      } catch {
+
+        data = {};
+
+      }
+
+      if (!response.ok) {
+
+        console.error(
+          "Update Department Error:",
+          response.status,
+          data
+        );
+
+        throw new Error(
+          data.message ||
+          `Failed to update department: ${response.status}`
+        );
+
+      }
+
+      console.log(
+        "Department Updated Successfully:",
+        data
+      );
+
+      alert(
+        data.message ||
+        "Department updated successfully."
+      );
+
+      setShowEditModal(false);
+
+      setSelectedDepartment(null);
+
+      setEditFormData({
+        name: "",
+        contact: "",
+        description: "",
+        address: "",
+        profileImage: null,
+      });
+
+      await fetchDepartments();
+
+    } catch (error) {
+
+      console.error(
+        "Error updating department:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Failed to update department."
+      );
+
+    }
+
+  };
+
+  /* ==========================================================
+     OPEN DELETE MODAL
+  ========================================================== */
+
+  const openDeleteModal = (
+    department
+  ) => {
+
+    setSelectedDepartment(
+      department
+    );
 
     setShowDeleteModal(true);
 
   };
-  const addDepartment = (e) => {
-    e.preventDefault();
 
-    const newDepartment = {
-      ...formData,
-      createdOn: new Date().toLocaleDateString("en-GB", {
+  /* ==========================================================
+     DELETE DEPARTMENT
+  ========================================================== */
+
+  const deleteDepartment = async () => {
+
+    if (!selectedDepartment) {
+      return;
+    }
+
+    try {
+
+      setError("");
+
+      const token = getToken();
+
+      if (!token) {
+
+        throw new Error(
+          "JWT token not found. Please login again."
+        );
+
+      }
+
+      const departmentId =
+        selectedDepartment.departmentId;
+
+      const response = await fetch(
+        `${API_URL}/api/departments/${departmentId}`,
+        {
+          method: "DELETE",
+
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+
+        }
+      );
+
+      const responseText =
+        await response.text();
+
+      let data = {};
+
+      try {
+
+        data = responseText
+          ? JSON.parse(responseText)
+          : {};
+
+      } catch {
+
+        data = {};
+
+      }
+
+      if (!response.ok) {
+
+        console.error(
+          "Delete Department Error:",
+          response.status,
+          data
+        );
+
+        throw new Error(
+          data.message ||
+          `Failed to delete department: ${response.status}`
+        );
+
+      }
+
+      console.log(
+        "Department Deleted:",
+        data
+      );
+
+      alert(
+        data.message ||
+        "Department deleted successfully."
+      );
+
+      setShowDeleteModal(false);
+
+      setSelectedDepartment(null);
+
+      await fetchDepartments();
+
+    } catch (error) {
+
+      console.error(
+        "Error deleting department:",
+        error
+      );
+
+      alert(
+        error.message ||
+        "Failed to delete department."
+      );
+
+    }
+
+  };
+
+  /* ==========================================================
+     FORMAT DATE
+  ========================================================== */
+
+  const formatDate = (date) => {
+
+    if (!date) {
+      return "-";
+    }
+
+    return new Date(
+      date
+    ).toLocaleDateString(
+      "en-IN",
+      {
         day: "2-digit",
         month: "short",
         year: "numeric",
-      }),
-    };
+      }
+    );
 
-    setDepartments([...departments, newDepartment]);
-
-    setShowAddModal(false);
-
-    setFormData({
-      id: "",
-      name: "",
-      email: "",
-      contact: "",
-
-    });
   };
 
   /* ==========================================================
-      UPDATE DEPARTMENT
+     JSX
   ========================================================== */
-
-  const updateDepartment = (e) => {
-    e.preventDefault();
-
-    const updatedDepartments = departments.map((department) =>
-      department.id === selectedDepartment.id
-        ? {
-            ...department,
-            ...formData,
-          }
-        : department
-    );
-
-    setDepartments(updatedDepartments);
-
-    setShowEditModal(false);
-
-    setSelectedDepartment(null);
-  };
-
-  /* ==========================================================
-      DELETE DEPARTMENT
-  ========================================================== */
-
-  const deleteDepartment = () => {
-    const updatedDepartments = departments.filter(
-      (department) => department.id !== selectedDepartment.id
-    );
-
-    setDepartments(updatedDepartments);
-
-    setShowDeleteModal(false);
-
-    setSelectedDepartment(null);
-  };
 
   return (
+
     <div className="user-page">
+
+      {/* ======================================================
+          PAGE HEADER
+      ====================================================== */}
 
       <div className="page-header">
 
         <div>
-          <h1>Department Management</h1>
-          <p>
-            Manage all departments, update department information,
-            and monitor their current status.
-          </p>
-        </div>
 
-       
+          <h1>
+            Department Management
+          </h1>
+
+          <p>
+            Manage all departments and
+            update department information.
+          </p>
+
+        </div>
 
       </div>
 
-      {/* ==========================================================
-            SUMMARY CARDS
-      ========================================================== */}
+      {/* ======================================================
+          SUMMARY
+      ====================================================== */}
 
       <div className="user-summary">
 
         <div className="summary-card">
-          <span>Total Departments</span>
-          <h3>{totalDepartments}</h3>
+
+          <span>
+            Total Departments
+          </span>
+
+          <h3>
+            {totalDepartments}
+          </h3>
+
         </div>
 
         <div className="summary-card">
-          <span>Active Departments</span>
-          <h3>{activeDepartments}</h3>
+
+          <span>
+            Active Departments
+          </span>
+
+          <h3>
+            {activeDepartments}
+          </h3>
+
         </div>
 
         <div className="summary-card">
-          <span>Inactive Departments</span>
-          <h3>{inactiveDepartments}</h3>
+
+          <span>
+            Inactive Departments
+          </span>
+
+          <h3>
+            {inactiveDepartments}
+          </h3>
+
         </div>
 
         <div className="summary-card">
-          <span>Pending Departments</span>
-          <h3>{pendingDepartments}</h3>
+
+          <span>
+            Registered Departments
+          </span>
+
+          <h3>
+            {departments.length}
+          </h3>
+
         </div>
 
       </div>
 
-      {/* ==========================================================
-            TOOLBAR
-      ========================================================== */}
+      {/* ======================================================
+          ERROR
+      ====================================================== */}
+
+      {error && (
+
+        <div
+          style={{
+            padding: "12px",
+            marginBottom: "15px",
+            background: "#ffe5e5",
+            color: "#c62828",
+            borderRadius: "6px",
+          }}
+        >
+
+          {error}
+
+        </div>
+
+      )}
+
+      {/* ======================================================
+          TOOLBAR
+      ====================================================== */}
 
       <div className="toolbar">
 
-  <div className="search-box">
-    <FaSearch />
+        <div className="search-box">
 
-    <input
-      type="text"
-      placeholder="Search department..."
-      value={search}
-      onChange={(e) => {
-        setSearch(e.target.value);
-        setCurrentPage(1);
-      }}
-    />
-  </div>
+          <FaSearch />
 
-  <button
-    className="add-btn"
-    onClick={openAddModal}
-  >
-    <FaPlus />
-    <span>Add Department</span>
-  </button>
+          <input
+            type="text"
+            placeholder="Search department..."
+            value={search}
+            onChange={(e) => {
 
-</div>
+              setSearch(
+                e.target.value
+              );
 
-      {/* ==========================================================
-            TABLE CARD
-      ========================================================== */}
+              setCurrentPage(1);
+
+            }}
+          />
+
+        </div>
+
+        <button
+          className="add-btn"
+          onClick={openAddModal}
+        >
+
+          <FaPlus />
+
+          <span>
+            Add Department
+          </span>
+
+        </button>
+
+      </div>
+
+      {/* ======================================================
+          TABLE
+      ====================================================== */}
 
       <div className="table-card">
 
         <div className="card-header">
 
           <div>
-            <h2>Departments</h2>
+
+            <h2>
+              Departments
+            </h2>
+
             <p>
-              Showing all registered departments in the system.
+              Showing{" "}
+              {currentDepartments.length}{" "}
+              of{" "}
+              {filteredDepartments.length}{" "}
+              departments.
             </p>
+
           </div>
 
         </div>
@@ -374,74 +1037,149 @@ function DepartmentManagement() {
             <thead>
 
               <tr>
-                <th>ID</th>
-                <th>Department</th>
-                <th>Email</th>
-                <th>Contact</th>
-                <th>Created On</th>
-                <th className="text-center">Action</th>
+
+                <th>
+                  ID
+                </th>
+
+                <th>
+                  Department
+                </th>
+
+                <th>
+                  Email
+                </th>
+
+                <th>
+                  Contact
+                </th>
+
+                <th>
+                  Created On
+                </th>
+
+                <th className="text-center">
+                  Action
+                </th>
+
               </tr>
 
             </thead>
 
             <tbody>
 
-              {currentDepartments.length > 0 ? (
+              {loading ? (
 
-                currentDepartments.map((department) => (
+                <tr>
 
-                  <tr key={department.id}>
+                  <td
+                    colSpan="6"
+                    className="empty-row"
+                  >
+                    Loading departments...
+                  </td>
 
-                    <td>{department.id}</td>
+                </tr>
 
-                    <td>{department.name}</td>
+              ) : currentDepartments.length > 0 ? (
 
-                    <td>{department.email}</td>
+                currentDepartments.map(
+                  (department) => (
 
-                    <td>{department.contact}</td>
+                    <tr
+                      key={
+                        department.departmentId
+                      }
+                    >
 
-                    
+                      <td>
+                        {
+                          department.departmentId
+                        }
+                      </td>
 
-                    <td>{department.createdOn}</td>
+                      <td>
 
-                    <td>
+                        <strong>
+                          {department.name}
+                        </strong>
 
-                      <div className="action-buttons">
+                      </td>
 
-                        <button
-                          className="edit-btn"
-                          onClick={() =>
-                            openEditModal(department)
-                          }
-                        >
-                          <FaEdit />
-                          Edit
-                        </button>
+                      <td>
+                        {
+                          department.email ||
+                          "-"
+                        }
+                      </td>
 
-                        <button
-                          className="delete-btn"
-                          onClick={() =>
-                            openDeleteModal(department)
-                          }
-                        >
-                          <FaTrash />
-                          Delete
-                        </button>
+                      <td>
+                        {
+                          department.contact ||
+                          "-"
+                        }
+                      </td>
 
-                      </div>
+                      <td>
+                        {formatDate(
+                          department.createdAt
+                        )}
+                      </td>
 
-                    </td>
+                      <td>
 
-                  </tr>
+                        <div className="action-buttons">
 
-                ))
+                          <button
+                            className="edit-btn"
+                            onClick={() =>
+                              openEditModal(
+                                department
+                              )
+                            }
+                          >
+
+                            <FaEdit />
+
+                            Edit
+
+                          </button>
+
+                          <button
+                            className="delete-btn"
+                            onClick={() =>
+                              openDeleteModal(
+                                department
+                              )
+                            }
+                          >
+
+                            <FaTrash />
+
+                            Delete
+
+                          </button>
+
+                        </div>
+
+                      </td>
+
+                    </tr>
+
+                  )
+                )
 
               ) : (
 
-                <tr className="empty-row">
+                <tr>
 
-                  <td colSpan="8">
+                  <td
+                    colSpan="6"
+                    className="empty-row"
+                  >
+
                     No department found.
+
                   </td>
 
                 </tr>
@@ -456,117 +1194,262 @@ function DepartmentManagement() {
 
       </div>
 
-      {/* ==========================================================
-            PAGINATION
-      ========================================================== */}
+      {/* ======================================================
+          PAGINATION
+      ====================================================== */}
 
-      <div className="pagination-wrapper">
+      {totalPages > 0 && (
 
-  <button
-    onClick={previousPage}
-    disabled={currentPage === 1}
-  >
-    <FaChevronLeft />
-    Previous
-  </button>
+        <div className="pagination-wrapper">
 
-  <div className="page-numbers">
+          <button
+            onClick={previousPage}
+            disabled={
+              currentPage === 1
+            }
+          >
 
-    {Array.from({ length: totalPages }, (_, index) => (
+            <FaChevronLeft />
 
-      <button
-        key={index}
-        onClick={() => paginate(index + 1)}
-        className={
-          currentPage === index + 1
-            ? "active-page"
-            : ""
-        }
-      >
-        {index + 1}
-      </button>
+            Previous
 
-    ))}
+          </button>
 
-  </div>
+          <div className="page-numbers">
 
-  <button
-    onClick={nextPage}
-    disabled={
-      currentPage === totalPages ||
-      totalPages === 0
-    }
-  >
-    Next
-    <FaChevronRight />
-  </button>
+            {Array.from(
+              {
+                length: totalPages,
+              },
+              (_, index) => (
 
-</div>
-       
-      {/* ==========================================================
-            ADD DEPARTMENT MODAL
-      ========================================================== */}
+                <button
+                  key={index}
+                  onClick={() =>
+                    paginate(
+                      index + 1
+                    )
+                  }
+                  className={
+                    currentPage ===
+                    index + 1
+                      ? "active-page"
+                      : ""
+                  }
+                >
+
+                  {index + 1}
+
+                </button>
+
+              )
+            )}
+
+          </div>
+
+          <button
+            onClick={nextPage}
+            disabled={
+              currentPage ===
+                totalPages ||
+              totalPages === 0
+            }
+          >
+
+            Next
+
+            <FaChevronRight />
+
+          </button>
+
+        </div>
+
+      )}
+
+      {/* ======================================================
+          ADD DEPARTMENT MODAL
+      ====================================================== */}
 
       {showAddModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+
+        <div
+          className="modal-overlay"
+          onClick={() =>
+            setShowAddModal(false)
+          }
+        >
+
+          <div
+            className="modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
 
             <div className="modal-header">
-              <h2>Add Department</h2>
+
+              <h2>
+                Add Department
+              </h2>
+
               <button
                 className="close-btn"
-                onClick={() => setShowAddModal(false)}
+                onClick={() =>
+                  setShowAddModal(false)
+                }
               >
                 ×
               </button>
+
             </div>
 
-            <form onSubmit={addDepartment}>
+            <form
+              onSubmit={addDepartment}
+            >
 
               <div className="form-grid">
 
                 <div className="form-group">
-                  <label>Department ID</label>
-                  <input
-                    type="text"
-                    name="id"
-                    value={formData.id}
-                    readOnly
-                  />
-                </div>
 
-                <div className="form-group">
-                  <label>Department Name</label>
+                  <label>
+                    Department Name
+                  </label>
+
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    value={
+                      addFormData.name
+                    }
+                    onChange={
+                      handleAddChange
+                    }
                     required
                   />
+
                 </div>
 
                 <div className="form-group">
-                  <label>Email</label>
+
+                  <label>
+                    Email
+                  </label>
+
                   <input
                     type="email"
                     name="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    value={
+                      addFormData.email
+                    }
+                    onChange={
+                      handleAddChange
+                    }
                     required
                   />
+
                 </div>
 
                 <div className="form-group">
-                  <label>Contact</label>
+
+                  <label>
+                    Contact
+                  </label>
+
                   <input
                     type="text"
                     name="contact"
-                    value={formData.contact}
-                    onChange={handleChange}
+                    value={
+                      addFormData.contact
+                    }
+                    onChange={
+                      handleAddChange
+                    }
+                    maxLength="10"
                     required
                   />
+
                 </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Address
+                  </label>
+
+                  <input
+                    type="text"
+                    name="address"
+                    value={
+                      addFormData.address
+                    }
+                    onChange={
+                      handleAddChange
+                    }
+                    placeholder="Ahmedabad"
+                    required
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Description
+                  </label>
+
+                  <textarea
+                    name="description"
+                    value={
+                      addFormData.description
+                    }
+                    onChange={
+                      handleAddChange
+                    }
+                    rows="3"
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="password"
+                    value={
+                      addFormData.password
+                    }
+                    onChange={
+                      handleAddChange
+                    }
+                    required
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Confirm Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={
+                      addFormData.confirmPassword
+                    }
+                    onChange={
+                      handleAddChange
+                    }
+                    required
+                  />
+
+                </div>
+
               </div>
 
               <div className="modal-footer">
@@ -574,7 +1457,9 @@ function DepartmentManagement() {
                 <button
                   type="button"
                   className="cancel-btn"
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() =>
+                    setShowAddModal(false)
+                  }
                 >
                   Cancel
                 </button>
@@ -591,82 +1476,153 @@ function DepartmentManagement() {
             </form>
 
           </div>
+
         </div>
+
       )}
 
-      {/* ==========================================================
-            EDIT MODAL
-      ========================================================== */}
+      {/* ======================================================
+          EDIT DEPARTMENT MODAL
+      ====================================================== */}
 
       {showEditModal && (
-        <div className="modal-overlay">
-          <div className="modal">
+
+        <div
+          className="modal-overlay"
+          onClick={() =>
+            setShowEditModal(false)
+          }
+        >
+
+          <div
+            className="modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
 
             <div className="modal-header">
-              <h2>Edit Department</h2>
+
+              <h2>
+                Edit Department
+              </h2>
 
               <button
                 className="close-btn"
-                onClick={() => setShowEditModal(false)}
+                onClick={() =>
+                  setShowEditModal(false)
+                }
               >
                 ×
               </button>
 
             </div>
 
-            <form onSubmit={updateDepartment}>
+            <form
+              onSubmit={
+                updateDepartment
+              }
+            >
 
               <div className="form-grid">
 
                 <div className="form-group">
-                  <label>Department Name</label>
+
+                  <label>
+                    Department Name
+                  </label>
 
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
-                    onChange={handleChange}
+                    value={
+                      editFormData.name
+                    }
+                    onChange={
+                      handleEditChange
+                    }
                     required
                   />
+
                 </div>
 
                 <div className="form-group">
-                  <label>Email</label>
 
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Contact</label>
+                  <label>
+                    Contact
+                  </label>
 
                   <input
                     type="text"
                     name="contact"
-                    value={formData.contact}
-                    onChange={handleChange}
+                    value={
+                      editFormData.contact
+                    }
+                    onChange={
+                      handleEditChange
+                    }
+                    maxLength="10"
                     required
                   />
+
                 </div>
 
                 <div className="form-group">
-                  <label>Department Head</label>
+
+                  <label>
+                    Address
+                  </label>
 
                   <input
                     type="text"
-                    name="head"
-                    value={formData.head}
-                    onChange={handleChange}
+                    name="address"
+                    value={
+                      editFormData.address
+                    }
+                    onChange={
+                      handleEditChange
+                    }
+                    
                     required
                   />
+
                 </div>
 
-                
+                <div className="form-group">
+
+                  <label>
+                    Description
+                  </label>
+
+                  <textarea
+                    name="description"
+                    value={
+                      editFormData.description
+                    }
+                    onChange={
+                      handleEditChange
+                    }
+                    rows="4"
+                  />
+
+                </div>
+
+                <div className="form-group">
+
+                  <label>
+                    Profile Image
+                  </label>
+
+                  <input
+                    type="file"
+                    name="profileImage"
+                    accept="image/*"
+                    onChange={
+                      handleEditChange
+                    }
+                  />
+
+                </div>
 
               </div>
 
@@ -675,7 +1631,9 @@ function DepartmentManagement() {
                 <button
                   type="button"
                   className="cancel-btn"
-                  onClick={() => setShowEditModal(false)}
+                  onClick={() =>
+                    setShowEditModal(false)
+                  }
                 >
                   Cancel
                 </button>
@@ -692,37 +1650,65 @@ function DepartmentManagement() {
             </form>
 
           </div>
+
         </div>
+
       )}
 
-      {/* ==========================================================
-            DELETE MODAL
-      ========================================================== */}
+      {/* ======================================================
+          DELETE MODAL
+      ====================================================== */}
 
       {showDeleteModal && (
-        <div className="modal-overlay">
 
-          <div className="delete-modal">
+        <div
+          className="modal-overlay"
+          onClick={() =>
+            setShowDeleteModal(false)
+          }
+        >
 
-            <h2>Delete Department</h2>
+          <div
+            className="delete-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+
+            <h2>
+              Delete Department
+            </h2>
 
             <p>
-              Are you sure you want to delete
-              <strong> {selectedDepartment?.name}</strong> ?
+
+              Are you sure you want to
+              delete
+
+              <strong>
+                {" "}
+                {selectedDepartment?.name}
+              </strong>
+
+              ?
+
             </p>
 
             <div className="delete-actions">
 
               <button
                 className="cancel-btn"
-                onClick={() => setShowDeleteModal(false)}
+                onClick={() =>
+                  setShowDeleteModal(false)
+                }
               >
                 Cancel
               </button>
 
               <button
                 className="delete-confirm-btn"
-                onClick={deleteDepartment}
+                onClick={
+                  deleteDepartment
+                }
               >
                 Delete
               </button>
@@ -732,11 +1718,13 @@ function DepartmentManagement() {
           </div>
 
         </div>
+
       )}
+
     </div>
+
   );
+
 }
 
 export default DepartmentManagement;
-
-

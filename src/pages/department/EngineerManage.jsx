@@ -1,167 +1,177 @@
-// import "../engineer/ComplaintsHistory.css";
-import "../department/EngineerManage.css"
-import { useMemo, useState } from "react";
+import "../department/EngineerManage.css";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   FaSearch,
-  // FaPlus,
   FaChevronLeft,
   FaChevronRight,
-  FaTimes,
 } from "react-icons/fa";
 
 function DepartmentManagement() {
-  /* ==========================================================
-     DUMMY ENGINEER DATA
-  ========================================================== */
-
-  const [engineers, setEngineers] = useState([
-    {
-      id: "ENG-1001",
-      firstName: "Amit",
-      lastName: "Patel",
-      email: "amit@gmail.com",
-      mobile: "9876543210",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1002",
-      firstName: "Jay",
-      lastName: "Mehta",
-      email: "jay@gmail.com",
-      mobile: "9876543211",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1003",
-      firstName: "Priya",
-      lastName: "Shah",
-      email: "priya@gmail.com",
-      mobile: "9876543212",
-      department: "Water Department",
-      status: "Inactive",
-    },
-
-    {
-      id: "ENG-1004",
-      firstName: "Rakesh",
-      lastName: "Patel",
-      email: "rakesh@gmail.com",
-      mobile: "9876543213",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1005",
-      firstName: "Hardik",
-      lastName: "Shah",
-      email: "hardik@gmail.com",
-      mobile: "9876543214",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1006",
-      firstName: "Nilesh",
-      lastName: "Patel",
-      email: "nilesh@gmail.com",
-      mobile: "9876543215",
-      department: "Water Department",
-      status: "Inactive",
-    },
-
-    {
-      id: "ENG-1007",
-      firstName: "Vikas",
-      lastName: "Mehta",
-      email: "vikas@gmail.com",
-      mobile: "9876543216",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1008",
-      firstName: "Raj",
-      lastName: "Shah",
-      email: "raj@gmail.com",
-      mobile: "9876543217",
-      department: "Water Department",
-      status: "Active",
-    },
-
-    {
-      id: "ENG-1009",
-      firstName: "Kunal",
-      lastName: "Patel",
-      email: "kunal@gmail.com",
-      mobile: "9876543218",
-      department: "Water Department",
-      status: "Inactive",
-    },
-
-    {
-      id: "ENG-1010",
-      firstName: "Sanjay",
-      lastName: "Joshi",
-      email: "sanjay@gmail.com",
-      mobile: "9876543219",
-      department: "Water Department",
-      status: "Active",
-    },
-  ]);
 
   /* ==========================================================
      STATES
   ========================================================== */
 
-  const [search, setSearch] = useState("");
+  const [engineers, setEngineers] = useState([]);
 
-  const [showModal, setShowModal] = useState(false);
+  const [search, setSearch] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
   const engineersPerPage = 5;
 
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-    branch: "",
-    qualification: "",
-    otherQualification: "",
-    experience: "",
-    department: "Water Department",
-    status: "Active",
-    photo: null,
-    degree: null,
-    experienceCertificate: null
-  });
+
+  /* ==========================================================
+     GET ENGINEERS OF LOGGED-IN DEPARTMENT
+  ========================================================== */
+
+  useEffect(() => {
+
+    const fetchEngineers = async () => {
+
+      try {
+
+        setLoading(true);
+        setError("");
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setError("Authentication token not found. Please login again.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(
+          "http://localhost:8085/api/department/engineers",
+          {
+            method: "GET",
+
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+
+          if (response.status === 401) {
+            throw new Error("Unauthorized. Please login again.");
+          }
+
+          if (response.status === 403) {
+            throw new Error(
+              "You do not have permission to view engineers."
+            );
+          }
+
+          throw new Error("Failed to load engineers.");
+        }
+
+        const data = await response.json();
+
+        /*
+         * Backend returns:
+         *
+         * {
+         *   content: [...]
+         * }
+         */
+
+        const engineerList = data.content || [];
+
+        setEngineers(engineerList);
+
+      } catch (err) {
+
+        console.error("Error loading engineers:", err);
+
+        setError(
+          err.message ||
+          "Unable to load engineers."
+        );
+
+        setEngineers([]);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchEngineers();
+
+  }, []);
+
 
   /* ==========================================================
      SEARCH
   ========================================================== */
 
   const filteredEngineers = useMemo(() => {
+
+    const keyword = search.toLowerCase().trim();
+
+    if (!keyword) {
+      return engineers;
+    }
+
     return engineers.filter((item) => {
-      const keyword = search.toLowerCase();
+
+      const engineerId =
+        String(item.engineerId || "").toLowerCase();
+
+      const userId =
+        String(item.userId || "").toLowerCase();
+
+      const firstName =
+        String(item.firstName || "").toLowerCase();
+
+      const lastName =
+        String(item.lastName || "").toLowerCase();
+
+      const email =
+        String(item.email || "").toLowerCase();
+
+      const contact =
+        String(item.contact || "").toLowerCase();
+
+      const department =
+        String(item.department || "").toLowerCase();
 
       return (
-        item.id.toLowerCase().includes(keyword) ||
-        item.firstName.toLowerCase().includes(keyword) ||
-        item.lastName.toLowerCase().includes(keyword) ||
-        item.email.toLowerCase().includes(keyword) ||
-        item.mobile.includes(keyword)
+        engineerId.includes(keyword) ||
+        userId.includes(keyword) ||
+        firstName.includes(keyword) ||
+        lastName.includes(keyword) ||
+        email.includes(keyword) ||
+        contact.includes(keyword) ||
+        department.includes(keyword)
       );
+
     });
-  }, [engineers,search]);
+
+  }, [engineers, search]);
+
+
+  /* ==========================================================
+     RESET PAGE WHEN SEARCH CHANGES
+  ========================================================== */
+
+  useEffect(() => {
+
+    setCurrentPage(1);
+
+  }, [search]);
+
 
   /* ==========================================================
      PAGINATION
@@ -183,109 +193,47 @@ function DepartmentManagement() {
       indexOfLastEngineer
     );
 
-  const nextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const previousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
 
   /* ==========================================================
-     INPUT CHANGE
+     NEXT PAGE
   ========================================================== */
 
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "file" ? files[0] : value
-    });
+  const nextPage = () => {
+
+    if (currentPage < totalPages) {
+
+      setCurrentPage(
+        (prev) => prev + 1
+      );
+
+    }
+
   };
 
-  const toggleStatus = (id) => {
-
-  const updatedEngineers = engineers.map((engineer) => {
-
-    if (engineer.id === id) {
-
-      return {
-        ...engineer,
-        status:
-          engineer.status === "Active"
-            ? "Inactive"
-            : "Active",
-      };
-
-    }
-
-    return engineer;
-
-  });
-
-  setEngineers(updatedEngineers);
-
-};
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const data = new FormData();
-
-    data.append("firstName", formData.firstName);
-    data.append("lastName", formData.lastName);
-    data.append("email", formData.email);
-    data.append("mobile", formData.mobile);
-    data.append("branch", formData.branch);
-    data.append(
-        "qualification",
-        formData.qualification === "Other"
-            ? formData.otherQualification
-            : formData.qualification
-    );
-    data.append("experience", formData.experience);
-    data.append("department", formData.department);
-    data.append("status", formData.status);
-
-    data.append("photo", formData.photo);
-    data.append("degree", formData.degree);
-
-    if (formData.experienceCertificate) {
-        data.append(
-            "experienceCertificate",
-            formData.experienceCertificate
-        );
-    }
-
-    console.log("Engineer Data:", formData);
-
-    setShowModal(false);
-
-    setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        mobile: "",
-        branch: "",
-        qualification: "",
-        otherQualification: "",
-        experience: "",
-        department: "Water Department",
-        status: "Active",
-        photo: null,
-        degree: null,
-        experienceCertificate: null
-    });
-};
 
   /* ==========================================================
-     JSX START
+     PREVIOUS PAGE
+  ========================================================== */
+
+  const previousPage = () => {
+
+    if (currentPage > 1) {
+
+      setCurrentPage(
+        (prev) => prev - 1
+      );
+
+    }
+
+  };
+
+
+  /* ==========================================================
+     JSX
   ========================================================== */
 
   return (
+
     <div className="assigned-page">
 
       {/* ==========================================================
@@ -296,19 +244,21 @@ function DepartmentManagement() {
 
         <div>
 
-          <h1>Engineer Management</h1>
+          <h1>
+            Engineer Management
+          </h1>
 
           <p>
-            Manage engineers assigned to your department.
-            Add new engineers and maintain their records.
+            View engineers assigned to your department.
           </p>
 
         </div>
 
       </div>
 
+
       {/* ==========================================================
-          TOOLBAR
+          SEARCH TOOLBAR
       ========================================================== */}
 
       <div className="complaint-toolbar">
@@ -323,25 +273,13 @@ function DepartmentManagement() {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setCurrentPage(1);
             }}
           />
 
         </div>
 
-        <div className="toolbar-right">
-
-          {/* <button
-            className="toolbar-btn"
-            onClick={() => setShowModal(true)}
-          >
-            <FaPlus />
-            Add Engineer
-          </button> */}
-
-        </div>
-
       </div>
+
 
       {/* ==========================================================
           ENGINEER TABLE
@@ -351,9 +289,12 @@ function DepartmentManagement() {
 
         <div className="card-header">
 
-          <h2>Engineer List</h2>
+          <h2>
+            Engineer List
+          </h2>
 
         </div>
+
 
         <div className="table-wrapper">
 
@@ -363,85 +304,152 @@ function DepartmentManagement() {
 
               <tr>
 
-                <th>Engineer ID</th>
+                <th>
+                  Engineer ID
+                </th>
 
-                <th>Name</th>
+                <th>
+                  Name
+                </th>
 
-                <th>Email</th>
+                <th>
+                  Email
+                </th>
 
-                <th>Mobile</th>
+                <th>
+                  Mobile
+                </th>
 
-                <th>Department</th>
-
-                <th>Status</th>
-
-                <th>Action</th>
+                <th>
+                  Department
+                </th>
 
               </tr>
 
             </thead>
 
+
             <tbody>
 
-              {currentEngineers.length === 0 ? (
+              {/* ==================================================
+                  LOADING
+              ================================================== */}
+
+              {loading ? (
 
                 <tr>
 
                   <td
-                    colSpan="7"
+                    colSpan="5"
                     className="empty-row"
                   >
+
+                    Loading engineers...
+
+                  </td>
+
+                </tr>
+
+              ) : error ? (
+
+                /* ==================================================
+                   ERROR
+                ================================================== */
+
+                <tr>
+
+                  <td
+                    colSpan="5"
+                    className="empty-row"
+                  >
+
+                    {error}
+
+                  </td>
+
+                </tr>
+
+              ) : currentEngineers.length === 0 ? (
+
+                /* ==================================================
+                   NO ENGINEERS
+                ================================================== */
+
+                <tr>
+
+                  <td
+                    colSpan="5"
+                    className="empty-row"
+                  >
+
                     No engineer found.
+
                   </td>
 
                 </tr>
 
               ) : (
 
+                /* ==================================================
+                   ENGINEER DATA
+                ================================================== */
+
                 currentEngineers.map((item) => (
 
-                  <tr key={item.id}>
+                  <tr
+                    key={item.engineerId}
+                  >
+
+                    {/* Engineer ID */}
 
                     <td className="complaint-id">
-                      {item.id}
+
+                      ENG-{item.engineerId}
+
                     </td>
+
+
+                    {/* Name */}
 
                     <td>
+
                       <strong>
-                        {item.firstName} {item.lastName}
+
+                        {item.firstName}{" "}
+
+                        {item.lastName}
+
                       </strong>
+
                     </td>
 
-                    <td>{item.email}</td>
 
-                    <td>{item.mobile}</td>
+                    {/* Email */}
 
-                    <td>{item.department}</td>
+                    <td>
 
-                     <td>
-        <span
-            className={`status ${item.status
-                .toLowerCase()
-                .replace(/\s/g, "-")}`}
-        >
-            {item.status}
-        </span>
-    </td>
+                      {item.email}
 
-   <td>
-  <button
-    className={
-      item.status === "Active"
-        ? "deactivate-btn"
-        : "activate-btn"
-    }
-    onClick={() => toggleStatus(item.id)}
-  >
-    {item.status === "Active"
-      ? "Deactivate"
-      : "Activate"}
-  </button>
-</td>
+                    </td>
+
+
+                    {/* Mobile */}
+
+                    <td>
+
+                      {item.contact}
+
+                    </td>
+
+
+                    {/* Department */}
+
+                    <td>
+
+                      {item.department}
+
+                    </td>
+
                   </tr>
 
                 ))
@@ -455,302 +463,7 @@ function DepartmentManagement() {
         </div>
 
       </div>
-            {/* ==========================================================
-          ADD ENGINEER MODAL
-      ========================================================== */}
 
-      {showModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            className="engineer-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* ======================================================
-                MODAL HEADER
-            ====================================================== */}
-
-            <div className="modal-header">
-              <h2>Add Engineer</h2>
-
-              <button
-                className="close-btn"
-                onClick={() => setShowModal(false)}
-              >
-                <FaTimes />
-              </button>
-            </div>
-
-            {/* ======================================================
-                MODAL BODY
-            ====================================================== */}
-
-            <form
-              className="engineer-form"
-              onSubmit={handleSubmit}
-            >
-              <div className="form-grid">
-
-    {/* First Name */}
-    <div className="form-group">
-        <label>First Name</label>
-
-        <input
-            type="text"
-            name="firstName"
-            placeholder="Enter First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-        />
-    </div>
-
-    {/* Last Name */}
-    <div className="form-group">
-        <label>Last Name</label>
-
-        <input
-            type="text"
-            name="lastName"
-            placeholder="Enter Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-        />
-    </div>
-
-    {/* Email */}
-    <div className="form-group">
-        <label>Email Address</label>
-
-        <input
-            type="email"
-            name="email"
-            placeholder="Enter Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            required
-        />
-    </div>
-
-    {/* Mobile */}
-    <div className="form-group">
-        <label>Mobile Number</label>
-
-        <input
-            type="tel"
-            name="mobile"
-            placeholder="Enter Mobile Number"
-            value={formData.mobile}
-            onChange={handleChange}
-            maxLength={10}
-            required
-        />
-    </div>
-
-    {/* Engineering Branch */}
-    <div className="form-group">
-        <label>Engineering Branch</label>
-
-        <select
-            name="branch"
-            value={formData.branch}
-            onChange={handleChange}
-            required
-        >
-            <option value="">
-                Select Branch
-            </option>
-
-            <option value="Civil Engineering">
-                Civil Engineering
-            </option>
-
-            <option value="Mechanical Engineering">
-                Mechanical Engineering
-            </option>
-
-            <option value="Electrical Engineering">
-                Electrical Engineering
-            </option>
-
-            <option value="Computer Engineering">
-                Computer Engineering
-            </option>
-
-            <option value="Environmental Engineering">
-                Environmental Engineering
-            </option>
-        </select>
-    </div>
-
-    {/* Highest Qualification */}
-    <div className="form-group">
-        <label>Highest Qualification</label>
-
-        <select
-            name="qualification"
-            value={formData.qualification}
-            onChange={handleChange}
-            required
-        >
-            <option value="">
-                Select Qualification
-            </option>
-
-            <option value="B.E.">
-                B.E.
-            </option>
-
-            <option value="B.Tech">
-                B.Tech
-            </option>
-
-            <option value="M.E.">
-                M.E.
-            </option>
-
-            <option value="M.Tech">
-                M.Tech
-            </option>
-
-            <option value="Diploma">
-                Diploma in Engineering
-            </option>
-
-            <option value="Ph.D.">
-                Ph.D.
-            </option>
-
-            <option value="Other">
-                Other
-            </option>
-        </select>
-
-        {formData.qualification === "Other" && (
-            <input
-                type="text"
-                name="otherQualification"
-                placeholder="Enter Qualification"
-                value={formData.otherQualification}
-                onChange={handleChange}
-                required
-            />
-        )}
-    </div>
-
-    {/* Experience */}
-    <div className="form-group">
-        <label>Experience (Years)</label>
-
-        <input
-            type="number"
-            name="experience"
-            placeholder="Enter Experience"
-            value={formData.experience}
-            onChange={handleChange}
-            min="0"
-        />
-    </div>
-
-    {/* Department */}
-    <div className="form-group">
-        <label>Department</label>
-
-        <input
-            type="text"
-            name="department"
-            value={formData.department}
-            readOnly
-        />
-    </div>
-
-    {/* Status */}
-    <div className="form-group">
-        <label>Status</label>
-
-        <select
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-        >
-            <option value="Active">
-                Active
-            </option>
-
-            <option value="Inactive">
-                Inactive
-            </option>
-        </select>
-    </div>
-
-    {/* Photo */}
-    <div className="form-group">
-        <label>Passport Size Photo</label>
-
-        <input
-            type="file"
-            name="photo"
-            onChange={handleChange}
-            accept="image/*"
-            required
-        />
-    </div>
-
-    {/* Degree Certificate */}
-    <div className="form-group">
-        <label>Degree Certificate</label>
-
-        <input
-            type="file"
-            name="degree"
-            onChange={handleChange}
-            accept=".pdf,.jpg,.jpeg,.png"
-            required
-        />
-    </div>
-
-    {/* Experience Certificate */}
-    <div className="form-group ">
-        <label>Experience Certificate (Optional)</label>
-
-        <input
-            type="file"
-            name="experienceCertificate"
-            onChange={handleChange}
-            accept=".pdf,.jpg,.jpeg,.png"
-        />
-    </div>
-
-</div>
-              {/* ======================================================
-                  BUTTONS
-              ====================================================== */}
-
-              <div className="modal-actions">
-
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="save-btn"
-                >
-                  Add Engineer
-                </button>
-
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* ==========================================================
           PAGINATION
@@ -760,42 +473,64 @@ function DepartmentManagement() {
 
         <div className="pagination-wrapper">
 
+          {/* Previous */}
+
           <button
             onClick={previousPage}
             disabled={currentPage === 1}
           >
+
             <FaChevronLeft />
+
             Previous
+
           </button>
+
+
+          {/* Page Numbers */}
 
           <div className="page-numbers">
 
-            {[...Array(totalPages)].map((_, index) => (
+            {[...Array(totalPages)].map(
+              (_, index) => (
 
-              <button
-                key={index}
-                className={
-                  currentPage === index + 1
-                    ? "active-page"
-                    : ""
-                }
-                onClick={() =>
-                  setCurrentPage(index + 1)
-                }
-              >
-                {index + 1}
-              </button>
+                <button
+                  key={index}
+                  className={
+                    currentPage === index + 1
+                      ? "active-page"
+                      : ""
+                  }
+                  onClick={() =>
+                    setCurrentPage(
+                      index + 1
+                    )
+                  }
+                >
 
-            ))}
+                  {index + 1}
+
+                </button>
+
+              )
+            )}
 
           </div>
 
+
+          {/* Next */}
+
           <button
             onClick={nextPage}
-            disabled={currentPage === totalPages}
+            disabled={
+              currentPage === totalPages
+            }
           >
+
             Next
+
             <FaChevronRight />
+
           </button>
 
         </div>
@@ -803,7 +538,9 @@ function DepartmentManagement() {
       )}
 
     </div>
+
   );
+
 }
 
 export default DepartmentManagement;
