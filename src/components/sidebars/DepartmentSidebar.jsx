@@ -50,7 +50,7 @@ function DepartmentSidebar() {
 
                         <li><NavLink to="/department/view-feedback"><FaComments /><span>Feedback</span></NavLink></li>
 
-                        <li><NavLink to="/department/view-enginner-request"><FaInbox /><span>Engineer Applications</span></NavLink></li>
+                        {/* <li><NavLink to="/department/view-enginner-request"><FaInbox /><span>Engineer Applications</span></NavLink></li> */}
 
                         <li><NavLink to="/department/department-report"><FaChartBar /><span>Reports</span></NavLink></li>
 

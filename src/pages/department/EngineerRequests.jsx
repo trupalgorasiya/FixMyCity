@@ -1,712 +1,1603 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import "./EngineerRequest.css";
+
 import {
-    FaSearch,
-    FaEye,
-    FaCheck,
-    FaTimes,
-    FaChevronLeft,
-    FaChevronRight,
     FaUserTie,
-    FaClock,
+    FaSearch,
     FaCheckCircle,
     FaTimesCircle,
+    FaPowerOff,
+    FaEye,
+    FaSyncAlt,
+    FaTimes,
     FaBuilding,
-    FaEnvelope,
-    FaPhone,
     FaGraduationCap,
     FaBriefcase,
-    FaFileAlt,
-    FaDownload,
+    FaPhone,
+    FaEnvelope,
+    FaMapMarkerAlt,
+    FaFileAlt
 } from "react-icons/fa";
-import "./EngineerRequests.css";
 
-const EngineerRequests = () => {
+const API_BASE_URL = "http://localhost:8085";
 
-    /* ==========================================================
-       ENGINEER APPLICATION DATA
-    ========================================================== */
+const ENGINEER_REQUEST_API =
+    `${API_BASE_URL}/api/admin/engineers/requests`;
 
-    const [applications, setApplications] = useState([
-        {
-            id: "REQ-1001",
-            engineerId: "ENG-2001",
-            firstName: "Amit",
-            lastName: "Patel",
-            email: "amit.patel@gmail.com",
-            mobile: "9876543210",
-            branch: "Civil Engineering",
-            qualification: "B.E.",
-            experience: "3",
-            department: "Road & Infrastructure Department",
-            appliedDate: "07 Aug 2026",
-            status: "Pending",
-            photo: "/FixMyCity/public/amit.jpg",
-            degree: "/FixMyCity/public/amit-degree.jpeg",
-            experienceCertificate: "/FixMyCity/public/experienceLatter.png",
-        },
-        {
-            id: "REQ-1002",
-            engineerId: "ENG-2002",
-            firstName: "Jay",
-            lastName: "Mehta",
-            email: "jay.mehta@gmail.com",
-            mobile: "9876543211",
-            branch: "Mechanical Engineering",
-            qualification: "B.Tech",
-            experience: "2",
-            department: "Water Department",
-            appliedDate: "06 Aug 2026",
-            status: "Pending",
-            photo: "jay.jpg",
-            degree: "jay-degree.pdf",
-            experienceCertificate: null,
-        },
-        {
-            id: "REQ-1003",
-            engineerId: "ENG-2003",
-            firstName: "Priya",
-            lastName: "Shah",
-            email: "priya.shah@gmail.com",
-            mobile: "9876543212",
-            branch: "Electrical Engineering",
-            qualification: "M.Tech",
-            experience: "4",
-            department: "Electricity Department",
-            appliedDate: "05 Aug 2026",
-            status: "Approved",
-            photo: "priya.jpg",
-            degree: "priya-degree.pdf",
-            experienceCertificate: "priya-experience.pdf",
-        },
-        {
-            id: "REQ-1004",
-            engineerId: "ENG-2004",
-            firstName: "Rakesh",
-            lastName: "Patel",
-            email: "rakesh.patel@gmail.com",
-            mobile: "9876543213",
-            branch: "Environmental Engineering",
-            qualification: "M.E.",
-            experience: "5",
-            department: "Environment Department",
-            appliedDate: "04 Aug 2026",
-            status: "Rejected",
-            photo: "rakesh.jpg",
-            degree: "rakesh-degree.pdf",
-            experienceCertificate: "rakesh-experience.pdf",
-            rejectionReason: "Experience certificate could not be verified.",
-        },
-        {
-            id: "REQ-1005",
-            engineerId: "ENG-2005",
-            firstName: "Hardik",
-            lastName: "Shah",
-            email: "hardik.shah@gmail.com",
-            mobile: "9876543214",
-            branch: "Computer Engineering",
-            qualification: "B.Tech",
-            experience: "1",
-            department: "IT & Smart City Department",
-            appliedDate: "03 Aug 2026",
-            status: "Pending",
-            photo: "hardik.jpg",
-            degree: "hardik-degree.pdf",
-            experienceCertificate: null,
-        },
-        {
-            id: "REQ-1006",
-            engineerId: "ENG-2006",
-            firstName: "Nilesh",
-            lastName: "Patel",
-            email: "nilesh.patel@gmail.com",
-            mobile: "9876543215",
-            branch: "Civil Engineering",
-            qualification: "Diploma",
-            experience: "6",
-            department: "Road & Infrastructure Department",
-            appliedDate: "02 Aug 2026",
-            status: "Approved",
-            photo: "nilesh.jpg",
-            degree: "nilesh-degree.pdf",
-            experienceCertificate: "nilesh-experience.pdf",
-        },
-    ]);
-
-    /* ==========================================================
-       STATES
-    ========================================================== */
-
-    const [search, setSearch] = useState("");
-    const [statusFilter, setStatusFilter] = useState("All");
-    const [departmentFilter, setDepartmentFilter] = useState("All");
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const applicationsPerPage = 5;
-
-    const [selectedApplication, setSelectedApplication] = useState(null);
-    const [showReviewModal, setShowReviewModal] = useState(false);
-
-    const [showRejectModal, setShowRejectModal] = useState(false);
-    const [rejectionReason, setRejectionReason] = useState("");
-
-    /* ==========================================================
-       STATISTICS
-    ========================================================== */
-
-    const totalApplications = applications.length;
-
-    const pendingApplications = applications.filter(
-        (item) => item.status === "Pending"
-    ).length;
-
-    const approvedApplications = applications.filter(
-        (item) => item.status === "Approved"
-    ).length;
-
-    const rejectedApplications = applications.filter(
-        (item) => item.status === "Rejected"
-    ).length;
-
-    /* ==========================================================
-       DEPARTMENT LIST
-    ========================================================== */
-
-    const departments = [
-        ...new Set(applications.map((item) => item.department)),
-    ];
-
-    /* ==========================================================
-       FILTER APPLICATIONS
-    ========================================================== */
-
-    const filteredApplications = useMemo(() => {
-
-        const keyword = search.toLowerCase();
-
-        return applications.filter((item) => {
-
-            const matchesSearch =
-                item.id.toLowerCase().includes(keyword) ||
-                item.engineerId.toLowerCase().includes(keyword) ||
-                `${item.firstName} ${item.lastName}`
-                    .toLowerCase()
-                    .includes(keyword) ||
-                item.email.toLowerCase().includes(keyword) ||
-                item.mobile.includes(keyword);
-
-            const matchesStatus =
-                statusFilter === "All" ||
-                item.status === statusFilter;
-
-            const matchesDepartment =
-                departmentFilter === "All" ||
-                item.department === departmentFilter;
-
-            return (
-                matchesSearch &&
-                matchesStatus &&
-                matchesDepartment
-            );
-        });
-
-    }, [
-        applications,
-        search,
-        statusFilter,
-        departmentFilter,
-    ]);
-
-    /* ==========================================================
-       PAGINATION
-    ========================================================== */
-
-    const totalPages = Math.ceil(
-        filteredApplications.length / applicationsPerPage
+const getToken = () => {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("jwt") ||
+        ""
     );
+};
 
-    const indexOfLastApplication =
-        currentPage * applicationsPerPage;
+const formatDate = (date) => {
+    if (!date) {
+        return "Not Available";
+    }
 
-    const indexOfFirstApplication =
-        indexOfLastApplication - applicationsPerPage;
+    try {
+        return new Date(date).toLocaleDateString("en-IN");
+    } catch {
+        return date;
+    }
+};
 
-    const currentApplications =
-        filteredApplications.slice(
-            indexOfFirstApplication,
-            indexOfLastApplication
+const getFullName = (engineer) => {
+    const firstName =
+        engineer.firstName ||
+        engineer.user?.firstName ||
+        "";
+
+    const lastName =
+        engineer.lastName ||
+        engineer.user?.lastName ||
+        "";
+
+    const fullName =
+        `${firstName} ${lastName}`.trim();
+
+    return fullName || "Unknown Engineer";
+};
+
+const getDepartmentName = (engineer) => {
+    return (
+        engineer.department ||
+        engineer.departmentName ||
+        engineer.department?.name ||
+        engineer.department?.departmentName ||
+        engineer.user?.department ||
+        "Unknown Department"
+    );
+};
+
+const getEngineerId = (engineer) => {
+    return (
+        engineer.engineerId ||
+        engineer.id ||
+        engineer.user?.engineerId ||
+        null
+    );
+};
+
+const getUserId = (engineer) => {
+    return (
+        engineer.userId ||
+        engineer.user?.userId ||
+        null
+    );
+};
+
+const getActiveStatus = (engineer) => {
+    if (
+        engineer.isActive !== undefined &&
+        engineer.isActive !== null
+    ) {
+        return Boolean(engineer.isActive);
+    }
+
+    if (
+        engineer.user?.isActive !== undefined &&
+        engineer.user?.isActive !== null
+    ) {
+        return Boolean(engineer.user.isActive);
+    }
+
+    return false;
+};
+
+const getRejectedStatus = (engineer) => {
+    if (
+        engineer.isRejected !== undefined &&
+        engineer.isRejected !== null
+    ) {
+        return Boolean(engineer.isRejected);
+    }
+
+    return false;
+};
+
+function EngineerRequest() {
+
+    const [engineers, setEngineers] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(false);
+
+    const [searchTerm, setSearchTerm] =
+        useState("");
+
+    const [statusFilter, setStatusFilter] =
+        useState("ALL");
+
+    const [selectedEngineer, setSelectedEngineer] =
+        useState(null);
+
+    const [showDetails, setShowDetails] =
+        useState(false);
+
+    const [showRejectModal, setShowRejectModal] =
+        useState(false);
+
+    const [rejectReason, setRejectReason] =
+        useState("");
+
+    const [processingId, setProcessingId] =
+        useState(null);
+
+
+    /*
+    ==========================================================
+    LOAD ENGINEER REQUESTS
+    ==========================================================
+    */
+
+    useEffect(() => {
+        loadEngineerRequests();
+    }, []);
+
+
+    const loadEngineerRequests = async () => {
+
+        try {
+
+            setLoading(true);
+
+            const token = getToken();
+
+            if (!token) {
+                alert(
+                    "You are not logged in. Please login again."
+                );
+                return;
+            }
+
+            const response =
+                await fetch(
+                    ENGINEER_REQUEST_API,
+                    {
+                        method: "GET",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+
+                            "Content-Type":
+                                "application/json"
+                        }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const contentType =
+                    response.headers.get(
+                        "content-type"
+                    ) || "";
+
+                let message =
+                    "Unable to load engineer requests.";
+
+                try {
+
+                    if (
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        const error =
+                            await response.json();
+
+                        message =
+                            error.message ||
+                            error.error ||
+                            message;
+
+                    } else {
+
+                        const text =
+                            await response.text();
+
+                        if (text) {
+                            message = text;
+                        }
+
+                    }
+
+                } catch {
+                    // Ignore parsing error
+                }
+
+                throw new Error(message);
+            }
+
+
+            const data =
+                await response.json();
+
+
+            /*
+             * Backend may return:
+             *
+             * [
+             *   {...},
+             *   {...}
+             * ]
+             *
+             * OR
+             *
+             * {
+             *   content: [...]
+             * }
+             */
+
+            let requestList = [];
+
+            if (Array.isArray(data)) {
+
+                requestList = data;
+
+            } else if (
+                data &&
+                Array.isArray(data.content)
+            ) {
+
+                requestList =
+                    data.content;
+
+            } else if (
+                data &&
+                Array.isArray(data.engineers)
+            ) {
+
+                requestList =
+                    data.engineers;
+
+            } else if (
+                data &&
+                Array.isArray(data.data)
+            ) {
+
+                requestList =
+                    data.data;
+
+            }
+
+
+            setEngineers(requestList);
+
+
+        } catch (error) {
+
+            console.error(
+                "Engineer Request Error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Unable to load engineer requests."
+            );
+
+        } finally {
+
+            setLoading(false);
+        }
+    };
+
+
+    /*
+    ==========================================================
+    SEARCH + FILTER
+    ==========================================================
+    */
+
+    const filteredEngineers =
+        useMemo(() => {
+
+            return engineers.filter(
+                engineer => {
+
+                    const search =
+                        searchTerm
+                            .toLowerCase()
+                            .trim();
+
+                    const name =
+                        getFullName(
+                            engineer
+                        ).toLowerCase();
+
+                    const email =
+                        (
+                            engineer.email ||
+                            engineer.user?.email ||
+                            ""
+                        ).toLowerCase();
+
+                    const department =
+                        getDepartmentName(
+                            engineer
+                        ).toLowerCase();
+
+                    const contact =
+                        (
+                            engineer.contact ||
+                            engineer.user?.contact ||
+                            ""
+                        ).toLowerCase();
+
+
+                    const matchesSearch =
+                        !search ||
+                        name.includes(search) ||
+                        email.includes(search) ||
+                        department.includes(search) ||
+                        contact.includes(search);
+
+
+                    const rejected =
+                        getRejectedStatus(
+                            engineer
+                        );
+
+                    const active =
+                        getActiveStatus(
+                            engineer
+                        );
+
+
+                    let matchesStatus = true;
+
+
+                    if (
+                        statusFilter ===
+                        "PENDING"
+                    ) {
+
+                        matchesStatus =
+                            !rejected &&
+                            !active;
+
+                    } else if (
+                        statusFilter ===
+                        "ACTIVE"
+                    ) {
+
+                        matchesStatus =
+                            !rejected &&
+                            active;
+
+                    } else if (
+                        statusFilter ===
+                        "REJECTED"
+                    ) {
+
+                        matchesStatus =
+                            rejected;
+
+                    } else if (
+                        statusFilter ===
+                        "INACTIVE"
+                    ) {
+
+                        matchesStatus =
+                            !rejected &&
+                            !active;
+
+                    }
+
+
+                    return (
+                        matchesSearch &&
+                        matchesStatus
+                    );
+                }
+            );
+
+        }, [
+            engineers,
+            searchTerm,
+            statusFilter
+        ]);
+
+
+    /*
+    ==========================================================
+    SUMMARY
+    ==========================================================
+    */
+
+    const totalRequests =
+        engineers.length;
+
+    const pendingRequests =
+        engineers.filter(
+            engineer =>
+                !getRejectedStatus(
+                    engineer
+                ) &&
+                !getActiveStatus(
+                    engineer
+                )
+        ).length;
+
+    const activeEngineers =
+        engineers.filter(
+            engineer =>
+                !getRejectedStatus(
+                    engineer
+                ) &&
+                getActiveStatus(
+                    engineer
+                )
+        ).length;
+
+    const rejectedRequests =
+        engineers.filter(
+            engineer =>
+                getRejectedStatus(
+                    engineer
+                )
+        ).length;
+
+
+    /*
+    ==========================================================
+    OPEN DETAILS
+    ==========================================================
+    */
+
+    const handleViewDetails = (
+        engineer
+    ) => {
+
+        setSelectedEngineer(
+            engineer
         );
 
-    const nextPage = () => {
-
-        if (currentPage < totalPages) {
-            setCurrentPage((prev) => prev + 1);
-        }
-
+        setShowDetails(true);
     };
 
-    const previousPage = () => {
 
-        if (currentPage > 1) {
-            setCurrentPage((prev) => prev - 1);
-        }
+    /*
+    ==========================================================
+    CLOSE DETAILS
+    ==========================================================
+    */
 
+    const handleCloseDetails = () => {
+
+        setShowDetails(false);
+
+        setSelectedEngineer(null);
     };
 
-    /* ==========================================================
-       OPEN REVIEW
-    ========================================================== */
 
-    const openReview = (application) => {
+    /*
+    ==========================================================
+    ACCEPT ENGINEER
+    ==========================================================
+    */
 
-        setSelectedApplication(application);
-        setShowReviewModal(true);
+    const handleAccept = async (
+        engineer
+    ) => {
 
-    };
+        const engineerId =
+            getEngineerId(
+                engineer
+            );
 
-    /* ==========================================================
-       APPROVE APPLICATION
-    ========================================================== */
+        if (!engineerId) {
 
-    const approveApplication = () => {
+            alert(
+                "Engineer ID not found."
+            );
 
-        if (!selectedApplication) {
             return;
         }
 
-        setApplications((prev) =>
-            prev.map((application) =>
-                application.id === selectedApplication.id
-                    ? {
-                        ...application,
-                        status: "Approved",
+
+        const confirmed =
+            window.confirm(
+                `Are you sure you want to accept ${getFullName(
+                    engineer
+                )}?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            setProcessingId(
+                engineerId
+            );
+
+            const token =
+                getToken();
+
+
+            const response =
+                await fetch(
+                    `${ENGINEER_REQUEST_API}/${engineerId}/accept`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+
+                            "Content-Type":
+                                "application/json"
+                        }
                     }
-                    : application
-            )
-        );
+                );
 
-        setSelectedApplication((prev) => ({
-            ...prev,
-            status: "Approved",
-        }));
 
+            if (!response.ok) {
+
+                const contentType =
+                    response.headers.get(
+                        "content-type"
+                    ) || "";
+
+                let message =
+                    "Unable to accept engineer.";
+
+                try {
+
+                    if (
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        const data =
+                            await response.json();
+
+                        message =
+                            data.message ||
+                            data.error ||
+                            message;
+
+                    } else {
+
+                        const text =
+                            await response.text();
+
+                        if (text) {
+                            message = text;
+                        }
+
+                    }
+
+                } catch {
+                    // Ignore
+                }
+
+                throw new Error(message);
+            }
+
+
+            alert(
+                "Engineer accepted successfully."
+            );
+
+
+            await loadEngineerRequests();
+
+
+        } catch (error) {
+
+            console.error(
+                "Accept Engineer Error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Unable to accept engineer."
+            );
+
+        } finally {
+
+            setProcessingId(null);
+        }
     };
 
-    /* ==========================================================
-       OPEN REJECT MODAL
-    ========================================================== */
 
-    const openRejectModal = () => {
+    /*
+    ==========================================================
+    OPEN REJECT MODAL
+    ==========================================================
+    */
 
-        setRejectionReason("");
+    const handleOpenReject = (
+        engineer
+    ) => {
+
+        setSelectedEngineer(
+            engineer
+        );
+
+        setRejectReason("");
+
         setShowRejectModal(true);
-
     };
 
-    /* ==========================================================
-       REJECT APPLICATION
-    ========================================================== */
 
-    const rejectApplication = () => {
+    /*
+    ==========================================================
+    CLOSE REJECT MODAL
+    ==========================================================
+    */
 
-        if (!selectedApplication || !rejectionReason.trim()) {
-            return;
-        }
-
-        setApplications((prev) =>
-            prev.map((application) =>
-                application.id === selectedApplication.id
-                    ? {
-                        ...application,
-                        status: "Rejected",
-                        rejectionReason:
-                            rejectionReason.trim(),
-                    }
-                    : application
-            )
-        );
-
-        setSelectedApplication((prev) => ({
-            ...prev,
-            status: "Rejected",
-            rejectionReason:
-                rejectionReason.trim(),
-        }));
+    const handleCloseReject = () => {
 
         setShowRejectModal(false);
 
+        setSelectedEngineer(null);
+
+        setRejectReason("");
     };
 
-    /* ==========================================================
-       RESET PAGE WHEN FILTER CHANGES
-    ========================================================== */
 
-    const resetPage = () => {
-        setCurrentPage(1);
+    /*
+    ==========================================================
+    REJECT ENGINEER
+    ==========================================================
+    */
+
+    const handleReject = async () => {
+
+        if (!selectedEngineer) {
+            return;
+        }
+
+
+        if (
+            !rejectReason.trim()
+        ) {
+
+            alert(
+                "Please enter rejection reason."
+            );
+
+            return;
+        }
+
+
+        const engineerId =
+            getEngineerId(
+                selectedEngineer
+            );
+
+
+        if (!engineerId) {
+
+            alert(
+                "Engineer ID not found."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            setProcessingId(
+                engineerId
+            );
+
+
+            const token =
+                getToken();
+
+
+            const response =
+                await fetch(
+                    `${ENGINEER_REQUEST_API}/${engineerId}/reject`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+
+                            Authorization:
+                                `Bearer ${token}`,
+
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                reason:
+                                    rejectReason.trim()
+                            })
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const contentType =
+                    response.headers.get(
+                        "content-type"
+                    ) || "";
+
+                let message =
+                    "Unable to reject engineer.";
+
+                try {
+
+                    if (
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        const data =
+                            await response.json();
+
+                        message =
+                            data.message ||
+                            data.error ||
+                            message;
+
+                    } else {
+
+                        const text =
+                            await response.text();
+
+                        if (text) {
+                            message = text;
+                        }
+
+                    }
+
+                } catch {
+                    // Ignore
+                }
+
+                throw new Error(message);
+            }
+
+
+            alert(
+                "Engineer request rejected."
+            );
+
+
+            handleCloseReject();
+
+
+            await loadEngineerRequests();
+
+
+        } catch (error) {
+
+            console.error(
+                "Reject Engineer Error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Unable to reject engineer."
+            );
+
+        } finally {
+
+            setProcessingId(null);
+        }
     };
 
-    /* ==========================================================
-       JSX
-    ========================================================== */
+
+    /*
+    ==========================================================
+    ACTIVATE / DEACTIVATE ENGINEER
+    ==========================================================
+    */
+
+    const handleToggleActive = async (
+        engineer
+    ) => {
+
+        const engineerId =
+            getEngineerId(
+                engineer
+            );
+
+        if (!engineerId) {
+
+            alert(
+                "Engineer ID not found."
+            );
+
+            return;
+        }
+
+
+        const currentlyActive =
+            getActiveStatus(
+                engineer
+            );
+
+
+        const action =
+            currentlyActive
+                ? "deactivate"
+                : "activate";
+
+
+        const confirmed =
+            window.confirm(
+                `Are you sure you want to ${action} ${getFullName(
+                    engineer
+                )}?`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        try {
+
+            setProcessingId(
+                engineerId
+            );
+
+
+            const token =
+                getToken();
+
+
+            const response =
+                await fetch(
+                    `${ENGINEER_REQUEST_API}/${engineerId}/active`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+
+                            Authorization:
+                                `Bearer ${token}`,
+
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                active:
+                                    !currentlyActive
+                            })
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                const contentType =
+                    response.headers.get(
+                        "content-type"
+                    ) || "";
+
+                let message =
+                    `Unable to ${action} engineer.`;
+
+                try {
+
+                    if (
+                        contentType.includes(
+                            "application/json"
+                        )
+                    ) {
+
+                        const data =
+                            await response.json();
+
+                        message =
+                            data.message ||
+                            data.error ||
+                            message;
+
+                    } else {
+
+                        const text =
+                            await response.text();
+
+                        if (text) {
+                            message = text;
+                        }
+
+                    }
+
+                } catch {
+                    // Ignore
+                }
+
+                throw new Error(message);
+            }
+
+
+            alert(
+                currentlyActive
+                    ? "Engineer deactivated successfully."
+                    : "Engineer activated successfully."
+            );
+
+
+            await loadEngineerRequests();
+
+
+        } catch (error) {
+
+            console.error(
+                "Active Status Error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Unable to update engineer status."
+            );
+
+        } finally {
+
+            setProcessingId(null);
+        }
+    };
+
+
+    /*
+    ==========================================================
+    DOCUMENT URL
+    ==========================================================
+    */
+
+    const getDocumentUrl = (
+        path
+    ) => {
+
+        if (!path) {
+            return null;
+        }
+
+        if (
+            path.startsWith("http://") ||
+            path.startsWith("https://")
+        ) {
+            return path;
+        }
+
+        if (path.startsWith("/")) {
+            return `${API_BASE_URL}${path}`;
+        }
+
+        return `${API_BASE_URL}/${path}`;
+    };
+
+
+    /*
+    ==========================================================
+    RENDER
+    ==========================================================
+    */
 
     return (
-        <div className="engineer-request-pages">
+
+        <div className="engineer-request-page">
 
             {/* ==================================================
-                PAGE HEADER
+                HEADER
             ================================================== */}
 
-            <div className="engineer-request-header">
+            <div className="page-header">
 
-                <div className="header-content">
+                <div className="page-title-section">
 
-                    <div className="header-icon">
+                    <div className="page-title-icon">
                         <FaUserTie />
                     </div>
 
                     <div>
-                        <h1>Engineer Applications</h1>
+
+                        <h1>
+                            Engineer Requests
+                        </h1>
 
                         <p>
-                            Review engineer applications submitted
-                            for department assignment.
+                            Review, approve, reject and
+                            manage engineer registrations.
                         </p>
+
                     </div>
 
                 </div>
+
+
+                <button
+                    className="refresh-btn"
+                    onClick={
+                        loadEngineerRequests
+                    }
+                    disabled={loading}
+                >
+
+                    <FaSyncAlt />
+
+                    {loading
+                        ? "Loading..."
+                        : "Refresh"}
+
+                </button>
 
             </div>
 
+
             {/* ==================================================
-                STATISTICS
+                SUMMARY
             ================================================== */}
 
-            <div className="request-stat-grid">
+            <div className="summary-grid">
 
-                <div className="request-stat-card">
+                <div className="summary-card">
 
-                    <div className="request-stat-icon total">
+                    <div className="summary-icon">
                         <FaUserTie />
                     </div>
 
                     <div>
-                        <span>Total Applications</span>
-                        <strong>{totalApplications}</strong>
+
+                        <span>
+                            Total Requests
+                        </span>
+
+                        <strong>
+                            {totalRequests}
+                        </strong>
+
                     </div>
 
                 </div>
 
-                <div className="request-stat-card">
 
-                    <div className="request-stat-icon pending">
-                        <FaClock />
+                <div className="summary-card">
+
+                    <div className="summary-icon">
+                        <FaBriefcase />
                     </div>
 
                     <div>
-                        <span>Pending Review</span>
-                        <strong>{pendingApplications}</strong>
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <strong>
+                            {pendingRequests}
+                        </strong>
+
                     </div>
 
                 </div>
 
-                <div className="request-stat-card">
 
-                    <div className="request-stat-icon approved">
+                <div className="summary-card">
+
+                    <div className="summary-icon">
                         <FaCheckCircle />
                     </div>
 
                     <div>
-                        <span>Approved</span>
-                        <strong>{approvedApplications}</strong>
+
+                        <span>
+                            Active
+                        </span>
+
+                        <strong>
+                            {activeEngineers}
+                        </strong>
+
                     </div>
 
                 </div>
 
-                <div className="request-stat-card">
 
-                    <div className="request-stat-icon rejected">
+                <div className="summary-card">
+
+                    <div className="summary-icon">
                         <FaTimesCircle />
                     </div>
 
                     <div>
-                        <span>Rejected</span>
-                        <strong>{rejectedApplications}</strong>
+
+                        <span>
+                            Rejected
+                        </span>
+
+                        <strong>
+                            {rejectedRequests}
+                        </strong>
+
                     </div>
 
                 </div>
 
             </div>
 
+
             {/* ==================================================
-                TOOLBAR
+                FILTER CARD
             ================================================== */}
 
-            <div className="request-toolbar">
+            <div className="filter-card">
 
-                <div className="request-search">
+                <div className="search-box">
 
                     <FaSearch />
 
                     <input
                         type="text"
-                        placeholder="Search ID, name, email or mobile..."
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            resetPage();
-                        }}
+                        placeholder="Search engineer, email, contact or department..."
+                        value={
+                            searchTerm
+                        }
+                        onChange={
+                            event =>
+                                setSearchTerm(
+                                    event.target.value
+                                )
+                        }
                     />
 
                 </div>
 
-                <div className="request-filters">
 
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => {
-                            setStatusFilter(e.target.value);
-                            resetPage();
-                        }}
-                    >
-                        <option value="All">
-                            All Status
-                        </option>
+                <select
+                    value={
+                        statusFilter
+                    }
+                    onChange={
+                        event =>
+                            setStatusFilter(
+                                event.target.value
+                            )
+                    }
+                >
 
-                        <option value="Pending">
-                            Pending
-                        </option>
+                    <option value="ALL">
+                        All Requests
+                    </option>
 
-                        <option value="Approved">
-                            Approved
-                        </option>
+                    <option value="PENDING">
+                        Pending
+                    </option>
 
-                        <option value="Rejected">
-                            Rejected
-                        </option>
+                    <option value="ACTIVE">
+                        Active
+                    </option>
 
-                    </select>
+                    <option value="INACTIVE">
+                        Inactive
+                    </option>
 
-                    <select
-                        value={departmentFilter}
-                        onChange={(e) => {
-                            setDepartmentFilter(e.target.value);
-                            resetPage();
-                        }}
-                    >
+                    <option value="REJECTED">
+                        Rejected
+                    </option>
 
-                        <option value="All">
-                            All Departments
-                        </option>
-
-                        {departments.map((department) => (
-                            <option
-                                key={department}
-                                value={department}
-                            >
-                                {department}
-                            </option>
-                        ))}
-
-                    </select>
-
-                </div>
+                </select>
 
             </div>
 
+
             {/* ==================================================
-                APPLICATION TABLE
+                TABLE
             ================================================== */}
 
             <div className="request-card">
 
-                <div className="request-card-header">
+                <div className="card-header">
 
                     <div>
-                        <h2>Engineer Request List</h2>
+
+                        <h2>
+                            Engineer Registration Requests
+                        </h2>
 
                         <p>
-                            Review and manage submitted engineer
-                            applications.
+                            Review engineer information
+                            before approving the request.
                         </p>
+
                     </div>
 
-                    <span className="result-count">
-                        {filteredApplications.length} Applications
+                    <span>
+                        {filteredEngineers.length}
+                        {" "}
+                        Records
                     </span>
 
                 </div>
 
-                <div className="request-table-wrapper">
 
-                    <table className="request-table">
+                <div className="table-container">
+
+                    <table>
 
                         <thead>
 
                             <tr>
 
-                                <th>Request ID</th>
+                                <th>
+                                    Engineer
+                                </th>
 
-                                <th>Engineer</th>
+                                <th>
+                                    Contact
+                                </th>
 
-                                <th>Department</th>
+                                <th>
+                                    Department
+                                </th>
 
-                                <th>Qualification</th>
+                                <th>
+                                    Qualification
+                                </th>
 
-                                <th>Experience</th>
+                                <th>
+                                    Experience
+                                </th>
 
-                                <th>Applied Date</th>
+                                <th>
+                                    Status
+                                </th>
 
-                                <th>Status</th>
-
-                                <th>Action</th>
+                                <th>
+                                    Actions
+                                </th>
 
                             </tr>
 
                         </thead>
 
+
                         <tbody>
 
-                            {currentApplications.length === 0 ? (
+                            {
+                                loading ? (
 
-                                <tr>
+                                    <tr>
 
-                                    <td
-                                        colSpan="8"
-                                        className="request-empty"
-                                    >
-                                        No engineer applications
-                                        found.
-                                    </td>
+                                        <td
+                                            colSpan="7"
+                                            className="empty-row"
+                                        >
+                                            Loading engineer requests...
+                                        </td>
 
-                                </tr>
+                                    </tr>
 
-                            ) : (
+                                ) : filteredEngineers.length === 0 ? (
 
-                                currentApplications.map(
-                                    (application) => (
+                                    <tr>
 
-                                        <tr
-                                            key={
-                                                application.id
-                                            }
+                                        <td
+                                            colSpan="7"
+                                            className="empty-row"
                                         >
 
-                                            <td>
+                                            No engineer requests
+                                            found.
 
-                                                <span className="request-id">
-                                                    {
-                                                        application.id
-                                                    }
-                                                </span>
+                                        </td>
 
-                                            </td>
+                                    </tr>
 
-                                            <td>
+                                ) : (
 
-                                                <div className="engineer-name-cell">
+                                    filteredEngineers.map(
+                                        engineer => {
 
-                                                    <div className="engineer-avatar">
-                                                        {
-                                                            application.firstName.charAt(
-                                                                0
-                                                            )
-                                                        }
-                                                        {
-                                                            application.lastName.charAt(
-                                                                0
-                                                            )
-                                                        }
-                                                    </div>
+                                            const engineerId =
+                                                getEngineerId(
+                                                    engineer
+                                                );
 
-                                                    <div>
+                                            const rejected =
+                                                getRejectedStatus(
+                                                    engineer
+                                                );
 
-                                                        <strong>
-                                                            {
-                                                                application.firstName
-                                                            }{" "}
-                                                            {
-                                                                application.lastName
-                                                            }
-                                                        </strong>
+                                            const active =
+                                                getActiveStatus(
+                                                    engineer
+                                                );
 
-                                                        <small>
-                                                            {
-                                                                application.engineerId
-                                                            }
-                                                        </small>
+                                            return (
 
-                                                    </div>
-
-                                                </div>
-
-                                            </td>
-
-                                            <td>
-
-                                                <div className="department-cell">
-
-                                                    <FaBuilding />
-
-                                                    <span>
-                                                        {
-                                                            application.department
-                                                        }
-                                                    </span>
-
-                                                </div>
-
-                                            </td>
-
-                                            <td>
-                                                {
-                                                    application.qualification
-                                                }
-                                            </td>
-
-                                            <td>
-                                                {
-                                                    application.experience
-                                                }{" "}
-                                                Years
-                                            </td>
-
-                                            <td>
-                                                {
-                                                    application.appliedDate
-                                                }
-                                            </td>
-
-                                            <td>
-
-                                                <span
-                                                    className={`request-status ${application.status.toLowerCase()}`}
-                                                >
-                                                    {application.status}
-                                                </span>
-
-                                            </td>
-
-                                            <td>
-
-                                                <button
-                                                    className="review-btn"
-                                                    onClick={() =>
-                                                        openReview(
-                                                            application
+                                                <tr
+                                                    key={
+                                                        engineerId ||
+                                                        getUserId(
+                                                            engineer
                                                         )
                                                     }
                                                 >
-                                                    <FaEye />
-                                                    Review
-                                                </button>
 
-                                            </td>
+                                                    {/* ENGINEER */}
 
-                                        </tr>
+                                                    <td>
 
+                                                        <div className="engineer-info">
+
+                                                            <div className="engineer-avatar">
+                                                                <FaUserTie />
+                                                            </div>
+
+                                                            <div>
+
+                                                                <strong>
+                                                                    {
+                                                                        getFullName(
+                                                                            engineer
+                                                                        )
+                                                                    }
+                                                                </strong>
+
+                                                                <small>
+                                                                    {
+                                                                        engineer.email ||
+                                                                        engineer.user?.email ||
+                                                                        "No email"
+                                                                    }
+                                                                </small>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </td>
+
+
+                                                    {/* CONTACT */}
+
+                                                    <td>
+
+                                                        {
+                                                            engineer.contact ||
+                                                            engineer.user?.contact ||
+                                                            "N/A"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* DEPARTMENT */}
+
+                                                    <td>
+
+                                                        <span className="department-badge">
+
+                                                            <FaBuilding />
+
+                                                            {
+                                                                getDepartmentName(
+                                                                    engineer
+                                                                )
+                                                            }
+
+                                                        </span>
+
+                                                    </td>
+
+
+                                                    {/* QUALIFICATION */}
+
+                                                    <td>
+
+                                                        {
+                                                            engineer.highestQualification ||
+                                                            "N/A"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* EXPERIENCE */}
+
+                                                    <td>
+
+                                                        {
+                                                            engineer.experience !==
+                                                            undefined &&
+                                                            engineer.experience !==
+                                                            null
+                                                                ? `${engineer.experience} Years`
+                                                                : "N/A"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* STATUS */}
+
+                                                    <td>
+
+                                                        {
+                                                            rejected ? (
+
+                                                                <span className="status rejected">
+                                                                    <FaTimesCircle />
+                                                                    Rejected
+                                                                </span>
+
+                                                            ) : active ? (
+
+                                                                <span className="status active">
+                                                                    <FaCheckCircle />
+                                                                    Active
+                                                                </span>
+
+                                                            ) : (
+
+                                                                <span className="status pending">
+                                                                    Pending
+                                                                </span>
+
+                                                            )
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* ACTIONS */}
+
+                                                    <td>
+
+                                                        <div className="action-buttons">
+
+                                                            <button
+                                                                className="view-btn"
+                                                                title="View Details"
+                                                                onClick={() =>
+                                                                    handleViewDetails(
+                                                                        engineer
+                                                                    )
+                                                                }
+                                                            >
+
+                                                                <FaEye />
+
+                                                            </button>
+
+
+                                                            {
+                                                                !rejected &&
+                                                                !active && (
+
+                                                                    <>
+
+                                                                        <button
+                                                                            className="accept-btn"
+                                                                            title="Accept Engineer"
+                                                                            onClick={() =>
+                                                                                handleAccept(
+                                                                                    engineer
+                                                                                )
+                                                                            }
+                                                                            disabled={
+                                                                                processingId ===
+                                                                                engineerId
+                                                                            }
+                                                                        >
+
+                                                                            <FaCheckCircle />
+
+                                                                        </button>
+
+
+                                                                        <button
+                                                                            className="reject-btn"
+                                                                            title="Reject Engineer"
+                                                                            onClick={() =>
+                                                                                handleOpenReject(
+                                                                                    engineer
+                                                                                )
+                                                                            }
+                                                                            disabled={
+                                                                                processingId ===
+                                                                                engineerId
+                                                                            }
+                                                                        >
+
+                                                                            <FaTimesCircle />
+
+                                                                        </button>
+
+                                                                    </>
+
+                                                                )
+                                                            }
+
+
+                                                            {
+                                                                !rejected && (
+
+                                                                    <button
+                                                                        className={
+                                                                            active
+                                                                                ? "deactivate-btn"
+                                                                                : "activate-btn"
+                                                                        }
+                                                                        title={
+                                                                            active
+                                                                                ? "Deactivate Engineer"
+                                                                                : "Activate Engineer"
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleToggleActive(
+                                                                                engineer
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            processingId ===
+                                                                            engineerId
+                                                                        }
+                                                                    >
+
+                                                                        <FaPowerOff />
+
+                                                                    </button>
+
+                                                                )
+                                                            }
+
+                                                        </div>
+
+                                                    </td>
+
+                                                </tr>
+
+                                            );
+                                        }
                                     )
-                                )
 
-                            )}
+                                )
+                            }
 
                         </tbody>
 
@@ -716,268 +1607,125 @@ const EngineerRequests = () => {
 
             </div>
 
-            {/* ==================================================
-                PAGINATION
-            ================================================== */}
-
-            {totalPages > 1 && (
-
-                <div className="request-pagination">
-
-                    <button
-                        onClick={previousPage}
-                        disabled={currentPage === 1}
-                    >
-                        <FaChevronLeft />
-                        Previous
-                    </button>
-
-                    <div>
-
-                        {[...Array(totalPages)].map(
-                            (_, index) => (
-
-                                <button
-                                    key={index}
-                                    className={
-                                        currentPage ===
-                                        index + 1
-                                            ? "active"
-                                            : ""
-                                    }
-                                    onClick={() =>
-                                        setCurrentPage(
-                                            index + 1
-                                        )
-                                    }
-                                >
-                                    {index + 1}
-                                </button>
-
-                            )
-                        )}
-
-                    </div>
-
-                    <button
-                        onClick={nextPage}
-                        disabled={
-                            currentPage === totalPages
-                        }
-                    >
-                        Next
-                        <FaChevronRight />
-                    </button>
-
-                </div>
-
-            )}
 
             {/* ==================================================
-                REVIEW APPLICATION MODAL
+                DETAILS MODAL
             ================================================== */}
 
-            {showReviewModal &&
-                selectedApplication && (
+            {
+                showDetails &&
+                selectedEngineer && (
 
-                    <div
-                        className="review-overlay"
-                        onClick={() =>
-                            setShowReviewModal(false)
-                        }
-                    >
+                    <div className="modal-overlay">
 
-                        <div
-                            className="review-modal"
-                            onClick={(e) =>
-                                e.stopPropagation()
-                            }
-                        >
+                        <div className="engineer-modal">
 
-                            {/* MODAL HEADER */}
-
-                            <div className="review-header">
+                            <div className="modal-header">
 
                                 <div>
 
-                                    <span>
-                                        Engineer Application
-                                    </span>
-
                                     <h2>
-                                        Review Application
+                                        Engineer Details
                                     </h2>
+
+                                    <p>
+                                        Complete registration
+                                        information.
+                                    </p>
 
                                 </div>
 
+
                                 <button
-                                    className="review-close"
-                                    onClick={() =>
-                                        setShowReviewModal(
-                                            false
-                                        )
+                                    onClick={
+                                        handleCloseDetails
                                     }
                                 >
+
                                     <FaTimes />
+
                                 </button>
 
                             </div>
 
-                            {/* MODAL BODY */}
 
-                            <div className="review-body">
+                            <div className="modal-body">
 
-                                {/* APPLICATION STATUS */}
+                                {/* PERSONAL */}
 
-                                <div
-                                    className={`application-status-banner ${selectedApplication.status.toLowerCase()}`}
-                                >
+                                <div className="detail-section">
 
-                                    {selectedApplication.status ===
-                                        "Pending" && (
-                                        <>
-                                            <FaClock />
-                                            <div>
-                                                <strong>
-                                                    Application
-                                                    Pending
-                                                </strong>
-                                                <span>
-                                                    This application
-                                                    is waiting for
-                                                    admin review.
-                                                </span>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {selectedApplication.status ===
-                                        "Approved" && (
-                                        <>
-                                            <FaCheckCircle />
-                                            <div>
-                                                <strong>
-                                                    Application
-                                                    Approved
-                                                </strong>
-                                                <span>
-                                                    This engineer
-                                                    has been approved.
-                                                </span>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {selectedApplication.status ===
-                                        "Rejected" && (
-                                        <>
-                                            <FaTimesCircle />
-                                            <div>
-                                                <strong>
-                                                    Application
-                                                    Rejected
-                                                </strong>
-                                                <span>
-                                                    This engineer
-                                                    application was
-                                                    rejected.
-                                                </span>
-                                            </div>
-                                        </>
-                                    )}
-
-                                </div>
-
-                                {/* BASIC INFORMATION */}
-
-                                <div className="review-section">
-
-                                    <div className="section-title">
-
+                                    <h3>
                                         <FaUserTie />
+                                        Personal Information
+                                    </h3>
 
-                                        <div>
-                                            <h3>
-                                                Personal Information
-                                            </h3>
-
-                                            <p>
-                                                Engineer's basic
-                                                application details
-                                            </p>
-                                        </div>
-
-                                    </div>
-
-                                    <div className="profile-review">
-
-                                        <div className="profile-photo">
-
-                                            {selectedApplication.firstName.charAt(
-                                                0
-                                            )}
-                                            {selectedApplication.lastName.charAt(
-                                                0
-                                            )}
-
-                                        </div>
-
-                                        <div className="profile-name">
-
-                                            <h2>
-                                                {
-                                                    selectedApplication.firstName
-                                                }{" "}
-                                                {
-                                                    selectedApplication.lastName
-                                                }
-                                            </h2>
-
-                                            <span>
-                                                {
-                                                    selectedApplication.engineerId
-                                                }
-                                            </span>
-
-                                        </div>
-
-                                    </div>
 
                                     <div className="detail-grid">
 
-                                        <div className="detail-item">
+                                        <div>
 
-                                            <FaEnvelope />
+                                            <label>
+                                                Full Name
+                                            </label>
 
-                                            <div>
-                                                <label>
-                                                    Email Address
-                                                </label>
-
-                                                <strong>
-                                                    {
-                                                        selectedApplication.email
-                                                    }
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    getFullName(
+                                                        selectedEngineer
+                                                    )
+                                                }
+                                            </strong>
 
                                         </div>
 
-                                        <div className="detail-item">
 
-                                            <FaPhone />
+                                        <div>
 
-                                            <div>
-                                                <label>
-                                                    Mobile Number
-                                                </label>
+                                            <label>
+                                                Email
+                                            </label>
 
-                                                <strong>
-                                                    {
-                                                        selectedApplication.mobile
-                                                    }
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    selectedEngineer.email ||
+                                                    selectedEngineer.user?.email ||
+                                                    "N/A"
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label>
+                                                Contact
+                                            </label>
+
+                                            <strong>
+                                                {
+                                                    selectedEngineer.contact ||
+                                                    selectedEngineer.user?.contact ||
+                                                    "N/A"
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label>
+                                                Address
+                                            </label>
+
+                                            <strong>
+                                                {
+                                                    selectedEngineer.address ||
+                                                    "N/A"
+                                                }
+                                            </strong>
 
                                         </div>
 
@@ -985,302 +1733,333 @@ const EngineerRequests = () => {
 
                                 </div>
 
-                                {/* PROFESSIONAL INFORMATION */}
 
-                                <div className="review-section">
+                                {/* PROFESSIONAL */}
 
-                                    <div className="section-title">
+                                <div className="detail-section">
 
-                                        <FaGraduationCap />
+                                    <h3>
+                                        <FaBriefcase />
+                                        Professional Information
+                                    </h3>
 
-                                        <div>
-                                            <h3>
-                                                Professional
-                                                Information
-                                            </h3>
-
-                                            <p>
-                                                Engineering and
-                                                qualification details
-                                            </p>
-                                        </div>
-
-                                    </div>
 
                                     <div className="detail-grid">
 
-                                        <div className="detail-item">
+                                        <div>
 
-                                            <FaGraduationCap />
+                                            <label>
+                                                Department
+                                            </label>
 
-                                            <div>
-                                                <label>
-                                                    Engineering Branch
-                                                </label>
-
-                                                <strong>
-                                                    {
-                                                        selectedApplication.branch
-                                                    }
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    getDepartmentName(
+                                                        selectedEngineer
+                                                    )
+                                                }
+                                            </strong>
 
                                         </div>
 
-                                        <div className="detail-item">
 
-                                            <FaGraduationCap />
+                                        <div>
 
-                                            <div>
-                                                <label>
-                                                    Highest Qualification
-                                                </label>
+                                            <label>
+                                                Branch
+                                            </label>
 
-                                                <strong>
-                                                    {
-                                                        selectedApplication.qualification
-                                                    }
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    selectedEngineer.engineer_branch ||
+                                                    "N/A"
+                                                }
+                                            </strong>
 
                                         </div>
 
-                                        <div className="detail-item">
 
-                                            <FaBriefcase />
+                                        <div>
 
-                                            <div>
-                                                <label>
-                                                    Experience
-                                                </label>
+                                            <label>
+                                                Highest Qualification
+                                            </label>
 
-                                                <strong>
-                                                    {
-                                                        selectedApplication.experience
-                                                    }{" "}
-                                                    Years
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    selectedEngineer.highestQualification ||
+                                                    "N/A"
+                                                }
+                                            </strong>
 
                                         </div>
 
-                                        <div className="detail-item">
 
-                                            <FaBuilding />
+                                        <div>
 
-                                            <div>
-                                                <label>
-                                                    Requested Department
-                                                </label>
+                                            <label>
+                                                Experience
+                                            </label>
 
-                                                <strong>
-                                                    {
-                                                        selectedApplication.department
-                                                    }
-                                                </strong>
-                                            </div>
+                                            <strong>
+                                                {
+                                                    selectedEngineer.experience !==
+                                                    undefined &&
+                                                    selectedEngineer.experience !==
+                                                    null
+                                                        ? `${selectedEngineer.experience} Years`
+                                                        : "N/A"
+                                                }
+                                            </strong>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label>
+                                                Joining Date
+                                            </label>
+
+                                            <strong>
+                                                {
+                                                    formatDate(
+                                                        selectedEngineer.joiningDate
+                                                    )
+                                                }
+                                            </strong>
 
                                         </div>
 
                                     </div>
 
                                 </div>
+
 
                                 {/* DOCUMENTS */}
 
-                                <div className="review-section">
+                                <div className="detail-section">
 
-                                    <div className="section-title">
-
+                                    <h3>
                                         <FaFileAlt />
+                                        Documents
+                                    </h3>
 
-                                        <div>
-                                            <h3>
-                                                Submitted Documents
-                                            </h3>
 
-                                            <p>
-                                                Review documents
-                                                submitted by the
-                                                engineer.
-                                            </p>
-                                        </div>
+                                    <div className="document-list">
 
-                                    </div>
+                                        {
+                                            selectedEngineer.profileImage && (
 
-                                    <div className="documents-grid">
-
-                                        <div className="document-card">
-
-                                            <div className="document-icon">
-                                                <FaUserTie />
-                                            </div>
-
-                                            <div className="document-info">
-
-                                                <strong>
-                                                    Passport Photo
-                                                </strong>
-
-                                                <span>
-                                                    {
-                                                        selectedApplication.photo
+                                                <a
+                                                    href={
+                                                        getDocumentUrl(
+                                                            selectedEngineer.profileImage
+                                                        )
                                                     }
-                                                </span>
-
-                                            </div>
-
-                                            <button
-                                                className="document-btn"
-                                                type="button"
-                                            >
-                                                <FaEye />
-                                                View
-                                            </button>
-
-                                        </div>
-
-                                        <div className="document-card">
-
-                                            <div className="document-icon">
-                                                <FaFileAlt />
-                                            </div>
-
-                                            <div className="document-info">
-
-                                                <strong>
-                                                    Degree Certificate
-                                                </strong>
-
-                                                <span>
-                                                    {
-                                                        selectedApplication.degree
-                                                    }
-                                                </span>
-
-                                            </div>
-
-                                            <button
-                                                className="document-btn"
-                                                type="button"
-                                            >
-                                                <FaDownload />
-                                                View
-                                            </button>
-
-                                        </div>
-
-                                        <div className="document-card">
-
-                                            <div className="document-icon">
-                                                <FaBriefcase />
-                                            </div>
-
-                                            <div className="document-info">
-
-                                                <strong>
-                                                    Experience
-                                                    Certificate
-                                                </strong>
-
-                                                <span>
-                                                    {
-                                                        selectedApplication.experienceCertificate ||
-                                                        "Not Provided"
-                                                    }
-                                                </span>
-
-                                            </div>
-
-                                            {selectedApplication.experienceCertificate && (
-                                                <button
-                                                    className="document-btn"
-                                                    type="button"
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="document-link"
                                                 >
-                                                    <FaDownload />
-                                                    View
-                                                </button>
-                                            )}
 
-                                        </div>
+                                                    <FaUserTie />
+
+                                                    Passport Image
+
+                                                </a>
+
+                                            )
+                                        }
+
+
+                                        {
+                                            selectedEngineer.degree_Certificate && (
+
+                                                <a
+                                                    href={
+                                                        getDocumentUrl(
+                                                            selectedEngineer.degree_Certificate
+                                                        )
+                                                    }
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="document-link"
+                                                >
+
+                                                    <FaGraduationCap />
+
+                                                    Degree Certificate
+
+                                                </a>
+
+                                            )
+                                        }
+
+
+                                        {
+                                            selectedEngineer.experience_Certificate && (
+
+                                                <a
+                                                    href={
+                                                        getDocumentUrl(
+                                                            selectedEngineer.experience_Certificate
+                                                        )
+                                                    }
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="document-link"
+                                                >
+
+                                                    <FaBriefcase />
+
+                                                    Experience Certificate
+
+                                                </a>
+
+                                            )
+                                        }
+
+
+                                        {
+                                            !selectedEngineer.profileImage &&
+                                            !selectedEngineer.degree_Certificate &&
+                                            !selectedEngineer.experience_Certificate && (
+
+                                                <p>
+                                                    No documents available.
+                                                </p>
+
+                                            )
+                                        }
 
                                     </div>
 
                                 </div>
 
-                                {/* REJECTION REASON */}
 
-                                {selectedApplication.status ===
-                                    "Rejected" &&
-                                    selectedApplication.rejectionReason && (
+                                {/* REJECTION */}
 
-                                        <div className="rejection-display">
+                                {
+                                    getRejectedStatus(
+                                        selectedEngineer
+                                    ) && (
 
-                                            <FaTimesCircle />
+                                        <div className="rejection-box">
 
-                                            <div>
+                                            <strong>
+                                                Rejection Reason
+                                            </strong>
 
-                                                <strong>
-                                                    Rejection Reason
-                                                </strong>
-
-                                                <p>
-                                                    {
-                                                        selectedApplication.rejectionReason
-                                                    }
-                                                </p>
-
-                                            </div>
+                                            <p>
+                                                {
+                                                    selectedEngineer.rejectedReason ||
+                                                    "No reason provided."
+                                                }
+                                            </p>
 
                                         </div>
 
-                                    )}
+                                    )
+                                }
 
                             </div>
 
-                            {/* MODAL FOOTER */}
 
-                            <div className="review-footer">
+                            <div className="modal-footer">
 
-                                <button
-                                    className="close-review-btn"
-                                    onClick={() =>
-                                        setShowReviewModal(
-                                            false
-                                        )
-                                    }
-                                >
-                                    Close
-                                </button>
+                                {
+                                    !getRejectedStatus(
+                                        selectedEngineer
+                                    ) &&
+                                    !getActiveStatus(
+                                        selectedEngineer
+                                    ) && (
 
-                                {selectedApplication.status ===
-                                    "Pending" && (
+                                        <>
 
-                                    <div className="review-actions">
+                                            <button
+                                                className="accept-large-btn"
+                                                onClick={() => {
+
+                                                    handleCloseDetails();
+
+                                                    handleAccept(
+                                                        selectedEngineer
+                                                    );
+
+                                                }}
+                                            >
+
+                                                <FaCheckCircle />
+
+                                                Accept Engineer
+
+                                            </button>
+
+
+                                            <button
+                                                className="reject-large-btn"
+                                                onClick={() => {
+
+                                                    handleCloseDetails();
+
+                                                    handleOpenReject(
+                                                        selectedEngineer
+                                                    );
+
+                                                }}
+                                            >
+
+                                                <FaTimesCircle />
+
+                                                Reject Engineer
+
+                                            </button>
+
+                                        </>
+
+                                    )
+                                }
+
+
+                                {
+                                    !getRejectedStatus(
+                                        selectedEngineer
+                                    ) && (
 
                                         <button
-                                            className="reject-application-btn"
-                                            onClick={
-                                                openRejectModal
+                                            className={
+                                                getActiveStatus(
+                                                    selectedEngineer
+                                                )
+                                                    ? "deactivate-large-btn"
+                                                    : "activate-large-btn"
                                             }
+                                            onClick={() => {
+
+                                                handleCloseDetails();
+
+                                                handleToggleActive(
+                                                    selectedEngineer
+                                                );
+
+                                            }}
                                         >
-                                            <FaTimes />
-                                            Reject Application
+
+                                            <FaPowerOff />
+
+                                            {
+                                                getActiveStatus(
+                                                    selectedEngineer
+                                                )
+                                                    ? "Deactivate"
+                                                    : "Activate"
+                                            }
+
                                         </button>
 
-                                        <button
-                                            className="approve-application-btn"
-                                            onClick={
-                                                approveApplication
-                                            }
-                                        >
-                                            <FaCheck />
-                                            Approve Application
-                                        </button>
-
-                                    </div>
-
-                                )}
+                                    )
+                                }
 
                             </div>
 
@@ -1288,78 +2067,144 @@ const EngineerRequests = () => {
 
                     </div>
 
-                )}
+                )
+            }
+
 
             {/* ==================================================
                 REJECT MODAL
             ================================================== */}
 
-            {showRejectModal &&
-                selectedApplication && (
+            {
+                showRejectModal &&
+                selectedEngineer && (
 
-                    <div
-                        className="reject-overlay"
-                        onClick={() =>
-                            setShowRejectModal(false)
-                        }
-                    >
+                    <div className="modal-overlay">
 
-                        <div
-                            className="reject-modal"
-                            onClick={(e) =>
-                                e.stopPropagation()
-                            }
-                        >
+                        <div className="reject-modal">
 
-                            <div className="reject-icon">
-                                <FaTimesCircle />
-                            </div>
+                            <div className="modal-header">
 
-                            <h2>
-                                Reject Application?
-                            </h2>
+                                <div>
 
-                            <p>
-                                Please provide a reason for
-                                rejecting this engineer
-                                application.
-                            </p>
+                                    <h2>
+                                        Reject Engineer
+                                    </h2>
 
-                            <textarea
-                                value={rejectionReason}
-                                onChange={(e) =>
-                                    setRejectionReason(
-                                        e.target.value
-                                    )
-                                }
-                                placeholder="Enter rejection reason..."
-                                rows="5"
-                            />
+                                    <p>
+                                        Please provide a reason
+                                        for rejecting this request.
+                                    </p>
 
-                            <div className="reject-actions">
+                                </div>
+
 
                                 <button
-                                    className="cancel-reject-btn"
-                                    onClick={() =>
-                                        setShowRejectModal(
-                                            false
+                                    onClick={
+                                        handleCloseReject
+                                    }
+                                >
+
+                                    <FaTimes />
+
+                                </button>
+
+                            </div>
+
+
+                            <div className="reject-body">
+
+                                <div className="reject-engineer">
+
+                                    <div className="engineer-avatar">
+                                        <FaUserTie />
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {
+                                                getFullName(
+                                                    selectedEngineer
+                                                )
+                                            }
+                                        </strong>
+
+                                        <span>
+                                            {
+                                                getDepartmentName(
+                                                    selectedEngineer
+                                                )
+                                            }
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <label>
+                                    Rejection Reason
+                                </label>
+
+                                <textarea
+                                    rows="5"
+                                    placeholder="Enter reason for rejecting this engineer request..."
+                                    value={
+                                        rejectReason
+                                    }
+                                    onChange={
+                                        event =>
+                                            setRejectReason(
+                                                event.target.value
+                                            )
+                                    }
+                                />
+
+                            </div>
+
+
+                            <div className="modal-footer">
+
+                                <button
+                                    className="cancel-btn"
+                                    onClick={
+                                        handleCloseReject
+                                    }
+                                >
+
+                                    <FaTimes />
+
+                                    Cancel
+
+                                </button>
+
+
+                                <button
+                                    className="reject-large-btn"
+                                    onClick={
+                                        handleReject
+                                    }
+                                    disabled={
+                                        !rejectReason.trim() ||
+                                        processingId ===
+                                        getEngineerId(
+                                            selectedEngineer
                                         )
                                     }
                                 >
-                                    Cancel
-                                </button>
 
-                                <button
-                                    className="confirm-reject-btn"
-                                    onClick={
-                                        rejectApplication
+                                    <FaTimesCircle />
+
+                                    {
+                                        processingId ===
+                                        getEngineerId(
+                                            selectedEngineer
+                                        )
+                                            ? "Rejecting..."
+                                            : "Reject Engineer"
                                     }
-                                    disabled={
-                                        !rejectionReason.trim()
-                                    }
-                                >
-                                    <FaTimes />
-                                    Reject Application
+
                                 </button>
 
                             </div>
@@ -1368,10 +2213,11 @@ const EngineerRequests = () => {
 
                     </div>
 
-                )}
+                )
+            }
 
         </div>
     );
-};
+}
 
-export default EngineerRequests;
+export default EngineerRequest;

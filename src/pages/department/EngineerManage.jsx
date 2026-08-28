@@ -48,7 +48,7 @@ function DepartmentManagement() {
         }
 
         const response = await fetch(
-          "http://localhost:8085/api/department/engineers",
+          "http://localhost:8085/api/department/engineersAll",
           {
             method: "GET",
 

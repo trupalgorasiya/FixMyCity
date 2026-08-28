@@ -1,15 +1,10 @@
-import  { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./Report.css";
 
 import {
-    FaClipboardList,
     FaCheckCircle,
-    FaClock,
-    FaUsers,
-    FaUserCog,
     FaBuilding,
     FaChartLine,
-    FaExclamationTriangle,
     FaFilePdf,
     FaTimes,
     FaDownload,
@@ -17,1781 +12,1354 @@ import {
     FaFilter
 } from "react-icons/fa";
 
-import {
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    LineChart,
-    Line
-} from "recharts";
 
+/* ==========================================================
+   API URLS
+========================================================== */
+
+const API_BASE_URL = "http://localhost:8085";
+
+const DEPARTMENT_API_URL =
+    `${API_BASE_URL}/api/departments`;
+
+const REPORT_API_URL =
+    `${API_BASE_URL}/api/admin/reports/complaints`;
+
+
+/* ==========================================================
+   COLORS
+========================================================== */
+
+const COLORS = [
+    "#16a34a",
+    "#f59e0b",
+    "#7c3aed",
+    "#2563eb",
+    "#ef4444",
+    "#0891b2"
+];
+
+
+/* ==========================================================
+   EMPTY REPORT
+========================================================== */
+
+const EMPTY_REPORT = {
+
+    summary: {
+        totalComplaints: 0,
+        resolvedComplaints: 0,
+        pendingComplaints: 0,
+        inProgress: 0,
+        totalCitizens: 0,
+        totalEngineers: 0,
+        totalDepartments: 0,
+        resolutionRate: 0
+    },
+
+    complaintStatusData: [],
+
+    departmentData: [],
+
+    monthlyData: [],
+
+    engineers: [],
+
+    departments: []
+
+};
+
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+const getToken = () => {
+
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("jwt") ||
+        ""
+    );
+
+};
+
+
+const formatNumber = (value) => {
+
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+        return 0;
+    }
+
+    return number.toLocaleString("en-IN");
+
+};
+
+
+const formatPercentage = (value) => {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return "0%";
+    }
+
+    if (
+        typeof value === "string" &&
+        value.includes("%")
+    ) {
+        return value;
+    }
+
+    const number = Number(value);
+
+    if (Number.isNaN(number)) {
+        return "0%";
+    }
+
+    return `${number.toFixed(0)}%`;
+
+};
+
+
+const formatStatus = (status) => {
+
+    if (!status) {
+        return "Unknown";
+    }
+
+    return status
+        .toString()
+        .replaceAll("_", " ")
+        .replaceAll("-", " ")
+        .toLowerCase()
+        .replace(
+            /\b\w/g,
+            letter => letter.toUpperCase()
+        );
+
+};
+
+
+const formatMonth = (month) => {
+
+    if (!month) {
+        return "";
+    }
+
+    const monthMap = {
+
+        JANUARY: "Jan",
+        FEBRUARY: "Feb",
+        MARCH: "Mar",
+        APRIL: "Apr",
+        MAY: "May",
+        JUNE: "Jun",
+        JULY: "Jul",
+        AUGUST: "Aug",
+        SEPTEMBER: "Sep",
+        OCTOBER: "Oct",
+        NOVEMBER: "Nov",
+        DECEMBER: "Dec"
+
+    };
+
+    const upperMonth =
+        month.toString().toUpperCase();
+
+    return (
+        monthMap[upperMonth] ||
+        month.toString()
+    );
+
+};
+
+
+const escapeHtml = (value) => {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+};
+
+
+/* ==========================================================
+   COMPONENT
+========================================================== */
 
 function Reports() {
 
-    const [showReport, setShowReport] = useState(false);
+    const [showReport, setShowReport] =
+        useState(false);
+
+    const [loadingDepartments, setLoadingDepartments] =
+        useState(false);
+
+    const [generatingReport, setGeneratingReport] =
+        useState(false);
+
+    const [departmentsList, setDepartmentsList] =
+        useState([]);
+
+    const [reportData, setReportData] =
+        useState(EMPTY_REPORT);
 
 
-    /* ==========================================================
-       SUMMARY DATA
-    ========================================================== */
+    /* ======================================================
+       FILTER STATE
+    ====================================================== */
 
-    const summary = {
-        totalComplaints: 1248,
-        resolvedComplaints: 986,
-        pendingComplaints: 182,
-        inProgress: 80,
-        totalCitizens: 542,
-        totalEngineers: 28,
-        totalDepartments: 6,
-        resolutionRate: "79%"
-    };
+    const [filters, setFilters] = useState({
+
+        fromDate: "",
+        toDate: "",
+        departmentId: "ALL",
+        status: "ALL"
+
+    });
 
 
-    /* ==========================================================
-       COMPLAINT STATUS
-    ========================================================== */
+    /* ======================================================
+       LOAD DEPARTMENTS
+    ====================================================== */
 
-    const complaintStatusData = [
-        {
-            name: "Resolved",
-            value: 986
-        },
-        {
-            name: "Pending",
-            value: 182
-        },
-        {
-            name: "In Progress",
-            value: 80
-        }
-    ];
+    useEffect(() => {
+
+        loadDepartments();
+
+    }, []);
 
 
-    /* ==========================================================
-       DEPARTMENT DATA
-    ========================================================== */
+    const loadDepartments = async () => {
 
-    const departmentData = [
-        {
-            department: "Road",
-            complaints: 320
-        },
-        {
-            department: "Water",
-            complaints: 265
-        },
-        {
-            department: "Garbage",
-            complaints: 215
-        },
-        {
-            department: "Street Light",
-            complaints: 180
-        },
-        {
-            department: "Drainage",
-            complaints: 145
-        },
-        {
-            department: "Other",
-            complaints: 123
-        }
-    ];
+        try {
+
+            setLoadingDepartments(true);
+
+            const token = getToken();
+
+            const response =
+                await fetch(
+                    DEPARTMENT_API_URL,
+                    {
+                        method: "GET",
+
+                        headers: {
+
+                            ...(token && {
+                                Authorization:
+                                    `Bearer ${token}`
+                            })
+
+                        }
+                    }
+                );
 
 
-    /* ==========================================================
-       MONTHLY DATA
-    ========================================================== */
+            if (!response.ok) {
 
-    const monthlyData = [
-        {
-            month: "Jan",
-            complaints: 82
-        },
-        {
-            month: "Feb",
-            complaints: 105
-        },
-        {
-            month: "Mar",
-            complaints: 120
-        },
-        {
-            month: "Apr",
-            complaints: 145
-        },
-        {
-            month: "May",
-            complaints: 168
-        },
-        {
-            month: "Jun",
-            complaints: 185
-        },
-        {
-            month: "Jul",
-            complaints: 205
-        },
-        {
-            month: "Aug",
-            complaints: 238
-        }
-    ];
+                throw new Error(
+                    "Failed to load departments."
+                );
+
+            }
 
 
-    const COLORS = [
-        "#16a34a",
-        "#f59e0b",
-        "#7c3aed"
-    ];
+            const data =
+                await response.json();
 
 
-    /* ==========================================================
-       ENGINEER DATA
-    ========================================================== */
-
-    const engineers = [
-        {
-            name: "Rahul Sharma",
-            department: "Road Department",
-            assigned: 48,
-            completed: 45,
-            pending: 3,
-            efficiency: "94%"
-        },
-        {
-            name: "Amit Patel",
-            department: "Water Department",
-            assigned: 42,
-            completed: 38,
-            pending: 4,
-            efficiency: "90%"
-        },
-        {
-            name: "Jay Mehta",
-            department: "Garbage Department",
-            assigned: 36,
-            completed: 31,
-            pending: 5,
-            efficiency: "86%"
-        },
-        {
-            name: "Vijay Shah",
-            department: "Street Light",
-            assigned: 32,
-            completed: 28,
-            pending: 4,
-            efficiency: "88%"
-        }
-    ];
+            setDepartmentsList(
+                Array.isArray(data)
+                    ? data
+                    : []
+            );
 
 
-    /* ==========================================================
-       DEPARTMENT PERFORMANCE
-    ========================================================== */
+        } catch (error) {
 
-    const departments = [
-        {
-            name: "Road Department",
-            total: 320,
-            resolved: 288,
-            pending: 32,
-            rate: "90%"
-        },
-        {
-            name: "Water Department",
-            total: 265,
-            resolved: 241,
-            pending: 24,
-            rate: "91%"
-        },
-        {
-            name: "Garbage Department",
-            total: 215,
-            resolved: 194,
-            pending: 21,
-            rate: "90%"
-        },
-        {
-            name: "Street Light",
-            total: 180,
-            resolved: 160,
-            pending: 20,
-            rate: "89%"
-        },
-        {
-            name: "Drainage Department",
-            total: 145,
-            resolved: 121,
-            pending: 24,
-            rate: "83%"
-        }
-    ];
-
-
-    /* ==========================================================
-       RECENT ACTIVITIES
-    ========================================================== */
-
-    const recentActivities = [
-        {
-            id: 1,
-            title: "Road complaint resolved",
-            time: "10 minutes ago"
-        },
-        {
-            id: 2,
-            title: "New engineer assigned",
-            time: "35 minutes ago"
-        },
-        {
-            id: 3,
-            title: "Water leakage complaint received",
-            time: "1 hour ago"
-        },
-        {
-            id: 4,
-            title: "Street Light department updated",
-            time: "Today"
-        }
-    ];
-
-
-    /* ==========================================================
-       GENERATE REPORT
-    ========================================================== */
-
-    const handleGenerateReport = () => {
-        setShowReport(true);
-    };
-
-
-    /* ==========================================================
-       CLOSE REPORT
-    ========================================================== */
-
-    const handleCloseReport = () => {
-        setShowReport(false);
-    };
-
-
-    /* ==========================================================
-       DOWNLOAD REPORT
-       
-       IMPORTANT:
-       We are NOT using window.print() on the React page.
-
-       Instead, a completely separate HTML document is created.
-       This prevents the black/blank print page problem.
-    ========================================================== */
-
-    const handleDownloadReport = () => {
-
-        const reportWindow = window.open(
-            "",
-            "_blank",
-            "width=1200,height=900"
-        );
-
-
-        if (!reportWindow) {
+            console.error(
+                "Department API Error:",
+                error
+            );
 
             alert(
-                "Please allow pop-ups in your browser to download the report."
+                "Unable to load departments."
+            );
+
+        } finally {
+
+            setLoadingDepartments(false);
+
+        }
+
+    };
+
+
+    /* ======================================================
+       FILTER CHANGE
+    ====================================================== */
+
+    const handleFilterChange = (event) => {
+
+        const {
+            name,
+            value
+        } = event.target;
+
+
+        setFilters(previous => ({
+
+            ...previous,
+
+            [name]: value
+
+        }));
+
+    };
+
+
+    /* ======================================================
+       NORMALIZE REPORT DATA
+    ====================================================== */
+
+    const normalizeReportData = (data) => {
+
+        if (!data) {
+            return EMPTY_REPORT;
+        }
+
+
+        const summarySource =
+            data.summary || data;
+
+
+        const totalComplaints =
+            Number(
+                summarySource.totalComplaints ??
+                data.totalComplaints ??
+                0
+            );
+
+
+        const resolvedComplaints =
+            Number(
+                summarySource.resolvedComplaints ??
+                data.resolvedComplaints ??
+                0
+            );
+
+
+        const pendingComplaints =
+            Number(
+                summarySource.pendingComplaints ??
+                data.pendingComplaints ??
+                0
+            );
+
+
+        const inProgress =
+            Number(
+                summarySource.inProgress ??
+                summarySource.inProgressComplaints ??
+                data.inProgress ??
+                data.inProgressComplaints ??
+                0
+            );
+
+
+        const totalCitizens =
+            Number(
+                summarySource.totalCitizens ??
+                data.totalCitizens ??
+                0
+            );
+
+
+        const totalEngineers =
+            Number(
+                summarySource.totalEngineers ??
+                data.totalEngineers ??
+                0
+            );
+
+
+        const totalDepartments =
+            Number(
+                summarySource.totalDepartments ??
+                data.totalDepartments ??
+                0
+            );
+
+
+        const resolutionRate =
+            summarySource.resolutionRate ??
+            data.resolutionRate ??
+            (
+                totalComplaints > 0
+                    ? (
+                        resolvedComplaints /
+                        totalComplaints
+                    ) * 100
+                    : 0
+            );
+
+
+        /* ==================================================
+           STATUS DATA
+        ================================================== */
+
+        const statusSource =
+            data.complaintStatusData ||
+            data.complaintStatus ||
+            data.statusData ||
+            [];
+
+
+        let complaintStatusData =
+            Array.isArray(statusSource)
+                ? statusSource.map(item => ({
+
+                    name:
+                        item.name ||
+                        item.status ||
+                        "Unknown",
+
+                    value:
+                        Number(
+                            item.value ??
+                            item.complaints ??
+                            item.count ??
+                            0
+                        )
+
+                }))
+                : [];
+
+
+        if (
+            complaintStatusData.length === 0
+        ) {
+
+            complaintStatusData = [
+
+                {
+                    name: "Resolved",
+                    value: resolvedComplaints
+                },
+
+                {
+                    name: "Pending",
+                    value: pendingComplaints
+                },
+
+                {
+                    name: "In Progress",
+                    value: inProgress
+                }
+
+            ].filter(
+                item => item.value > 0
+            );
+
+        }
+
+
+        /* ==================================================
+           DEPARTMENT CHART DATA
+        ================================================== */
+
+        const departmentSource =
+            data.departmentData ||
+            data.departmentPerformance ||
+            data.departments ||
+            [];
+
+
+        const departmentData =
+            Array.isArray(departmentSource)
+                ? departmentSource.map(item => ({
+
+                    department:
+                        item.department ||
+                        item.departmentName ||
+                        item.name ||
+                        "Unknown",
+
+                    complaints:
+                        Number(
+                            item.complaints ??
+                            item.totalComplaints ??
+                            item.total ??
+                            0
+                        )
+
+                }))
+                : [];
+
+
+        /* ==================================================
+           MONTHLY DATA
+        ================================================== */
+
+        const monthlySource =
+            data.monthlyData ||
+            data.monthlyComplaints ||
+            [];
+
+
+        const monthlyData =
+            Array.isArray(monthlySource)
+                ? monthlySource.map(item => ({
+
+                    month:
+                        formatMonth(
+                            item.month
+                        ),
+
+                    complaints:
+                        Number(
+                            item.complaints ??
+                            item.count ??
+                            item.totalComplaints ??
+                            0
+                        )
+
+                }))
+                : [];
+
+
+        /* ==================================================
+           ENGINEERS
+        ================================================== */
+
+        const engineerSource =
+            data.engineers ||
+            data.engineerPerformance ||
+            [];
+
+
+        const engineers =
+            Array.isArray(engineerSource)
+                ? engineerSource.map(item => ({
+
+                    name:
+                        item.name ||
+                        item.engineerName ||
+                        "Unknown",
+
+                    department:
+                        item.department ||
+                        item.departmentName ||
+                        "Unknown",
+
+                    assigned:
+                        Number(
+                            item.assigned ??
+                            item.assignedComplaints ??
+                            0
+                        ),
+
+                    completed:
+                        Number(
+                            item.completed ??
+                            item.completedComplaints ??
+                            item.resolvedComplaints ??
+                            0
+                        ),
+
+                    pending:
+                        Number(
+                            item.pending ??
+                            item.pendingComplaints ??
+                            0
+                        ),
+
+                    efficiency:
+                        item.efficiency ??
+                        item.efficiencyRate ??
+                        0
+
+                }))
+                : [];
+
+
+        /* ==================================================
+           DEPARTMENTS TABLE
+        ================================================== */
+
+        const departmentTableSource =
+            data.departments ||
+            data.departmentPerformance ||
+            [];
+
+
+        const departments =
+            Array.isArray(
+                departmentTableSource
+            )
+                ? departmentTableSource.map(
+                    item => {
+
+                        const total =
+                            Number(
+                                item.total ??
+                                item.totalComplaints ??
+                                item.complaints ??
+                                0
+                            );
+
+
+                        const resolved =
+                            Number(
+                                item.resolved ??
+                                item.resolvedComplaints ??
+                                0
+                            );
+
+
+                        const pending =
+                            Number(
+                                item.pending ??
+                                item.pendingComplaints ??
+                                Math.max(
+                                    total -
+                                    resolved,
+                                    0
+                                )
+                            );
+
+
+                        const rate =
+                            item.rate ??
+                            item.performance ??
+                            (
+                                total > 0
+                                    ? (
+                                        resolved /
+                                        total
+                                    ) * 100
+                                    : 0
+                            );
+
+
+                        return {
+
+                            name:
+                                item.name ||
+                                item.department ||
+                                item.departmentName ||
+                                "Unknown",
+
+                            total,
+
+                            resolved,
+
+                            pending,
+
+                            rate
+
+                        };
+
+                    }
+                )
+                : [];
+
+
+        return {
+
+            summary: {
+
+                totalComplaints,
+
+                resolvedComplaints,
+
+                pendingComplaints,
+
+                inProgress,
+
+                totalCitizens,
+
+                totalEngineers,
+
+                totalDepartments,
+
+                resolutionRate
+
+            },
+
+            complaintStatusData,
+
+            departmentData,
+
+            monthlyData,
+
+            engineers,
+
+            departments
+
+        };
+
+    };
+
+
+    /* ======================================================
+       GENERATE REPORT
+       
+       IMPORTANT:
+       Backend may return:
+       1. JSON
+       2. PDF
+    ====================================================== */
+
+  
+const handleGenerateReport = async () => {
+
+    // ==========================================
+    // DATE VALIDATION
+    // ==========================================
+
+    if (
+        filters.fromDate &&
+        filters.toDate &&
+        filters.fromDate > filters.toDate
+    ) {
+
+        alert(
+            "From Date cannot be greater than To Date."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        setGeneratingReport(true);
+
+
+        // ==========================================
+        // TOKEN
+        // ==========================================
+
+        const token = getToken();
+
+
+        if (!token) {
+
+            alert(
+                "You are not logged in. Please login again."
             );
 
             return;
         }
 
 
-        const today = new Date().toLocaleDateString(
-            "en-IN",
-            {
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            }
+        // ==========================================
+        // REQUEST BODY
+        // ==========================================
+
+        const requestBody = {
+
+
+            startDate:
+                filters.fromDate || null,
+
+            endDate:
+                filters.toDate || null,
+
+            departmentId:
+                filters.departmentId === "ALL"
+                    ? null
+                    : Number(
+                        filters.departmentId
+                    ),
+
+            status:
+                filters.status === "ALL"
+                    ? null
+                    : filters.status
+
+        };
+
+
+        console.log(
+            "================================"
+        );
+
+        console.log(
+            "REPORT REQUEST"
+        );
+
+        console.log(
+            JSON.stringify(
+                requestBody,
+                null,
+                2
+            )
+        );
+
+        console.log(
+            "================================"
         );
 
 
-        /* ======================================================
-           ENGINEER TABLE HTML
-        ====================================================== */
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/admin/reports/complaints`,
+                {
 
-        const engineerRows = engineers.map(
-            (engineer) => `
-                <tr>
-                    <td>${engineer.name}</td>
-                    <td>${engineer.department}</td>
-                    <td>${engineer.assigned}</td>
-                    <td>${engineer.completed}</td>
-                    <td>${engineer.pending}</td>
-                    <td class="green">
-                        ${engineer.efficiency}
-                    </td>
-                </tr>
-            `
-        ).join("");
+                    method: "POST",
 
+                    headers: {
 
-        /* ======================================================
-           DEPARTMENT TABLE HTML
-        ====================================================== */
+                        "Content-Type":
+                            "application/json",
 
-        const departmentRows = departments.map(
-            (department) => `
-                <tr>
-                    <td>${department.name}</td>
-                    <td>${department.total}</td>
-                    <td>${department.resolved}</td>
-                    <td>${department.pending}</td>
-                    <td class="green">
-                        ${department.rate}
-                    </td>
-                </tr>
-            `
-        ).join("");
+                        "Accept":
+                            "application/pdf",
+
+                        Authorization:
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            requestBody
+                        )
+
+                }
+            );
 
 
-        /* ======================================================
-           DEPARTMENT BARS
-        ====================================================== */
+        console.log(
+            "Report Response Status:",
+            response.status
+        );
 
-        const maxDepartmentValue = Math.max(
-            ...departmentData.map(
-                item => item.complaints
+
+        console.log(
+            "Report Content-Type:",
+            response.headers.get(
+                "content-type"
             )
         );
 
 
-        const departmentBars = departmentData.map(
-            item => {
+        // ==========================================
+        // HANDLE ERROR
+        // ==========================================
 
-                const width =
-                    (item.complaints /
-                        maxDepartmentValue) *
-                    100;
+        if (!response.ok) {
+
+            let errorMessage =
+                "Failed to generate report.";
 
 
-                return `
-                    <div class="bar-row">
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                ) || "";
 
-                        <div class="bar-label">
-                            ${item.department}
-                        </div>
 
-                        <div class="bar-track">
+            try {
 
-                            <div
-                                class="bar-fill"
-                                style="width:${width}%"
-                            ></div>
+                if (
+                    contentType.includes(
+                        "application/json"
+                    )
+                ) {
 
-                        </div>
+                    const errorData =
+                        await response.json();
 
-                        <div class="bar-value">
-                            ${item.complaints}
-                        </div>
 
-                    </div>
-                `;
+                    errorMessage =
+                        errorData.message ||
+                        errorData.error ||
+                        errorMessage;
+
+                } else {
+
+                    const errorText =
+                        await response.text();
+
+
+                    if (errorText) {
+
+                        errorMessage =
+                            errorText;
+
+                    }
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Error reading API error:",
+                    error
+                );
+
             }
-        ).join("");
 
 
-        /* ======================================================
-           MONTHLY BARS
-        ====================================================== */
+            throw new Error(
+                errorMessage
+            );
 
-        const maxMonthlyValue = Math.max(
-            ...monthlyData.map(
-                item => item.complaints
-            )
+        }
+
+
+        // ==========================================
+        // READ PDF
+        // ==========================================
+
+        const pdfBlob =
+            await response.blob();
+
+
+        console.log(
+            "PDF Blob:",
+            pdfBlob
         );
 
 
-        const monthlyBars = monthlyData.map(
-            item => {
+        // ==========================================
+        // VERIFY PDF
+        // ==========================================
 
-                const height =
-                    (item.complaints /
-                        maxMonthlyValue) *
-                    100;
+        if (
+            !pdfBlob ||
+            pdfBlob.size === 0
+        ) {
 
+            throw new Error(
+                "The generated PDF is empty."
+            );
 
-                return `
-                    <div class="month-column">
-
-                        <div class="month-number">
-                            ${item.complaints}
-                        </div>
-
-                        <div
-                            class="month-bar"
-                            style="height:${height}%"
-                        ></div>
-
-                        <div class="month-label">
-                            ${item.month}
-                        </div>
-
-                    </div>
-                `;
-            }
-        ).join("");
+        }
 
 
-        /* ======================================================
-           ACTIVITY HTML
-        ====================================================== */
+        // ==========================================
+        // OPEN PDF
+        // ==========================================
 
-        const activityRows = recentActivities.map(
-            activity => `
-                <div class="activity-row">
-
-                    <div class="activity-dot"></div>
-
-                    <div>
-                        <strong>
-                            ${activity.title}
-                        </strong>
-
-                        <span>
-                            ${activity.time}
-                        </span>
-                    </div>
-
-                </div>
-            `
-        ).join("");
+        const pdfUrl =
+            window.URL.createObjectURL(
+                pdfBlob
+            );
 
 
-        /* ======================================================
-           COMPLETE REPORT HTML
-        ====================================================== */
-
-        reportWindow.document.open();
-
-
-        reportWindow.document.write(`
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>
-FixMyCity - Administrative Report
-</title>
-
-
-<style>
-
-* {
-    box-sizing: border-box;
-}
-
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-
-    width: 100%;
-
-    background: #ffffff;
-
-    color: #0f172a;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-}
-
-
-body {
-    padding: 25px;
-}
-
-
-.report {
-    width: 100%;
-    max-width: 1100px;
-
-    margin: 0 auto;
-
-    background: #ffffff;
-}
-
-
-/* ==========================================================
-   HEADER
-========================================================== */
-
-.header {
-    padding: 25px 30px;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    gap: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #0f172a,
-            #1e3a8a
+        window.open(
+            pdfUrl,
+            "_blank"
         );
 
-    color: white;
 
-    border-radius: 12px;
-}
+        // ==========================================
+        // DOWNLOAD PDF
+        // ==========================================
 
+        const downloadLink =
+            document.createElement(
+                "a"
+            );
 
-.brand {
-    display: flex;
 
-    align-items: center;
+        downloadLink.href =
+            pdfUrl;
 
-    gap: 15px;
-}
 
+        downloadLink.download =
+            "FixMyCity-Complaint-Report.pdf";
 
-.logo {
-    width: 55px;
-    height: 55px;
 
-    border-radius: 12px;
-
-    background: rgba(
-        255,
-        255,
-        255,
-        0.15
-    );
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    font-size: 25px;
-}
-
-
-.brand h1 {
-    margin: 0;
-
-    font-size: 25px;
-}
-
-
-.brand p {
-    margin: 5px 0 0;
-
-    color: #cbd5e1;
-
-    font-size: 12px;
-}
-
-
-.meta {
-    text-align: right;
-
-    font-size: 11px;
-}
-
-
-.meta strong {
-    display: block;
-
-    margin-bottom: 5px;
-
-    font-size: 12px;
-
-    letter-spacing: 1px;
-}
-
-
-/* ==========================================================
-   TITLE
-========================================================== */
-
-.title-section {
-    padding: 25px 5px;
-
-    border-bottom:
-        1px solid #e2e8f0;
-}
-
-
-.title-section .small-title {
-    color: #2563eb;
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    letter-spacing: 1.5px;
-}
-
-
-.title-section h2 {
-    margin: 7px 0;
-
-    font-size: 25px;
-}
-
-
-.title-section p {
-    margin: 0;
-
-    color: #64748b;
-
-    font-size: 12px;
-}
-
-
-/* ==========================================================
-   SUMMARY
-========================================================== */
-
-.summary {
-    margin: 22px 0;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius: 10px;
-
-    overflow: hidden;
-}
-
-
-.stat {
-    padding: 18px;
-
-    background: #f8fafc;
-
-    border-right:
-        1px solid #e2e8f0;
-}
-
-
-.stat:last-child {
-    border-right: none;
-}
-
-
-.stat-label {
-    color: #64748b;
-
-    font-size: 10px;
-}
-
-
-.stat-value {
-    margin-top: 7px;
-
-    font-size: 24px;
-
-    font-weight: 800;
-}
-
-
-/* ==========================================================
-   SECTION
-========================================================== */
-
-.section {
-    margin-top: 28px;
-
-    page-break-inside: avoid;
-}
-
-
-.section-title {
-    margin-bottom: 14px;
-}
-
-
-.section-title h3 {
-    margin: 0;
-
-    font-size: 18px;
-}
-
-
-.section-title p {
-    margin: 5px 0 0;
-
-    color: #64748b;
-
-    font-size: 11px;
-}
-
-
-/* ==========================================================
-   CHART GRID
-========================================================== */
-
-.chart-grid {
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 18px;
-}
-
-
-.chart-card {
-    padding: 18px;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius: 10px;
-
-    background: white;
-
-    page-break-inside: avoid;
-}
-
-
-.chart-card h4 {
-    margin: 0 0 15px;
-
-    font-size: 13px;
-}
-
-
-/* ==========================================================
-   PIE CHART
-========================================================== */
-
-.pie-area {
-    min-height: 220px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 35px;
-}
-
-
-.pie {
-    width: 150px;
-    height: 150px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background:
-        conic-gradient(
-            #16a34a 0deg 285deg,
-            #f59e0b 285deg 337deg,
-            #7c3aed 337deg 360deg
+        document.body.appendChild(
+            downloadLink
         );
 
-    position: relative;
-}
+
+        downloadLink.click();
 
 
-.pie::after {
-    content: "";
-
-    position: absolute;
-
-    width: 70px;
-    height: 70px;
-
-    top: 50%;
-    left: 50%;
-
-    transform:
-        translate(
-            -50%,
-            -50%
+        document.body.removeChild(
+            downloadLink
         );
 
-    border-radius: 50%;
 
-    background: white;
-}
+        // ==========================================
+        // CLEAN URL
+        // ==========================================
 
+        setTimeout(() => {
 
-.legend {
-    display: flex;
+            window.URL.revokeObjectURL(
+                pdfUrl
+            );
 
-    flex-direction: column;
+        }, 10000);
 
-    gap: 12px;
-}
 
+    } catch (error) {
 
-.legend-item {
-    display: grid;
+        console.error(
+            "Report Generation Error:",
+            error
+        );
 
-    grid-template-columns:
-        10px 1fr auto;
 
-    gap: 8px;
+        alert(
+            error.message ||
+            "Unable to generate report."
+        );
 
-    align-items: center;
 
-    font-size: 10px;
-}
+    } finally {
 
+        setGeneratingReport(
+            false
+        );
 
-.legend-dot {
-    width: 9px;
-    height: 9px;
-
-    border-radius: 50%;
-}
-
-
-.resolved {
-    background: #16a34a;
-}
-
-
-.pending {
-    background: #f59e0b;
-}
-
-
-.progress {
-    background: #7c3aed;
-}
-
-
-/* ==========================================================
-   DEPARTMENT BAR
-========================================================== */
-
-.bar-chart {
-    min-height: 220px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    gap: 12px;
-}
-
-
-.bar-row {
-    display: grid;
-
-    grid-template-columns:
-        75px 1fr 35px;
-
-    gap: 8px;
-
-    align-items: center;
-}
-
-
-.bar-label {
-    font-size: 9px;
-
-    color: #475569;
-
-    text-align: right;
-}
-
-
-.bar-track {
-    height: 11px;
-
-    background: #e2e8f0;
-
-    border-radius: 20px;
-
-    overflow: hidden;
-}
-
-
-.bar-fill {
-    height: 100%;
-
-    background: #2563eb;
-
-    border-radius: 20px;
-}
-
-
-.bar-value {
-    font-size: 9px;
-
-    font-weight: 700;
-}
-
-
-/* ==========================================================
-   MONTHLY CHART
-========================================================== */
-
-.monthly-card {
-    margin-top: 18px;
-
-    padding: 18px;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius: 10px;
-
-    page-break-inside: avoid;
-}
-
-
-.monthly-card h4 {
-    margin: 0 0 15px;
-
-    font-size: 13px;
-}
-
-
-.monthly-chart {
-    height: 250px;
-
-    display: flex;
-
-    align-items: flex-end;
-
-    justify-content: space-around;
-
-    gap: 10px;
-
-    border-bottom:
-        1px solid #cbd5e1;
-
-    padding:
-        10px 10px 0;
-}
-
-
-.month-column {
-    height: 100%;
-
-    flex: 1;
-
-    max-width: 70px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
-    gap: 5px;
-}
-
-
-.month-number {
-    font-size: 9px;
-
-    font-weight: 700;
-}
-
-
-.month-bar {
-    width: 25px;
-
-    min-height: 5px;
-
-    background: #2563eb;
-
-    border-radius:
-        6px 6px 0 0;
-}
-
-
-.month-label {
-    font-size: 9px;
-
-    color: #64748b;
-}
-
-
-/* ==========================================================
-   TABLE
-========================================================== */
-
-.table-wrapper {
-    width: 100%;
-
-    overflow: hidden;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius: 10px;
-}
-
-
-table {
-    width: 100%;
-
-    border-collapse: collapse;
-
-    table-layout: fixed;
-}
-
-
-thead th {
-    padding: 12px 10px;
-
-    background: #f8fafc;
-
-    color: #475569;
-
-    text-align: left;
-
-    font-size: 10px;
-}
-
-
-tbody td {
-    padding: 12px 10px;
-
-    border-top:
-        1px solid #edf2f7;
-
-    color: #334155;
-
-    font-size: 10px;
-
-    word-break: break-word;
-}
-
-
-.green {
-    color: #15803d !important;
-
-    font-weight: 800;
-}
-
-
-/* ==========================================================
-   ACTIVITY
-========================================================== */
-
-.activities {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-}
-
-
-.activity-row {
-    display: flex;
-
-    gap: 10px;
-
-    padding: 11px;
-
-    border:
-        1px solid #e2e8f0;
-
-    border-radius: 8px;
-
-    background: #f8fafc;
-}
-
-
-.activity-dot {
-    width: 9px;
-    height: 9px;
-
-    margin-top: 4px;
-
-    flex-shrink: 0;
-
-    border-radius: 50%;
-
-    background: #2563eb;
-}
-
-
-.activity-row strong {
-    display: block;
-
-    font-size: 10px;
-}
-
-
-.activity-row span {
-    display: block;
-
-    margin-top: 4px;
-
-    color: #64748b;
-
-    font-size: 9px;
-}
-
-
-/* ==========================================================
-   FOOTER
-========================================================== */
-
-.footer {
-    margin-top: 30px;
-
-    padding-top: 18px;
-
-    border-top:
-        1px solid #e2e8f0;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    gap: 20px;
-
-    color: #64748b;
-
-    font-size: 9px;
-}
-
-
-.footer strong {
-    display: block;
-
-    color: #0f172a;
-
-    margin-bottom: 4px;
-}
-
-
-/* ==========================================================
-   PRINT
-========================================================== */
-
-@media print {
-
-    @page {
-        size: A4 portrait;
-
-        margin: 10mm;
     }
-
-
-    html,
-    body {
-        width: 100%;
-
-        margin: 0;
-
-        padding: 0;
-
-        background: white !important;
-    }
-
-
-    body {
-        padding: 0;
-    }
-
-
-    .report {
-        width: 100%;
-
-        max-width: none;
-    }
-
-
-    .header {
-        -webkit-print-color-adjust: exact;
-
-        print-color-adjust: exact;
-    }
-
-
-    .pie,
-    .bar-fill,
-    .month-bar,
-    .stat {
-        -webkit-print-color-adjust: exact;
-
-        print-color-adjust: exact;
-    }
-
-
-    .section,
-    .chart-card,
-    .monthly-card,
-    .table-wrapper,
-    .footer {
-        break-inside: avoid;
-
-        page-break-inside: avoid;
-    }
-
-}
-
-</style>
-
-</head>
-
-
-<body>
-
-
-<div class="report">
-
-
-    <!-- ======================================================
-         HEADER
-    ======================================================= -->
-
-    <div class="header">
-
-        <div class="brand">
-
-            <div class="logo">
-                🏙️
-            </div>
-
-            <div>
-
-                <h1>
-                    FixMyCity
-                </h1>
-
-                <p>
-                    Smart City Complaint Management System
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="meta">
-
-            <strong>
-                ADMINISTRATIVE REPORT
-            </strong>
-
-            <div>
-                Generated: ${today}
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         TITLE
-    ======================================================= -->
-
-    <div class="title-section">
-
-        <div class="small-title">
-            OFFICIAL REPORT
-        </div>
-
-        <h2>
-            City Complaint & Performance Report
-        </h2>
-
-        <p>
-            Comprehensive overview of complaints,
-            departments, engineers and system performance.
-        </p>
-
-    </div>
-
-
-    <!-- ======================================================
-         SUMMARY
-    ======================================================= -->
-
-    <div class="summary">
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Total Complaints
-            </div>
-
-            <div class="stat-value">
-                ${summary.totalComplaints}
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Resolved Complaints
-            </div>
-
-            <div class="stat-value">
-                ${summary.resolvedComplaints}
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Pending Complaints
-            </div>
-
-            <div class="stat-value">
-                ${summary.pendingComplaints}
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Resolution Rate
-            </div>
-
-            <div class="stat-value">
-                ${summary.resolutionRate}
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-    <!-- ======================================================
-         COMPLAINT ANALYTICS
-    ======================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h3>
-                Complaint Analytics
-            </h3>
-
-            <p>
-                Overall complaint distribution and
-                department performance.
-            </p>
-
-        </div>
-
-
-        <div class="chart-grid">
-
-
-            <!-- PIE -->
-
-            <div class="chart-card">
-
-                <h4>
-                    Complaint Status
-                </h4>
-
-
-                <div class="pie-area">
-
-                    <div class="pie"></div>
-
-
-                    <div class="legend">
-
-
-                        <div class="legend-item">
-
-                            <span
-                                class="legend-dot resolved"
-                            ></span>
-
-                            <span>
-                                Resolved
-                            </span>
-
-                            <strong>
-                                986
-                            </strong>
-
-                        </div>
-
-
-                        <div class="legend-item">
-
-                            <span
-                                class="legend-dot pending"
-                            ></span>
-
-                            <span>
-                                Pending
-                            </span>
-
-                            <strong>
-                                182
-                            </strong>
-
-                        </div>
-
-
-                        <div class="legend-item">
-
-                            <span
-                                class="legend-dot progress"
-                            ></span>
-
-                            <span>
-                                In Progress
-                            </span>
-
-                            <strong>
-                                80
-                            </strong>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- BAR -->
-
-            <div class="chart-card">
-
-                <h4>
-                    Department Performance
-                </h4>
-
-
-                <div class="bar-chart">
-
-                    ${departmentBars}
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-        <!-- MONTHLY -->
-
-        <div class="monthly-card">
-
-            <h4>
-                Monthly Complaint Trend
-            </h4>
-
-
-            <div class="monthly-chart">
-
-                ${monthlyBars}
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         ENGINEER PERFORMANCE
-    ======================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h3>
-                Engineer Performance
-            </h3>
-
-            <p>
-                Engineer workload and completion statistics.
-            </p>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Engineer
-                        </th>
-
-                        <th>
-                            Department
-                        </th>
-
-                        <th>
-                            Assigned
-                        </th>
-
-                        <th>
-                            Completed
-                        </th>
-
-                        <th>
-                            Pending
-                        </th>
-
-                        <th>
-                            Efficiency
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    ${engineerRows}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         DEPARTMENT PERFORMANCE
-    ======================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h3>
-                Department Performance
-            </h3>
-
-            <p>
-                Department-wise complaint resolution statistics.
-            </p>
-
-        </div>
-
-
-        <div class="table-wrapper">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Department
-                        </th>
-
-                        <th>
-                            Total
-                        </th>
-
-                        <th>
-                            Resolved
-                        </th>
-
-                        <th>
-                            Pending
-                        </th>
-
-                        <th>
-                            Resolution Rate
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    ${departmentRows}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         RECENT ACTIVITIES
-    ======================================================= -->
-
-    <div class="section">
-
-        <div class="section-title">
-
-            <h3>
-                Recent Activities
-            </h3>
-
-        </div>
-
-
-        <div class="activities">
-
-            ${activityRows}
-
-        </div>
-
-    </div>
-
-
-    <!-- ======================================================
-         FOOTER
-    ======================================================= -->
-
-    <div class="footer">
-
-        <div>
-
-            <strong>
-                FixMyCity
-            </strong>
-
-            Smart City Complaint Management System
-
-        </div>
-
-
-        <div>
-
-            Confidential Administrative Report
-
-            <br />
-
-            Generated Automatically
-
-        </div>
-
-    </div>
-
-
-</div>
-
-
-<script>
-
-window.onload = function () {
-
-    setTimeout(function () {
-
-        window.focus();
-
-        window.print();
-
-    }, 700);
 
 };
 
 
-window.onafterprint = function () {
-
-    setTimeout(function () {
-
-        window.close();
-
-    }, 300);
-
-};
-
-</script>
 
 
-</body>
+    /* ======================================================
+       CLOSE REPORT
+    ====================================================== */
 
-</html>
+    const handleCloseReport = () => {
 
-        `);
-
-
-        reportWindow.document.close();
+        setShowReport(false);
 
     };
 
+
+    /* ======================================================
+       DOWNLOAD HTML REPORT
+    ====================================================== */
+const handleDownloadReport = async () => {
+
+    try {
+
+        const token = getToken();
+
+
+        if (!token) {
+
+            alert(
+                "You are not logged in. Please login again."
+            );
+
+            return;
+        }
+
+
+        // ==========================================
+        // REQUEST BODY
+        // ==========================================
+
+        const requestBody = {
+
+            startDate:
+                filters.fromDate || null,
+
+            endDate:
+                filters.toDate || null,
+
+            departmentId:
+                filters.departmentId === "ALL"
+                    ? null
+                    : Number(
+                        filters.departmentId
+                    ),
+
+            status:
+                filters.status === "ALL"
+                    ? null
+                    : filters.status
+
+        };
+
+
+        console.log(
+            "PDF Request:",
+            requestBody
+        );
+
+
+        // ==========================================
+        // CALL PDF API
+        // ==========================================
+
+        const response =
+            await fetch(
+                `${API_BASE_URL}/api/admin/reports/complaints`,
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Accept":
+                            "application/pdf",
+
+                        Authorization:
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            requestBody
+                        )
+
+                }
+            );
+
+
+        // ==========================================
+        // ERROR
+        // ==========================================
+
+        if (!response.ok) {
+
+            let errorMessage =
+                "Unable to download report.";
+
+
+            const contentType =
+                response.headers.get(
+                    "content-type"
+                ) || "";
+
+
+            try {
+
+                if (
+                    contentType.includes(
+                        "application/json"
+                    )
+                ) {
+
+                    const errorData =
+                        await response.json();
+
+
+                    errorMessage =
+                        errorData.message ||
+                        errorData.error ||
+                        errorMessage;
+
+                } else {
+
+                    const errorText =
+                        await response.text();
+
+
+                    if (errorText) {
+
+                        errorMessage =
+                            errorText;
+
+                    }
+
+                }
+
+            } catch {
+                // Ignore parsing error
+            }
+
+
+            throw new Error(
+                errorMessage
+            );
+
+        }
+
+
+        // ==========================================
+        // PDF BLOB
+        // ==========================================
+
+        const blob =
+            await response.blob();
+
+
+        if (
+            !blob ||
+            blob.size === 0
+        ) {
+
+            throw new Error(
+                "Generated PDF is empty."
+            );
+
+        }
+
+
+        // ==========================================
+        // DOWNLOAD
+        // ==========================================
+
+        const url =
+            window.URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href = url;
+
+
+        link.download =
+            "FixMyCity-Complaint-Report.pdf";
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        document.body.removeChild(
+            link
+        );
+
+
+        // ==========================================
+        // CLEANUP
+        // ==========================================
+
+        setTimeout(() => {
+
+            window.URL.revokeObjectURL(
+                url
+            );
+
+        }, 10000);
+
+
+    } catch (error) {
+
+        console.error(
+            "PDF Download Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to download report."
+        );
+
+    }
+
+};
+
+
+
+
+    /* ======================================================
+       REPORT VALUES
+    ====================================================== */
+
+    const summary =
+        reportData.summary;
+
+    const complaintStatusData =
+        reportData.complaintStatusData;
+
+    const departmentData =
+        reportData.departmentData;
+
+    const monthlyData =
+        reportData.monthlyData;
+
+    const engineers =
+        reportData.engineers;
+
+    const departments =
+        reportData.departments;
+
+
+    /* ======================================================
+       STATUS TOTAL
+    ====================================================== */
+
+    const statusChartTotal =
+        useMemo(
+            () =>
+                complaintStatusData.reduce(
+                    (
+                        total,
+                        item
+                    ) =>
+                        total +
+                        Number(
+                            item.value
+                        ),
+                    0
+                ),
+            [
+                complaintStatusData
+            ]
+        );
+
+
+    /* ======================================================
+       RENDER
+    ====================================================== */
 
     return (
 
         <>
 
-            {/* ==================================================
-                MAIN REPORT PAGE
-            ================================================== */}
-
             <div className="reports-page">
 
-
-                {/* HEADER */}
+                {/* ==================================================
+                    HEADER
+                ================================================== */}
 
                 <div className="page-header">
 
                     <div className="page-title-section">
 
                         <div className="page-title-icon">
+
                             <FaChartBar />
+
                         </div>
 
                         <div>
@@ -1801,9 +1369,10 @@ window.onafterprint = function () {
                             </h1>
 
                             <p>
-                                Monitor complaints, departments,
-                                engineers and overall system
-                                performance.
+                                Monitor complaints,
+                                departments,
+                                engineers and overall
+                                system performance.
                             </p>
 
                         </div>
@@ -1813,192 +1382,23 @@ window.onafterprint = function () {
 
                     <button
                         className="generate-main-btn"
-                        onClick={handleGenerateReport}
+                        onClick={
+                            handleGenerateReport
+                        }
+                        disabled={
+                            generatingReport
+                        }
                     >
 
                         <FaFilePdf />
 
-                        Generate Report
+                        {
+                            generatingReport
+                                ? "Generating..."
+                                : "Generate Report"
+                        }
 
                     </button>
-
-                </div>
-
-
-                {/* ==================================================
-                    SUMMARY CARDS
-                ================================================== */}
-
-                <div className="summary-grid">
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Total Complaints
-                            </h4>
-
-                            <h2>
-                                {summary.totalComplaints}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon blue">
-                            <FaClipboardList />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Resolved
-                            </h4>
-
-                            <h2>
-                                {summary.resolvedComplaints}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon green">
-                            <FaCheckCircle />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Pending
-                            </h4>
-
-                            <h2>
-                                {summary.pendingComplaints}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon orange">
-                            <FaClock />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                In Progress
-                            </h4>
-
-                            <h2>
-                                {summary.inProgress}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon purple">
-                            <FaExclamationTriangle />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Total Citizens
-                            </h4>
-
-                            <h2>
-                                {summary.totalCitizens}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon cyan">
-                            <FaUsers />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Total Engineers
-                            </h4>
-
-                            <h2>
-                                {summary.totalEngineers}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon indigo">
-                            <FaUserCog />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Departments
-                            </h4>
-
-                            <h2>
-                                {summary.totalDepartments}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon teal">
-                            <FaBuilding />
-                        </div>
-
-                    </div>
-
-
-                    <div className="summary-card">
-
-                        <div className="summary-info">
-
-                            <h4>
-                                Resolution Rate
-                            </h4>
-
-                            <h2>
-                                {summary.resolutionRate}
-                            </h2>
-
-                        </div>
-
-                        <div className="summary-icon green">
-                            <FaChartLine />
-                        </div>
-
-                    </div>
-
 
                 </div>
 
@@ -2012,12 +1412,21 @@ window.onafterprint = function () {
                     <div className="card-header">
 
                         <h2>
+
                             <FaFilter />
+
+                            {" "}
+
                             Report Filters
+
                         </h2>
 
                         <p>
-                            Filter report data.
+
+                            Select the required
+                            filters and generate
+                            the report.
+
                         </p>
 
                     </div>
@@ -2025,16 +1434,30 @@ window.onafterprint = function () {
 
                     <div className="filter-grid">
 
+
+                        {/* FROM DATE */}
+
                         <div className="form-group">
 
                             <label>
                                 From Date
                             </label>
 
-                            <input type="date" />
+                            <input
+                                type="date"
+                                name="fromDate"
+                                value={
+                                    filters.fromDate
+                                }
+                                onChange={
+                                    handleFilterChange
+                                }
+                            />
 
                         </div>
 
+
+                        {/* TO DATE */}
 
                         <div className="form-group">
 
@@ -2042,10 +1465,21 @@ window.onafterprint = function () {
                                 To Date
                             </label>
 
-                            <input type="date" />
+                            <input
+                                type="date"
+                                name="toDate"
+                                value={
+                                    filters.toDate
+                                }
+                                onChange={
+                                    handleFilterChange
+                                }
+                            />
 
                         </div>
 
+
+                        {/* DEPARTMENT */}
 
                         <div className="form-group">
 
@@ -2053,36 +1487,61 @@ window.onafterprint = function () {
                                 Department
                             </label>
 
-                            <select>
+                            <select
+                                name="departmentId"
+                                value={
+                                    filters.departmentId
+                                }
+                                onChange={
+                                    handleFilterChange
+                                }
+                            >
 
-                                <option>
+                                <option value="ALL">
                                     All Departments
                                 </option>
 
-                                <option>
-                                    Road Department
-                                </option>
 
-                                <option>
-                                    Water Department
-                                </option>
+                                {
+                                    departmentsList.map(
+                                        department => (
 
-                                <option>
-                                    Garbage Department
-                                </option>
+                                            <option
+                                                key={
+                                                    department.departmentId
+                                                }
+                                                value={
+                                                    department.departmentId
+                                                }
+                                            >
 
-                                <option>
-                                    Street Light
-                                </option>
+                                                {
+                                                    department.name
+                                                }
 
-                                <option>
-                                    Drainage Department
-                                </option>
+                                            </option>
+
+                                        )
+                                    )
+                                }
 
                             </select>
 
+
+                            {
+                                loadingDepartments && (
+
+                                    <small>
+                                        Loading departments...
+                                    </small>
+
+                                )
+                            }
+
                         </div>
 
+
+                        {/* STATUS */}
 
                         <div className="form-group">
 
@@ -2090,61 +1549,50 @@ window.onafterprint = function () {
                                 Status
                             </label>
 
-                            <select>
+                            <select
+                                name="status"
+                                value={
+                                    filters.status
+                                }
+                                onChange={
+                                    handleFilterChange
+                                }
+                            >
 
-                                <option>
+                                <option value="ALL">
                                     All Status
                                 </option>
 
-                                <option>
-                                    Pending
+                                <option value="CREATED">
+                                    Created
                                 </option>
 
-                                <option>
+                                <option value="ASSIGNED">
+                                    Assigned
+                                </option>
+
+                                <option value="IN_PROGRESS">
                                     In Progress
                                 </option>
 
-                                <option>
+                                <option value="RESOLVED">
                                     Resolved
                                 </option>
 
-                            </select>
-
-                        </div>
-
-
-                        <div className="form-group">
-
-                            <label>
-                                Engineer
-                            </label>
-
-                            <select>
-
-                                <option>
-                                    All Engineers
+                                <option value="REJECTED">
+                                    Rejected
                                 </option>
 
-                                {
-                                    engineers.map(
-                                        engineer => (
-                                            <option
-                                                key={
-                                                    engineer.name
-                                                }
-                                            >
-                                                {
-                                                    engineer.name
-                                                }
-                                            </option>
-                                        )
-                                    )
-                                }
+                                <option value="CLOSED">
+                                    Closed
+                                </option>
 
                             </select>
 
                         </div>
 
+
+                        {/* BUTTON */}
 
                         <div className="form-group">
 
@@ -2154,455 +1602,39 @@ window.onafterprint = function () {
 
                             <button
                                 className="apply-btn"
+                                onClick={
+                                    handleGenerateReport
+                                }
+                                disabled={
+                                    generatingReport
+                                }
                             >
-                                Apply Filter
+
+                                <FaChartLine />
+
+                                {" "}
+
+                                {
+                                    generatingReport
+                                        ? "Generating..."
+                                        : "Generate Report"
+                                }
+
                             </button>
 
                         </div>
 
-                    </div>
-
-                </div>
-
-
-                {/* ==================================================
-                    SCREEN CHARTS
-                ================================================== */}
-
-                <div className="analytics-grid">
-
-
-                    <div className="analytics-card">
-
-                        <div className="card-header">
-
-                            <h2>
-                                Complaint Status
-                            </h2>
-
-                            <p>
-                                Complaint distribution
-                            </p>
-
-                        </div>
-
-
-                        <div className="chart-box">
-
-                            <ResponsiveContainer
-                                width="100%"
-                                height="100%"
-                            >
-
-                                <PieChart>
-
-                                    <Pie
-                                        data={
-                                            complaintStatusData
-                                        }
-                                        dataKey="value"
-                                        nameKey="name"
-                                        cx="50%"
-                                        cy="45%"
-                                        innerRadius={65}
-                                        outerRadius={105}
-                                        paddingAngle={4}
-                                    >
-
-                                        {
-                                            complaintStatusData.map(
-                                                (
-                                                    item,
-                                                    index
-                                                ) => (
-
-                                                    <Cell
-                                                        key={
-                                                            index
-                                                        }
-                                                        fill={
-                                                            COLORS[
-                                                                index
-                                                            ]
-                                                        }
-                                                    />
-
-                                                )
-                                            )
-                                        }
-
-                                    </Pie>
-
-                                    <Tooltip />
-
-                                    <Legend />
-
-                                </PieChart>
-
-                            </ResponsiveContainer>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="analytics-card">
-
-                        <div className="card-header">
-
-                            <h2>
-                                Department Performance
-                            </h2>
-
-                            <p>
-                                Complaints by department
-                            </p>
-
-                        </div>
-
-
-                        <div className="chart-box">
-
-                            <ResponsiveContainer
-                                width="100%"
-                                height="100%"
-                            >
-
-                                <BarChart
-                                    data={
-                                        departmentData
-                                    }
-                                >
-
-                                    <CartesianGrid
-                                        strokeDasharray="3 3"
-                                    />
-
-                                    <XAxis
-                                        dataKey="department"
-                                    />
-
-                                    <YAxis />
-
-                                    <Tooltip />
-
-                                    <Bar
-                                        dataKey="complaints"
-                                        fill="#2563eb"
-                                        radius={[
-                                            7,
-                                            7,
-                                            0,
-                                            0
-                                        ]}
-                                    />
-
-                                </BarChart>
-
-                            </ResponsiveContainer>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="analytics-card full-width">
-
-                        <div className="card-header">
-
-                            <h2>
-                                Monthly Complaint Trend
-                            </h2>
-
-                            <p>
-                                Monthly complaint statistics
-                            </p>
-
-                        </div>
-
-
-                        <div className="chart-box line-chart-box">
-
-                            <ResponsiveContainer
-                                width="100%"
-                                height="100%"
-                            >
-
-                                <LineChart
-                                    data={
-                                        monthlyData
-                                    }
-                                >
-
-                                    <CartesianGrid
-                                        strokeDasharray="3 3"
-                                    />
-
-                                    <XAxis
-                                        dataKey="month"
-                                    />
-
-                                    <YAxis />
-
-                                    <Tooltip />
-
-                                    <Line
-                                        type="monotone"
-                                        dataKey="complaints"
-                                        stroke="#2563eb"
-                                        strokeWidth={4}
-                                    />
-
-                                </LineChart>
-
-                            </ResponsiveContainer>
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-                {/* ==================================================
-                    ENGINEER TABLE
-                ================================================== */}
-
-                <div className="table-card">
-
-                    <div className="card-header">
-
-                        <h2>
-                            Engineer Performance
-                        </h2>
-
-                    </div>
-
-
-                    <div className="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Engineer
-                                    </th>
-
-                                    <th>
-                                        Department
-                                    </th>
-
-                                    <th>
-                                        Assigned
-                                    </th>
-
-                                    <th>
-                                        Completed
-                                    </th>
-
-                                    <th>
-                                        Pending
-                                    </th>
-
-                                    <th>
-                                        Efficiency
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                {
-                                    engineers.map(
-                                        engineer => (
-
-                                            <tr
-                                                key={
-                                                    engineer.name
-                                                }
-                                            >
-
-                                                <td>
-                                                    {
-                                                        engineer.name
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        engineer.department
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        engineer.assigned
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        engineer.completed
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        engineer.pending
-                                                    }
-                                                </td>
-
-                                                <td>
-
-                                                    <span
-                                                        className="efficiency-badge"
-                                                    >
-                                                        {
-                                                            engineer.efficiency
-                                                        }
-                                                    </span>
-
-                                                </td>
-
-                                            </tr>
-
-                                        )
-                                    )
-                                }
-
-                            </tbody>
-
-                        </table>
 
                     </div>
 
                 </div>
-
-
-                {/* ==================================================
-                    DEPARTMENT TABLE
-                ================================================== */}
-
-                <div className="table-card">
-
-                    <div className="card-header">
-
-                        <h2>
-                            Department Performance
-                        </h2>
-
-                    </div>
-
-
-                    <div className="table-container">
-
-                        <table>
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Department
-                                    </th>
-
-                                    <th>
-                                        Total
-                                    </th>
-
-                                    <th>
-                                        Resolved
-                                    </th>
-
-                                    <th>
-                                        Pending
-                                    </th>
-
-                                    <th>
-                                        Resolution Rate
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                {
-                                    departments.map(
-                                        department => (
-
-                                            <tr
-                                                key={
-                                                    department.name
-                                                }
-                                            >
-
-                                                <td>
-                                                    {
-                                                        department.name
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        department.total
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        department.resolved
-                                                    }
-                                                </td>
-
-                                                <td>
-                                                    {
-                                                        department.pending
-                                                    }
-                                                </td>
-
-                                                <td>
-
-                                                    <span
-                                                        className="efficiency-badge"
-                                                    >
-                                                        {
-                                                            department.rate
-                                                        }
-                                                    </span>
-
-                                                </td>
-
-                                            </tr>
-
-                                        )
-                                    )
-                                }
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
 
             </div>
 
 
-            {/* ==================================================
+            {/* ======================================================
                 REPORT PREVIEW
-            ================================================== */}
+            ====================================================== */}
 
             {
                 showReport && (
@@ -2612,12 +1644,18 @@ window.onafterprint = function () {
                         <div className="generated-report">
 
 
+                            {/* ==================================================
+                                HEADER
+                            ================================================== */}
+
                             <div className="generated-header">
 
                                 <div className="report-brand">
 
                                     <div className="report-logo">
+
                                         <FaBuilding />
+
                                     </div>
 
                                     <div>
@@ -2643,18 +1681,28 @@ window.onafterprint = function () {
                                     </strong>
 
                                     <span>
+
                                         Generated:
+
                                         {" "}
+
                                         {
                                             new Date()
-                                                .toLocaleDateString()
+                                                .toLocaleDateString(
+                                                    "en-IN"
+                                                )
                                         }
+
                                     </span>
 
                                 </div>
 
                             </div>
 
+
+                            {/* ==================================================
+                                TITLE
+                            ================================================== */}
 
                             <div className="generated-title">
 
@@ -2670,10 +1718,23 @@ window.onafterprint = function () {
                                     </h2>
 
                                     <p>
-                                        Comprehensive overview of
-                                        complaints, departments,
-                                        engineers and system
-                                        performance.
+
+                                        {
+                                            filters.fromDate ||
+                                            filters.toDate
+
+                                                ? `Report from ${
+                                                    filters.fromDate ||
+                                                    "Beginning"
+                                                } to ${
+                                                    filters.toDate ||
+                                                    "Today"
+                                                }`
+
+                                                : "Comprehensive overview of complaints, departments, engineers and system performance."
+
+                                        }
+
                                     </p>
 
                                 </div>
@@ -2690,6 +1751,10 @@ window.onafterprint = function () {
                             </div>
 
 
+                            {/* ==================================================
+                                SUMMARY
+                            ================================================== */}
+
                             <div className="generated-summary">
 
 
@@ -2701,7 +1766,9 @@ window.onafterprint = function () {
 
                                     <strong>
                                         {
-                                            summary.totalComplaints
+                                            formatNumber(
+                                                summary.totalComplaints
+                                            )
                                         }
                                     </strong>
 
@@ -2716,7 +1783,9 @@ window.onafterprint = function () {
 
                                     <strong>
                                         {
-                                            summary.resolvedComplaints
+                                            formatNumber(
+                                                summary.resolvedComplaints
+                                            )
                                         }
                                     </strong>
 
@@ -2731,7 +1800,9 @@ window.onafterprint = function () {
 
                                     <strong>
                                         {
-                                            summary.pendingComplaints
+                                            formatNumber(
+                                                summary.pendingComplaints
+                                            )
                                         }
                                     </strong>
 
@@ -2746,7 +1817,9 @@ window.onafterprint = function () {
 
                                     <strong>
                                         {
-                                            summary.resolutionRate
+                                            formatPercentage(
+                                                summary.resolutionRate
+                                            )
                                         }
                                     </strong>
 
@@ -2756,57 +1829,188 @@ window.onafterprint = function () {
                             </div>
 
 
-                            {/* REPORT INFORMATION */}
+                            {/* ==================================================
+                                SYSTEM INFORMATION
+                            ================================================== */}
 
                             <div className="report-information">
 
+
                                 <div>
+
                                     <strong>
                                         Citizens
                                     </strong>
 
                                     <span>
-                                        {summary.totalCitizens}
+                                        {
+                                            formatNumber(
+                                                summary.totalCitizens
+                                            )
+                                        }
                                     </span>
+
                                 </div>
 
 
                                 <div>
+
                                     <strong>
                                         Engineers
                                     </strong>
 
                                     <span>
-                                        {summary.totalEngineers}
+                                        {
+                                            formatNumber(
+                                                summary.totalEngineers
+                                            )
+                                        }
                                     </span>
+
                                 </div>
 
 
                                 <div>
+
                                     <strong>
                                         Departments
                                     </strong>
 
                                     <span>
-                                        {summary.totalDepartments}
+                                        {
+                                            formatNumber(
+                                                summary.totalDepartments
+                                            )
+                                        }
                                     </span>
+
                                 </div>
 
 
                                 <div>
+
                                     <strong>
                                         In Progress
                                     </strong>
 
                                     <span>
-                                        {summary.inProgress}
+                                        {
+                                            formatNumber(
+                                                summary.inProgress
+                                            )
+                                        }
                                     </span>
+
                                 </div>
+
 
                             </div>
 
 
-                            {/* REPORT TABLE */}
+                            {/* ==================================================
+                                FILTER INFORMATION
+                            ================================================== */}
+
+                            <div className="report-information">
+
+
+                                <div>
+
+                                    <strong>
+                                        From Date
+                                    </strong>
+
+                                    <span>
+                                        {
+                                            filters.fromDate ||
+                                            "All"
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        To Date
+                                    </strong>
+
+                                    <span>
+                                        {
+                                            filters.toDate ||
+                                            "All"
+                                        }
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        Department
+                                    </strong>
+
+                                    <span>
+
+                                        {
+                                            filters.departmentId ===
+                                            "ALL"
+
+                                                ? "All Departments"
+
+                                                : (
+                                                    departmentsList.find(
+                                                        department =>
+                                                            String(
+                                                                department.departmentId
+                                                            ) ===
+                                                            String(
+                                                                filters.departmentId
+                                                            )
+                                                    )?.name ||
+                                                    "Selected Department"
+                                                )
+
+                                        }
+
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <strong>
+                                        Status
+                                    </strong>
+
+                                    <span>
+
+                                        {
+                                            filters.status ===
+                                            "ALL"
+
+                                                ? "All Status"
+
+                                                : formatStatus(
+                                                    filters.status
+                                                )
+
+                                        }
+
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+                            {/* ==================================================
+                                ENGINEER PERFORMANCE
+                            ================================================== */}
 
                             <div className="generated-section">
 
@@ -2865,11 +2069,14 @@ window.onafterprint = function () {
 
                                             {
                                                 engineers.map(
-                                                    engineer => (
+                                                    (
+                                                        engineer,
+                                                        index
+                                                    ) => (
 
                                                         <tr
                                                             key={
-                                                                engineer.name
+                                                                index
                                                             }
                                                         >
 
@@ -2887,19 +2094,25 @@ window.onafterprint = function () {
 
                                                             <td>
                                                                 {
-                                                                    engineer.assigned
+                                                                    formatNumber(
+                                                                        engineer.assigned
+                                                                    )
                                                                 }
                                                             </td>
 
                                                             <td>
                                                                 {
-                                                                    engineer.completed
+                                                                    formatNumber(
+                                                                        engineer.completed
+                                                                    )
                                                                 }
                                                             </td>
 
                                                             <td>
                                                                 {
-                                                                    engineer.pending
+                                                                    formatNumber(
+                                                                        engineer.pending
+                                                                    )
                                                                 }
                                                             </td>
 
@@ -2908,7 +2121,9 @@ window.onafterprint = function () {
                                                                 <strong className="report-green">
 
                                                                     {
-                                                                        engineer.efficiency
+                                                                        formatPercentage(
+                                                                            engineer.efficiency
+                                                                        )
                                                                     }
 
                                                                 </strong>
@@ -2921,6 +2136,31 @@ window.onafterprint = function () {
                                                 )
                                             }
 
+
+                                            {
+                                                engineers.length ===
+                                                0 && (
+
+                                                    <tr>
+
+                                                        <td
+                                                            colSpan="6"
+                                                            style={{
+                                                                textAlign:
+                                                                    "center"
+                                                            }}
+                                                        >
+
+                                                            No engineer
+                                                            data available
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                )
+                                            }
+
                                         </tbody>
 
                                     </table>
@@ -2929,6 +2169,10 @@ window.onafterprint = function () {
 
                             </div>
 
+
+                            {/* ==================================================
+                                DEPARTMENT PERFORMANCE
+                            ================================================== */}
 
                             <div className="generated-section">
 
@@ -2983,11 +2227,14 @@ window.onafterprint = function () {
 
                                             {
                                                 departments.map(
-                                                    department => (
+                                                    (
+                                                        department,
+                                                        index
+                                                    ) => (
 
                                                         <tr
                                                             key={
-                                                                department.name
+                                                                index
                                                             }
                                                         >
 
@@ -2999,19 +2246,25 @@ window.onafterprint = function () {
 
                                                             <td>
                                                                 {
-                                                                    department.total
+                                                                    formatNumber(
+                                                                        department.total
+                                                                    )
                                                                 }
                                                             </td>
 
                                                             <td>
                                                                 {
-                                                                    department.resolved
+                                                                    formatNumber(
+                                                                        department.resolved
+                                                                    )
                                                                 }
                                                             </td>
 
                                                             <td>
                                                                 {
-                                                                    department.pending
+                                                                    formatNumber(
+                                                                        department.pending
+                                                                    )
                                                                 }
                                                             </td>
 
@@ -3020,7 +2273,9 @@ window.onafterprint = function () {
                                                                 <strong className="report-green">
 
                                                                     {
-                                                                        department.rate
+                                                                        formatPercentage(
+                                                                            department.rate
+                                                                        )
                                                                     }
 
                                                                 </strong>
@@ -3033,6 +2288,31 @@ window.onafterprint = function () {
                                                 )
                                             }
 
+
+                                            {
+                                                departments.length ===
+                                                0 && (
+
+                                                    <tr>
+
+                                                        <td
+                                                            colSpan="5"
+                                                            style={{
+                                                                textAlign:
+                                                                    "center"
+                                                            }}
+                                                        >
+
+                                                            No department
+                                                            data available
+
+                                                        </td>
+
+                                                    </tr>
+
+                                                )
+                                            }
+
                                         </tbody>
 
                                     </table>
@@ -3042,7 +2322,9 @@ window.onafterprint = function () {
                             </div>
 
 
-                            {/* FOOTER */}
+                            {/* ==================================================
+                                FOOTER
+                            ================================================== */}
 
                             <div className="generated-footer">
 
@@ -3072,7 +2354,9 @@ window.onafterprint = function () {
                             </div>
 
 
-                            {/* BUTTONS */}
+                            {/* ==================================================
+                                BUTTONS
+                            ================================================== */}
 
                             <div className="generated-actions">
 
