@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "../styles/EmailOtpModel.css";
 
 function EmailOtpModal({
   email,
   attachments = [],
   onVerify,
   onClose,
+  onResend,
 }) {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
 
   // Backend OTP expires after 5 minutes
   const [timeLeft, setTimeLeft] = useState(300);
@@ -145,6 +148,26 @@ function EmailOtpModal({
   };
 
   // =========================================================
+  // RESEND OTP
+  // =========================================================
+
+  const handleResend = async () => {
+    if (!onResend) return;
+    try {
+      setResending(true);
+      await onResend();
+      setTimeLeft(300);
+      setOtp("");
+      alert("New OTP has been sent to your email.");
+    } catch (err) {
+      console.error("Resend OTP Error:", err);
+      alert("Failed to resend OTP. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // =========================================================
   // CLOSE
   // =========================================================
 
@@ -173,64 +196,91 @@ function EmailOtpModal({
   // =========================================================
 
   return (
-    <div className="otp-modal">
+    <div className="otp-overlay">
 
-      <div className="otp-modal-content">
+      <div className="otp-modal">
+
+        <div className="otp-icon">
+          ✉️
+        </div>
 
         <h2>Verify Email</h2>
 
         <p>
-          OTP has been sent to:
-        </p>
-
-        <p>
+          OTP has been sent to:<br />
           <strong>{email}</strong>
         </p>
 
         <div>
-          <label htmlFor="otp">
+          <label
+            htmlFor="otp"
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: 600,
+              color: "#334155",
+              fontSize: "14px",
+            }}
+          >
             Enter 6-digit OTP
           </label>
 
           <input
             id="otp"
+            className="otp-input"
             type="text"
             inputMode="numeric"
             autoComplete="one-time-code"
             value={otp}
             maxLength={6}
-            placeholder="Enter OTP"
+            placeholder="· · · · · ·"
             onChange={handleOtpChange}
-            disabled={loading}
+            disabled={loading || resending}
+            autoFocus
           />
         </div>
 
-        <p>
+        <div className="otp-timer">
           {timeLeft > 0 ? (
-            <>
-              OTP expires in{" "}
-              <strong>{formattedTime}</strong>
-            </>
+            <p>
+              OTP expires in <span>{formattedTime}</span>
+            </p>
           ) : (
-            <strong>OTP Expired</strong>
+            <p style={{ color: "#e53935", fontWeight: 600 }}>
+              OTP Expired.{" "}
+              {onResend && (
+                <button
+                  type="button"
+                  className="resend-btn"
+                  onClick={handleResend}
+                  disabled={resending}
+                >
+                  {resending ? "Sending..." : "Resend OTP"}
+                </button>
+              )}
+            </p>
           )}
-        </p>
+        </div>
 
-        <button
-          type="button"
-          onClick={handleVerifyButton}
-          disabled={loading || timeLeft <= 0}
-        >
-          {loading ? "Verifying..." : "Verify OTP"}
-        </button>
+        <div className="otp-buttons">
+          <button
+            type="button"
+            className="verify-btn"
+            onClick={handleVerifyButton}
+            disabled={loading || resending || timeLeft <= 0}
+          >
+            {loading ? "Verifying..." : "Verify OTP"}
+          </button>
 
-        <button
-          type="button"
-          onClick={handleClose}
-          disabled={loading}
-        >
-          Cancel
-        </button>
+          <button
+            type="button"
+            className="cancel-btn"
+            onClick={handleClose}
+            disabled={loading || resending}
+          >
+            Cancel
+          </button>
+        </div>
 
       </div>
 

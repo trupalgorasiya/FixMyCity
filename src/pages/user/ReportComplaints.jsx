@@ -383,14 +383,8 @@ function ReportComplaint() {
       description: formData.description.trim(),
       address: formData.address,
       pincode: formData.pincode || "",
-      latitude:
-        formData.latitude === ""
-          ? null
-          : Number(formData.latitude),
-      longitude:
-        formData.longitude === ""
-          ? null
-          : Number(formData.longitude),
+      latitude: formData.latitude != null ? String(formData.latitude) : "",
+      longitude: formData.longitude != null ? String(formData.longitude) : "",
     };
 
     const response = await axios.post(
@@ -440,12 +434,87 @@ function ReportComplaint() {
     try {
       setSubmitting(true);
 
-      await sendComplaintOtp();
+      // Check if email already exists in backend
+      const checkRes = await axios.get(
+        `http://localhost:8085/api/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
+      );
 
-      setShowOtpModal(true);
+      const isRegistered = checkRes.data?.exists === true;
+
+      if (isRegistered) {
+        // =====================================================
+        // DIRECT COMPLAINT (Existing User)
+        // =====================================================
+        const directData = new FormData();
+        directData.append("firstName", formData.firstName.trim());
+        directData.append("lastName", formData.lastName.trim());
+        directData.append("email", formData.email.trim());
+        directData.append("contact", formData.contact.trim());
+        directData.append("department", formData.department);
+        directData.append("category", formData.category);
+        directData.append("title", formData.title.trim());
+        directData.append("description", formData.description.trim());
+        directData.append("address", formData.address);
+        directData.append("pincode", formData.pincode || "");
+        directData.append("latitude", formData.latitude || "");
+        directData.append("longitude", formData.longitude || "");
+
+        if (formData.attachments && formData.attachments.length > 0) {
+          formData.attachments.forEach((file) => {
+            directData.append("media", file);
+          });
+        }
+
+        const directResponse = await axios.post(
+          "http://localhost:8085/api/guest-complaint/direct-complaint",
+          directData
+        );
+
+        const compNumber = directResponse.data?.complaintNumber || "";
+        const successMsg =
+          directResponse.data?.message ||
+          "Complaint registered successfully under your registered account.";
+
+        setComplaintNumber(compNumber);
+        setMessage(successMsg);
+
+        setPopup({
+          show: true,
+          type: "success",
+          title: "Complaint Registered!",
+          message: successMsg,
+          details: compNumber
+            ? `Complaint Number: ${compNumber}`
+            : "Your complaint details have been emailed to you.",
+        });
+
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          contact: "",
+          title: "",
+          department: "",
+          departmentId: "",
+          category: "",
+          description: "",
+          address: "",
+          pincode: "",
+          latitude: "",
+          longitude: "",
+          attachments: [],
+          confirm: false,
+        });
+      } else {
+        // =====================================================
+        // SEND OTP FOR NEW USER
+        // =====================================================
+        await sendComplaintOtp();
+        setShowOtpModal(true);
+      }
     } catch (err) {
       console.error(
-        "Send OTP Error:",
+        "Submit Complaint Error:",
         err
       );
 
@@ -456,14 +525,14 @@ function ReportComplaint() {
       const errorMessage =
         typeof backendMessage === "string"
           ? backendMessage
-          : "Unable to send OTP. Please try again.";
+          : "Unable to submit complaint. Please try again.";
 
       setError(errorMessage);
 
       setPopup({
         show: true,
         type: "error",
-        title: "OTP Sending Failed",
+        title: "Submission Failed",
         message: errorMessage,
         details: "",
       });

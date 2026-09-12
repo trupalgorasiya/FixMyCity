@@ -1676,7 +1676,7 @@ function NewComplaints() {
           categoryFilter === "All" ||
 
           getCategoryName(item) ===
-            categoryFilter
+          categoryFilter
 
         );
 
@@ -1744,23 +1744,23 @@ function NewComplaints() {
 
     <div className="assigned-page">
 
-{/* =================================================
+      {/* =================================================
                 POPUP
             ================================================= */}
 
-            {popup.show && (
+      {popup.show && (
 
-                <CustomPopup
+        <CustomPopup
 
-                    type={popup.type}
+          type={popup.type}
 
-                    message={popup.message}
+          message={popup.message}
 
-                    onClose={closePopup}
+          onClose={closePopup}
 
-                />
+        />
 
-            )}
+      )}
       {/* =====================================================
           PAGE HEADER
       ===================================================== */}
@@ -1932,10 +1932,10 @@ function NewComplaints() {
                 <th>
                   Category
                 </th>
-
+                {/* 
                 <th>
                   Location
-                </th>
+                </th> */}
 
                 <th>
                   Priority
@@ -2054,14 +2054,14 @@ function NewComplaints() {
 
 
                       {/* LOCATION */}
-
+                      {/* 
                       <td>
 
                         {
                           getLocation(item)
                         }
 
-                      </td>
+                      </td> */}
 
 
                       {/* PRIORITY */}
@@ -2353,7 +2353,7 @@ function NewComplaints() {
                             engineer.firstName
                               ? `${engineer.firstName} ${engineer.lastName || ""}`
                               : engineer.name ||
-                                `Engineer ${engineer.engineerId || engineer.id}`
+                              `Engineer ${engineer.engineerId || engineer.id}`
                           }
 
                         </option>
@@ -2546,7 +2546,7 @@ function NewComplaints() {
       {/* =====================================================
           POPUP
       ===================================================== */}
-{/* 
+      {/* 
       {popup.show && (
 
         <div

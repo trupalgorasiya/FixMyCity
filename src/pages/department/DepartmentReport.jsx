@@ -1516,12 +1516,7 @@ function DepartmentReport() {
                     </div>
 
 
-                    <div
-                        className="report-information"
-                        style={{
-                            marginBottom: "20px"
-                        }}
-                    >
+                    <div className="report-information">
 
                         <div>
 
@@ -1704,6 +1699,83 @@ function DepartmentReport() {
                                 }
 
                             </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {/* ==================================================
+                    FEATURE CARDS
+                ================================================== */}
+
+                <div className="dept-report-features">
+
+                    <div className="dept-feature-card">
+
+                        <div className="dept-feature-icon icon-blue">
+
+                            <FaFilePdf />
+
+                        </div>
+
+                        <div className="dept-feature-text">
+
+                            <h3>
+                                Official Department PDF
+                            </h3>
+
+                            <p>
+                                Generate verified complaint summaries, resolutions, and official department documentation.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="dept-feature-card">
+
+                        <div className="dept-feature-icon icon-green">
+
+                            <FaCheckCircle />
+
+                        </div>
+
+                        <div className="dept-feature-text">
+
+                            <h3>
+                                Resolution Tracking
+                            </h3>
+
+                            <p>
+                                Monitor complaint resolution status, active assignments, and completion turnaround times.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="dept-feature-card">
+
+                        <div className="dept-feature-icon icon-purple">
+
+                            <FaChartLine />
+
+                        </div>
+
+                        <div className="dept-feature-text">
+
+                            <h3>
+                                Workload & Efficiency
+                            </h3>
+
+                            <p>
+                                Track engineer task allocations and performance metrics across your department.
+                            </p>
 
                         </div>
 
