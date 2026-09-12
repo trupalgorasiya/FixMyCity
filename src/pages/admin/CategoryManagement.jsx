@@ -12,7 +12,9 @@ import {
     FaLayerGroup,
     FaTimes,
     FaCheck,
-    FaFilter
+    FaFilter,
+    FaChevronLeft,
+    FaChevronRight
 } from "react-icons/fa";
 
 import "./CategoryManagement.css";
@@ -53,6 +55,15 @@ function CategoryManagement() {
     const [error, setError] =
         useState("");
 
+    /* =====================================================
+       PAGINATION
+    ===================================================== */
+
+    const [currentPage, setCurrentPage] =
+        useState(1);
+
+    const rowsPerPage = 5;
+
     const [formData, setFormData] = useState({
         departmentId: "",
         name: "",
@@ -64,7 +75,7 @@ function CategoryManagement() {
 
     /* =====================================================
        GET TOKEN
-       ===================================================== */
+    ===================================================== */
 
     const getToken = () => {
 
@@ -77,7 +88,7 @@ function CategoryManagement() {
 
     /* =====================================================
        API HEADERS
-       ===================================================== */
+    ===================================================== */
 
     const getHeaders = () => {
 
@@ -97,7 +108,7 @@ function CategoryManagement() {
     /* =====================================================
        LOAD DEPARTMENTS
        GET /api/departments
-       ===================================================== */
+    ===================================================== */
 
     const loadDepartments = async () => {
 
@@ -145,11 +156,8 @@ function CategoryManagement() {
     /* =====================================================
        LOAD ALL CATEGORIES
        
-       We load categories department-wise because
-       your API provides:
-
        GET /api/categories/department/{departmentId}
-       ===================================================== */
+    ===================================================== */
 
     const loadCategories = async () => {
 
@@ -204,21 +212,16 @@ function CategoryManagement() {
                                     department.name,
 
                                 /*
-                                    Your backend currently does
+                                    Backend currently does
                                     not return status.
-
-                                    Keeping Active here only for
-                                    existing UI compatibility.
                                 */
                                 status:
                                     category.status ||
                                     "Active",
 
                                 /*
-                                    Your API also doesn't return
-                                    complaint count.
-
-                                    Keep 0 until backend provides it.
+                                    Backend currently does
+                                    not return complaint count.
                                 */
                                 complaints:
                                     category.complaints || 0,
@@ -245,6 +248,12 @@ function CategoryManagement() {
 
             setCategories(allCategories);
 
+            /*
+                If current page becomes invalid after
+                loading/reloading data, return to page 1.
+            */
+            setCurrentPage(1);
+
         } catch (error) {
 
             console.error(
@@ -265,7 +274,7 @@ function CategoryManagement() {
 
     /* =====================================================
        INITIAL LOAD
-       ===================================================== */
+    ===================================================== */
 
     useEffect(() => {
 
@@ -276,7 +285,7 @@ function CategoryManagement() {
 
     /* =====================================================
        LOAD CATEGORIES AFTER DEPARTMENTS LOAD
-       ===================================================== */
+    ===================================================== */
 
     useEffect(() => {
 
@@ -291,7 +300,7 @@ function CategoryManagement() {
 
     /* =====================================================
        FILTER
-       ===================================================== */
+    ===================================================== */
 
     const filteredCategories = useMemo(() => {
 
@@ -339,8 +348,106 @@ function CategoryManagement() {
 
 
     /* =====================================================
+       PAGINATION
+    ===================================================== */
+
+    const totalPages = Math.ceil(
+        filteredCategories.length /
+        rowsPerPage
+    );
+
+    const indexOfLastRow =
+        currentPage * rowsPerPage;
+
+    const indexOfFirstRow =
+        indexOfLastRow - rowsPerPage;
+
+    const currentCategories =
+        filteredCategories.slice(
+            indexOfFirstRow,
+            indexOfLastRow
+        );
+
+
+    /*
+        Keep current page valid when filtering
+        changes the number of pages.
+    */
+    useEffect(() => {
+
+        if (
+            totalPages > 0 &&
+            currentPage > totalPages
+        ) {
+
+            setCurrentPage(totalPages);
+
+        }
+
+        if (
+            totalPages === 0 &&
+            currentPage !== 1
+        ) {
+
+            setCurrentPage(1);
+
+        }
+
+    }, [
+        totalPages,
+        currentPage
+    ]);
+
+
+    /* =====================================================
+       PAGINATION FUNCTIONS
+    ===================================================== */
+
+    const paginate = (pageNumber) => {
+
+        if (
+            pageNumber < 1 ||
+            pageNumber > totalPages
+        ) {
+
+            return;
+
+        }
+
+        setCurrentPage(pageNumber);
+
+    };
+
+
+    const nextPage = () => {
+
+        if (currentPage < totalPages) {
+
+            setCurrentPage(
+                prev => prev + 1
+            );
+
+        }
+
+    };
+
+
+    const previousPage = () => {
+
+        if (currentPage > 1) {
+
+            setCurrentPage(
+                prev => prev - 1
+            );
+
+        }
+
+    };
+
+
+    /* =====================================================
        STATISTICS
-       ===================================================== */
+    ===================================================== */
 
     const totalCategories =
         categories.length;
@@ -371,7 +478,7 @@ function CategoryManagement() {
 
     /* =====================================================
        ICON
-       ===================================================== */
+    ===================================================== */
 
     const getIcon = (icon) => {
 
@@ -397,7 +504,7 @@ function CategoryManagement() {
 
     /* =====================================================
        OPEN ADD MODAL
-       ===================================================== */
+    ===================================================== */
 
     const openAddModal = () => {
 
@@ -428,7 +535,7 @@ function CategoryManagement() {
 
     /* =====================================================
        OPEN EDIT MODAL
-       ===================================================== */
+    ===================================================== */
 
     const openEditModal = async (category) => {
 
@@ -436,8 +543,6 @@ function CategoryManagement() {
 
             /*
                 Load latest category details from backend.
-
-                GET /api/categories/{id}
             */
 
             const response = await fetch(
@@ -529,7 +634,7 @@ function CategoryManagement() {
 
     /* =====================================================
        CLOSE MODAL
-       ===================================================== */
+    ===================================================== */
 
     const closeModal = () => {
 
@@ -555,7 +660,7 @@ function CategoryManagement() {
 
     /* =====================================================
        INPUT CHANGE
-       ===================================================== */
+    ===================================================== */
 
     const handleInputChange = (e) => {
 
@@ -578,13 +683,7 @@ function CategoryManagement() {
        ADD CATEGORY
        
        POST /api/categories
-
-       {
-           "name": "...",
-           "description": "...",
-           "departmentId": 4
-       }
-       ===================================================== */
+    ===================================================== */
 
     const createCategory = async () => {
 
@@ -647,13 +746,7 @@ function CategoryManagement() {
        UPDATE CATEGORY
        
        PUT /api/categories/{id}
-
-       {
-           "name": "...",
-           "description": "...",
-           "departmentId": 2
-       }
-       ===================================================== */
+    ===================================================== */
 
     const updateCategory = async () => {
 
@@ -714,7 +807,7 @@ function CategoryManagement() {
 
     /* =====================================================
        SAVE CATEGORY
-       ===================================================== */
+    ===================================================== */
 
     const handleSubmit = async (e) => {
 
@@ -760,8 +853,8 @@ function CategoryManagement() {
 
 
             /*
-                Reload categories from backend
-                after successful operation.
+                Reload categories after
+                successful operation.
             */
 
             await loadCategories();
@@ -792,7 +885,7 @@ function CategoryManagement() {
        DELETE CATEGORY
        
        DELETE /api/categories/{id}
-       ===================================================== */
+    ===================================================== */
 
     const deleteCategory = async (id) => {
 
@@ -871,7 +964,7 @@ function CategoryManagement() {
 
     /* =====================================================
        RENDER
-       ===================================================== */
+    ===================================================== */
 
     return (
 
@@ -1090,9 +1183,13 @@ function CategoryManagement() {
                                 : "category-management-department"
                         }
 
-                        onClick={() =>
-                            setSelectedDepartment("All")
-                        }
+                        onClick={() => {
+
+                            setSelectedDepartment("All");
+
+                            setCurrentPage(1);
+
+                        }}
                     >
 
                         <span className="category-management-dept-symbol">
@@ -1120,13 +1217,17 @@ function CategoryManagement() {
                                     : "category-management-department"
                             }
 
-                            onClick={() =>
+                            onClick={() => {
+
                                 setSelectedDepartment(
                                     String(
                                         department.departmentId
                                     )
-                                )
-                            }
+                                );
+
+                                setCurrentPage(1);
+
+                            }}
                         >
 
                             <span className="category-management-dept-symbol">
@@ -1167,11 +1268,15 @@ function CategoryManagement() {
                         type="text"
                         placeholder="Search category, department..."
                         value={search}
-                        onChange={(e) =>
+                        onChange={(e) => {
+
                             setSearch(
                                 e.target.value
-                            )
-                        }
+                            );
+
+                            setCurrentPage(1);
+
+                        }}
                     />
 
                 </div>
@@ -1179,11 +1284,15 @@ function CategoryManagement() {
 
                 <select
                     value={statusFilter}
-                    onChange={(e) =>
+                    onChange={(e) => {
+
                         setStatusFilter(
                             e.target.value
-                        )
-                    }
+                        );
+
+                        setCurrentPage(1);
+
+                    }}
                 >
 
                     <option value="All">
@@ -1237,9 +1346,13 @@ function CategoryManagement() {
 
                         <p>
 
+                            Showing{" "}
+                            {currentCategories.length}
+                            {" "}
+                            of{" "}
                             {filteredCategories.length}
                             {" "}
-                            categories found
+                            categories
 
                         </p>
 
@@ -1267,6 +1380,10 @@ function CategoryManagement() {
                         <thead>
 
                             <tr>
+
+                                <th>
+                                    No.
+                                </th>
 
                                 <th>
                                     Category
@@ -1304,7 +1421,7 @@ function CategoryManagement() {
                                 <tr>
 
                                     <td
-                                        colSpan="6"
+                                        colSpan="7"
                                         className="category-management-empty"
                                     >
 
@@ -1316,16 +1433,26 @@ function CategoryManagement() {
 
                                 </tr>
 
-                            ) : filteredCategories.length > 0 ? (
+                            ) : currentCategories.length > 0 ? (
 
-                                filteredCategories.map(
-                                    category => (
+                                currentCategories.map(
+                                    (category, index) => (
 
                                         <tr
                                             key={
                                                 category.categoryId
                                             }
                                         >
+
+                                            {/* SERIAL NUMBER */}
+
+                                            <td>
+
+                                                {indexOfFirstRow +
+                                                    index +
+                                                    1}
+
+                                            </td>
 
 
                                             {/* CATEGORY */}
@@ -1476,7 +1603,7 @@ function CategoryManagement() {
                                 <tr>
 
                                     <td
-                                        colSpan="6"
+                                        colSpan="7"
                                         className="category-management-empty"
                                     >
 
@@ -1503,6 +1630,84 @@ function CategoryManagement() {
                 </div>
 
             </div>
+
+
+            {/* =================================================
+                PAGINATION
+            ================================================= */}
+
+            {totalPages > 1 && (
+
+                <div className="category-management-pagination">
+
+                    {/* PREVIOUS */}
+
+                    <button
+                        onClick={previousPage}
+                        disabled={currentPage === 1}
+                    >
+
+                        <FaChevronLeft />
+
+                        Previous
+
+                    </button>
+
+
+                    {/* PAGE NUMBERS */}
+
+                    <div className="category-management-page-numbers">
+
+                        {Array.from(
+                            {
+                                length: totalPages
+                            },
+                            (_, index) => (
+
+                                <button
+                                    key={index}
+                                    onClick={() =>
+                                        paginate(
+                                            index + 1
+                                        )
+                                    }
+                                    className={
+                                        currentPage ===
+                                        index + 1
+                                            ? "active-page"
+                                            : ""
+                                    }
+                                >
+
+                                    {index + 1}
+
+                                </button>
+
+                            )
+                        )}
+
+                    </div>
+
+
+                    {/* NEXT */}
+
+                    <button
+                        onClick={nextPage}
+                        disabled={
+                            currentPage ===
+                            totalPages
+                        }
+                    >
+
+                        Next
+
+                        <FaChevronRight />
+
+                    </button>
+
+                </div>
+
+            )}
 
 
             {/* =================================================
@@ -1792,3 +1997,4 @@ function CategoryManagement() {
 }
 
 export default CategoryManagement;
+

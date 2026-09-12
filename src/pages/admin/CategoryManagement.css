@@ -785,3 +785,91 @@
     }
 
 }
+
+/* ==========================================================
+   PAGINATION
+========================================================== */
+
+.category-management-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 15px 0;
+}
+
+.category-management-pagination > button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 15px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.category-management-pagination > button:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.category-management-pagination > button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.category-management-page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.category-management-page-numbers button {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.category-management-page-numbers button:hover {
+    border-color: #2563eb;
+    color: #2563eb;
+}
+
+.category-management-page-numbers button.active-page {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+
+/* ==========================================================
+   RESPONSIVE PAGINATION
+========================================================== */
+
+@media (max-width: 600px) {
+
+    .category-management-pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .category-management-page-numbers {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+}

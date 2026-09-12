@@ -1,0 +1,958 @@
+/* ==========================================================
+   MESSAGES PAGE
+========================================================== */
+
+.messages-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  box-sizing: border-box;
+  animation: pageFadeIn 0.35s ease;
+}
+
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.messages-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.messages-header h1 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.messages-header h1 svg {
+  color: #2563eb;
+  font-size: 1.7rem;
+}
+
+.messages-header p {
+  margin-top: 8px;
+  margin-bottom: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================
+   REFRESH BUTTON
+========================================================== */
+
+.refresh-btn {
+  height: 48px;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #2563eb;
+  color: #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.refresh-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.25);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ==========================================================
+   TOTAL MESSAGE CARD
+========================================================== */
+
+.message-stat {
+  width: 240px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+
+  padding: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  box-shadow:
+    0 6px 18px rgba(15, 23, 42, 0.05);
+
+  transition: 0.3s ease;
+}
+
+.message-stat:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 15px 30px rgba(15, 23, 42, 0.08);
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+
+  border-radius: 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 26px;
+
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.message-stat span {
+  display: block;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.message-stat strong {
+  display: block;
+  margin-top: 7px;
+
+  color: #2563eb;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+
+/* ==========================================================
+   MESSAGE COUNT
+========================================================== */
+
+.messages-count {
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #edf2f7;
+
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.messages-count strong {
+  color: #2563eb;
+  font-size: 1rem;
+}
+
+
+/* ==========================================================
+   MESSAGE TABLE CARD
+========================================================== */
+
+.messages-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.06);
+
+  transition: 0.3s ease;
+}
+
+.messages-card:hover {
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+
+/* ==========================================================
+   TABLE CONTAINER
+========================================================== */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: #eef2f7;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.messages-table {
+  width: 100%;
+  min-width: 1050px;
+
+  border-collapse: collapse;
+}
+
+
+/* ==========================================================
+   TABLE HEADER
+========================================================== */
+
+.messages-table thead {
+  background: #f8fafc;
+}
+
+.messages-table thead th {
+  padding: 18px 16px;
+
+  text-align: left;
+  white-space: nowrap;
+
+  color: #475569;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
+  border-bottom: 2px solid #e2e8f0;
+
+  letter-spacing: 0.3px;
+}
+
+
+/* ==========================================================
+   TABLE BODY
+========================================================== */
+
+.messages-table tbody tr {
+  border-bottom: 1px solid #edf2f7;
+
+  transition: 0.25s ease;
+
+  animation: fadeInUp 0.35s ease;
+}
+
+.messages-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.messages-table tbody td {
+  padding: 16px;
+
+  color: #334155;
+
+  font-size: 0.94rem;
+
+  vertical-align: middle;
+}
+
+
+/* ==========================================================
+   MESSAGE ID
+========================================================== */
+
+.messages-table tbody td:first-child {
+  font-weight: 700;
+  color: #2563eb;
+}
+
+
+/* ==========================================================
+   CITIZEN
+========================================================== */
+
+.citizen-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-icon {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  flex-shrink: 0;
+}
+
+.citizen-info span {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+
+/* ==========================================================
+   EMAIL
+========================================================== */
+
+.messages-table td:nth-child(3) {
+  color: #64748b;
+}
+
+
+/* ==========================================================
+   SUBJECT
+========================================================== */
+
+.messages-table td:nth-child(4) strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+
+/* ==========================================================
+   MESSAGE PREVIEW
+========================================================== */
+
+.message-preview {
+  max-width: 300px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: #64748b;
+}
+
+
+/* ==========================================================
+   ACTION BUTTONS
+========================================================== */
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.action-buttons button {
+  border: none;
+
+  width: 38px;
+  height: 38px;
+
+  padding: 0;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.9rem;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+
+/* ==========================================================
+   VIEW BUTTON
+========================================================== */
+
+.view-btn {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.view-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+
+  transform: translateY(-2px);
+}
+
+
+/* ==========================================================
+   DELETE BUTTON
+========================================================== */
+
+.delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+  color: #ffffff;
+
+  transform: translateY(-2px);
+}
+
+
+/* ==========================================================
+   EMPTY STATE
+========================================================== */
+
+.messages-empty {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  padding: 70px 20px;
+
+  text-align: center;
+
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.messages-empty svg {
+  font-size: 48px;
+  color: #94a3b8;
+}
+
+.messages-empty h2 {
+  margin-top: 18px;
+  margin-bottom: 7px;
+
+  color: #0f172a;
+
+  font-size: 1.3rem;
+}
+
+.messages-empty p {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 0.9rem;
+}
+
+
+/* ==========================================================
+   ERROR
+========================================================== */
+
+.message-error {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 14px 18px;
+
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+
+  border-radius: 12px;
+
+  color: #b91c1c;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.messages-loading {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 18px;
+
+  padding: 70px 20px;
+
+  text-align: center;
+
+  color: #64748b;
+
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.messages-loading p {
+  margin-top: 15px;
+}
+
+.loader {
+  width: 38px;
+  height: 38px;
+
+  margin: 0 auto;
+
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #2563eb;
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+
+/* ==========================================================
+   MODAL OVERLAY
+========================================================== */
+
+.message-modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(15, 23, 42, 0.45);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 9999;
+
+  backdrop-filter: blur(4px);
+
+  animation: fadeIn 0.25s ease;
+
+  padding: 20px;
+}
+
+
+/* ==========================================================
+   MODAL
+========================================================== */
+
+.message-modal {
+  width: 100%;
+  max-width: 750px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 28px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.18);
+
+  animation: popup 0.25s ease;
+}
+
+
+/* ==========================================================
+   MODAL SCROLLBAR
+========================================================== */
+
+.message-modal::-webkit-scrollbar {
+  width: 7px;
+}
+
+.message-modal::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 20px;
+}
+
+
+/* ==========================================================
+   MODAL HEADER
+========================================================== */
+
+.modal-header {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 25px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #edf2f7;
+}
+
+.modal-header h2 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 1.4rem;
+}
+
+.modal-header span {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #94a3b8;
+
+  font-size: 0.8rem;
+}
+
+
+/* ==========================================================
+   CLOSE BUTTON
+========================================================== */
+
+.close-modal {
+  width: 38px;
+  height: 38px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #eef2f7;
+
+  cursor: pointer;
+
+  font-size: 18px;
+
+  color: #475569;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.25s ease;
+}
+
+.close-modal:hover {
+  background: #2563eb;
+  color: #ffffff;
+
+  transform: rotate(90deg);
+}
+
+
+/* ==========================================================
+   MODAL BODY
+========================================================== */
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* ==========================================================
+   MESSAGE DETAILS
+========================================================== */
+
+.detail-item {
+  background: #f8fafc;
+
+  padding: 15px;
+
+  border-radius: 12px;
+
+  border: 1px solid #edf2f7;
+}
+
+.detail-item label {
+  display: block;
+
+  color: #64748b;
+
+  font-size: 0.82rem;
+
+  font-weight: 600;
+
+  margin-bottom: 7px;
+}
+
+.detail-item p {
+  margin: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #0f172a;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+}
+
+.detail-item p svg {
+  color: #2563eb;
+}
+
+
+/* ==========================================================
+   FULL MESSAGE
+========================================================== */
+
+.full-message {
+  background: #ffffff;
+
+  border: 1px solid #dbe3ee;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  color: #334155;
+
+  line-height: 1.7;
+
+  font-size: 0.92rem;
+
+  white-space: pre-wrap;
+
+  min-height: 80px;
+}
+
+
+/* ==========================================================
+   MODAL FOOTER
+========================================================== */
+
+.modal-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+
+  margin-top: 25px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #edf2f7;
+}
+
+.modal-close-btn {
+  padding: 11px 24px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #e5e7eb;
+
+  color: #334155;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.25s ease;
+}
+
+.modal-close-btn:hover {
+  background: #cbd5e1;
+
+  transform: translateY(-2px);
+}
+
+
+/* ==========================================================
+   ANIMATIONS
+========================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popup {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 992px) {
+  .messages-page {
+    padding: 25px;
+  }
+
+  .message-stat {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .messages-page {
+    padding: 20px;
+  }
+
+  .messages-header {
+    align-items: flex-start;
+  }
+
+  .messages-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .refresh-btn {
+    width: 100%;
+  }
+
+  .messages-table {
+    min-width: 950px;
+  }
+
+  .message-modal {
+    padding: 20px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .messages-page {
+    padding: 15px;
+  }
+
+  .messages-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .message-stat strong {
+    font-size: 1.6rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-close-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+/* ==========================================================
+   PRINT
+========================================================== */
+
+@media print {
+
+  body {
+    background: white;
+  }
+
+  .refresh-btn,
+  .action-buttons,
+  .modal-footer {
+    display: none;
+  }
+
+  .messages-page {
+    padding: 0;
+  }
+
+  .messages-card,
+  .message-modal {
+    box-shadow: none;
+    border: 1px solid #d1d5db;
+  }
+}

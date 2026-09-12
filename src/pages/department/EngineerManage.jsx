@@ -269,7 +269,7 @@ function DepartmentManagement() {
 
           <input
             type="text"
-            placeholder="Search Engineer ID, Name or Email..."
+            placeholder="Search Name, Mobile or Email..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -305,7 +305,7 @@ function DepartmentManagement() {
               <tr>
 
                 <th>
-                  Engineer ID
+                  Engineer No.
                 </th>
 
                 <th>
@@ -394,7 +394,7 @@ function DepartmentManagement() {
                    ENGINEER DATA
                 ================================================== */
 
-                currentEngineers.map((item) => (
+                currentEngineers.map((item,index) => (
 
                   <tr
                     key={item.engineerId}
@@ -404,7 +404,7 @@ function DepartmentManagement() {
 
                     <td className="complaint-id">
 
-                      ENG-{item.engineerId}
+                      ENG-{index + 1}
 
                     </td>
 

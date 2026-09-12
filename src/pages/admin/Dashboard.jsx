@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import "./AdminDashboard.css";
 
@@ -403,11 +404,12 @@ function Dashboard() {
         </div>
 
 
-        <button className="dashboard-btn">
-
-          Generate Report
-
-        </button>
+        <Link
+  to="/admin/report"
+  className="dashboard-btn"
+>
+  Generate Report
+</Link>
 
       </div>
 
@@ -761,83 +763,61 @@ function Dashboard() {
             </div>
 
 
-            <div className="monthly-grid">
+            <div className="dashboard-box">
+  <div className="card-header">
+    <div className="card-title">
+      <h2>
+        <FaChartLine />
+        Monthly Complaint Analytics
+      </h2>
 
-              {monthlyComplaints.map(
-                (item, index) => {
+      <p>Complaint distribution across the year</p>
+    </div>
 
-                  const complaintCount =
-                    Number(
-                      item.complaints
-                    ) || 0;
+    <div className="monthly-total">
+      <span>Total</span>
+      <strong>{dashboardData?.totalComplaints ?? 0}</strong>
+    </div>
+  </div>
 
+  <div className="monthly-grid">
+    {monthlyComplaints.map((item, index) => {
+      const complaintCount = Number(item.complaints) || 0;
 
-                  const percentage =
-                    maximumMonthlyComplaints === 0
-                      ? 0
-                      : (
-                          complaintCount /
-                          maximumMonthlyComplaints
-                        ) * 100;
+      const percentage =
+        maximumMonthlyComplaints === 0
+          ? 0
+          : (complaintCount / maximumMonthlyComplaints) * 100;
 
+      return (
+        <div
+          className="month-card"
+          key={item.month || index}
+        >
+          <div className="month-card-header">
+            <span>{formatMonth(item.month)}</span>
+            <strong>{complaintCount}</strong>
+          </div>
 
-                  return (
+          <div className="month-progress">
+            <div
+              className="month-progress-fill"
+              style={{
+                width: `${percentage}%`,
+              }}
+            />
+          </div>
 
-                    <div
-                      className="month-card"
-                      key={
-                        item.month ||
-                        index
-                      }
-                    >
-
-                      <div className="month-card-header">
-
-                        <span>
-                          {formatMonth(
-                            item.month
-                          )}
-                        </span>
-
-                        <strong>
-                          {complaintCount}
-                        </strong>
-
-                      </div>
-
-
-                      <div className="month-progress">
-
-                        <div
-                          className="month-progress-fill"
-
-                          style={{
-                            width:
-                              `${percentage}%`
-                          }}
-
-                        ></div>
-
-                      </div>
-
-
-                      <small>
-
-                        {complaintCount === 1
-                          ? "1 Complaint"
-                          : `${complaintCount} Complaints`}
-
-                      </small>
-
-                    </div>
-
-                  );
-
-                }
-              )}
-
-            </div>
-
+          <small>
+            {complaintCount === 1
+              ? "1 Complaint"
+              : `${complaintCount} Complaints`}
+          </small>
+        </div>
+      );
+    })}
+  </div>
+</div>
 
           </div>
 
@@ -885,45 +865,12 @@ function Dashboard() {
 
 
               <div className="department-summary-card">
-
-                <FaBuilding />
-
-                <div>
-
+                <FaBuilding /> 
                   <strong>
-                    {departmentPerformance.length}
-                  </strong>
-
-                  <span>
-                    Departments
-                  </span>
-
-                </div>
-
+                     {departmentPerformance.length}
+                  </strong>   Departments
               </div>
-
-
-              <div className="department-summary-card">
-
-                <FaCheckCircle />
-
-                <div>
-
-                  <strong>
-                    {totalResolved}
-                  </strong>
-
-                  <span>
-                    Resolved
-                  </span>
-
-                </div>
-
-              </div>
-
-
             </div>
-
 
             {/* PERFORMANCE LIST */}
 

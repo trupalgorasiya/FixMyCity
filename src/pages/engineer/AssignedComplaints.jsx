@@ -963,9 +963,7 @@ function AssignedComplaints() {
                   Email
                 </th>
 
-                <th>
-                  Number
-                </th>
+             
 
                 <th>
                   Priority
@@ -1078,11 +1076,6 @@ function AssignedComplaints() {
                           PHONE
                       ================================== */}
 
-                      <td>
-
-                        {item.contact}
-
-                      </td>
 
 
                       {/* ==================================

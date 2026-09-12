@@ -1,23 +1,50 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../styles/ReportComplaint.css";
-import StatusPopup from "../../configure/StatusPopup";
-import "../../styles/LocationPicker.css";
-import LocationPicker from "../../pages/LocationPicker";
 import axios from "axios";
+
+import "../../styles/ReportComplaint.css";
+import "../../styles/LocationPicker.css";
+import "../../styles/EmailOtpModel.css";
+
+import StatusPopup from "../../configure/StatusPopup";
+import LocationPicker from "../../pages/LocationPicker";
+import EmailOtpModal from "./../EmailOtpModal";
 
 function ReportComplaint() {
   const navigate = useNavigate();
+
+  // =========================================================
+  // DEPARTMENT / CATEGORY
+  // =========================================================
+
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const [loadingDepartments, setLoadingDepartments] = useState(true);
-  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingDepartments, setLoadingDepartments] =
+    useState(true);
+
+  const [loadingCategories, setLoadingCategories] =
+    useState(false);
+
+  // =========================================================
+  // SUBMIT / OTP
+  // =========================================================
+
   const [submitting, setSubmitting] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+
+  // =========================================================
+  // MESSAGE
+  // =========================================================
 
   const [message, setMessage] = useState("");
   const [complaintNumber, setComplaintNumber] = useState("");
   const [error, setError] = useState("");
+
+  // =========================================================
+  // POPUP
+  // =========================================================
+
   const [popup, setPopup] = useState({
     show: false,
     type: "success",
@@ -25,23 +52,41 @@ function ReportComplaint() {
     message: "",
     details: "",
   });
+
+  // =========================================================
+  // FORM DATA
+  // =========================================================
+
   const [formData, setFormData] = useState({
+    // Citizen information
+    firstName: "",
+    lastName: "",
+    email: "",
+    contact: "",
+
+    // Complaint information
     title: "",
     department: "",
     departmentId: "",
     category: "",
     description: "",
+
+    // Location
     address: "",
     pincode: "",
     latitude: "",
     longitude: "",
+
+    // Files
     attachments: [],
+
+    // Confirmation
     confirm: false,
   });
 
-  // =========================================
+  // =========================================================
   // GET DEPARTMENTS
-  // =========================================
+  // =========================================================
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -49,34 +94,28 @@ function ReportComplaint() {
         setLoadingDepartments(true);
         setError("");
 
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-          setError("You are not logged in. Please login again.");
-          return;
-        }
-
         const response = await axios.get(
-          "http://localhost:8085/api/departments",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          "http://localhost:8085/api/departments"
         );
 
         const data = Array.isArray(response.data)
           ? response.data
-          : response.data.data || [];
+          : response.data?.data || [];
 
         setDepartments(data);
       } catch (err) {
         console.error("Department Fetch Error:", err);
 
-        setError(
+        const backendMessage =
           err.response?.data?.message ||
-          "Unable to load departments."
-        );
+          err.response?.data;
+
+        const errorMessage =
+          typeof backendMessage === "string"
+            ? backendMessage
+            : "Unable to load departments.";
+
+        setError(errorMessage);
       } finally {
         setLoadingDepartments(false);
       }
@@ -85,9 +124,9 @@ function ReportComplaint() {
     fetchDepartments();
   }, []);
 
-  // =========================================
+  // =========================================================
   // GET CATEGORY BY DEPARTMENT
-  // =========================================
+  // =========================================================
 
   const fetchCategories = async (departmentId) => {
     if (!departmentId) {
@@ -99,25 +138,13 @@ function ReportComplaint() {
       setLoadingCategories(true);
       setError("");
 
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        setError("You are not logged in. Please login again.");
-        return;
-      }
-
       const response = await axios.get(
-        `http://localhost:8085/api/categories/department/${departmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `http://localhost:8085/api/categories/department/${departmentId}`
       );
 
       const data = Array.isArray(response.data)
         ? response.data
-        : response.data.data || [];
+        : response.data?.data || [];
 
       setCategories(data);
     } catch (err) {
@@ -125,28 +152,32 @@ function ReportComplaint() {
 
       setCategories([]);
 
-      setError(
+      const backendMessage =
         err.response?.data?.message ||
-        "Unable to load categories."
-      );
+        err.response?.data;
+
+      const errorMessage =
+        typeof backendMessage === "string"
+          ? backendMessage
+          : "Unable to load categories.";
+
+      setError(errorMessage);
     } finally {
       setLoadingCategories(false);
     }
   };
 
-  // =========================================
-  // HANDLE FORM CHANGE
-  // =========================================
+  // =========================================================
+  // HANDLE INPUT CHANGE
+  // =========================================================
 
   const handleChange = (e) => {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = e.target;
+    const { name, value, type, checked } = e.target;
 
-    // Department changed
+    // =======================================================
+    // DEPARTMENT CHANGED
+    // =======================================================
+
     if (name === "departmentId") {
       const selectedDepartment = departments.find(
         (department) =>
@@ -169,21 +200,22 @@ function ReportComplaint() {
       return;
     }
 
+    // =======================================================
+    // NORMAL INPUT
+    // =======================================================
+
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // =========================================
-  // FILE TYPE
-  // =========================================
+  // =========================================================
+  // GET FILE TYPE
+  // =========================================================
 
   const getFileType = (file) => {
-    if (file.type.startsWith("image/")) {
+    if (file.type?.startsWith("image/")) {
       return "image";
     }
 
@@ -191,39 +223,42 @@ function ReportComplaint() {
       return "pdf";
     }
 
-    if (file.type.startsWith("video/")) {
+    if (file.type?.startsWith("video/")) {
       return "video";
     }
 
     return "other";
   };
 
-  // =========================================
+  // =========================================================
   // FILE CHANGE
-  // =========================================
+  // =========================================================
 
   const handleFileChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
+    const selectedFiles = Array.from(
+      e.target.files || []
+    );
+
+    if (selectedFiles.length === 0) {
+      return;
+    }
 
     setFormData((prev) => {
       const remainingSlots =
         3 - prev.attachments.length;
 
       if (remainingSlots <= 0) {
-        alert("Maximum 3 attachments are allowed.");
+        alert(
+          "Maximum 3 attachments are allowed."
+        );
+
         return prev;
       }
 
       const filesToAdd =
-        selectedFiles.slice(
-          0,
-          remainingSlots
-        );
+        selectedFiles.slice(0, remainingSlots);
 
-      if (
-        selectedFiles.length >
-        remainingSlots
-      ) {
+      if (selectedFiles.length > remainingSlots) {
         alert(
           "You can upload a maximum of 3 attachments."
         );
@@ -238,714 +273,912 @@ function ReportComplaint() {
       };
     });
 
+    // Allow selecting the same file again
     e.target.value = "";
   };
 
-  // =========================================
+  // =========================================================
   // REMOVE ATTACHMENT
-  // =========================================
+  // =========================================================
 
   const removeAttachment = (index) => {
     setFormData((prev) => ({
       ...prev,
-      attachments:
-        prev.attachments.filter(
-          (_, i) => i !== index
-        ),
+      attachments: prev.attachments.filter(
+        (_, i) => i !== index
+      ),
     }));
   };
 
-  // =========================================
+  // =========================================================
   // LOCATION
-  // =========================================
+  // =========================================================
 
   const handleLocationSelect = (location) => {
     setFormData((prev) => ({
       ...prev,
-      address: location.address,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      pincode: location.pincode,
+      address: location.address || "",
+      latitude: location.latitude ?? "",
+      longitude: location.longitude ?? "",
+      pincode: location.pincode || "",
     }));
   };
 
-  // =========================================
-  // SUBMIT COMPLAINT
-  // =========================================
+  // =========================================================
+  // VALIDATE FORM
+  // =========================================================
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const validateForm = () => {
+    if (!formData.firstName.trim()) {
+      return "Please enter your first name.";
+    }
 
-  if (submitting) {
-    return;
-  }
+    if (!formData.lastName.trim()) {
+      return "Please enter your last name.";
+    }
 
-  setError("");
+    if (!formData.email.trim()) {
+      return "Please enter your email address.";
+    }
 
-  if (!formData.departmentId) {
-    setError("Please select a department.");
-    return;
-  }
+    const emailRegex =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!formData.category) {
-    setError("Please select a complaint category.");
-    return;
-  }
+    if (!emailRegex.test(formData.email.trim())) {
+      return "Please enter a valid email address.";
+    }
 
-  if (!formData.title.trim()) {
-    setError("Please enter a complaint title.");
-    return;
-  }
+    if (!formData.contact.trim()) {
+      return "Please enter your contact number.";
+    }
 
-  if (!formData.description.trim()) {
-    setError("Please enter complaint description.");
-    return;
-  }
+    if (
+      !/^[0-9]{10}$/.test(
+        formData.contact.trim()
+      )
+    ) {
+      return "Contact number must be exactly 10 digits.";
+    }
 
-  if (!formData.address) {
-    setError("Please select complaint location.");
-    return;
-  }
+    if (!formData.departmentId) {
+      return "Please select a department.";
+    }
 
-  if (!formData.confirm) {
-    setError(
-      "Please confirm that the information provided is correct."
-    );
-    return;
-  }
+    if (!formData.category) {
+      return "Please select a complaint category.";
+    }
 
-  const token = localStorage.getItem("token");
+    if (!formData.title.trim()) {
+      return "Please enter a complaint title.";
+    }
 
-  if (!token) {
-    setError("You are not logged in. Please login again.");
-    return;
-  }
+    if (!formData.description.trim()) {
+      return "Please enter complaint description.";
+    }
 
-  try {
-    setSubmitting(true);
+    if (!formData.address) {
+      return "Please select complaint location.";
+    }
 
-    const data = new FormData();
+    if (!formData.confirm) {
+      return "Please confirm that the information provided is correct.";
+    }
 
-    data.append(
-      "title",
-      formData.title.trim()
-    );
+    return null;
+  };
 
-    data.append(
-      "description",
-      formData.description.trim()
-    );
+  // =========================================================
+  // SEND OTP
+  // =========================================================
 
-    data.append(
-      "address",
-      formData.address
-    );
-
-    data.append(
-      "pincode",
-      formData.pincode
-    );
-
-    data.append(
-      "latitude",
-      formData.latitude
-    );
-
-    data.append(
-      "longitude",
-      formData.longitude
-    );
-
-    data.append(
-      "department",
-      formData.department
-    );
-
-    data.append(
-      "category",
-      formData.category
-    );
-
-    formData.attachments.forEach((file) => {
-      data.append("media", file);
-    });
+  const sendComplaintOtp = async () => {
+    const requestData = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
+      contact: formData.contact.trim(),
+      department: formData.department,
+      category: formData.category,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      address: formData.address,
+      pincode: formData.pincode || "",
+      latitude:
+        formData.latitude === ""
+          ? null
+          : Number(formData.latitude),
+      longitude:
+        formData.longitude === ""
+          ? null
+          : Number(formData.longitude),
+    };
 
     const response = await axios.post(
-      "http://localhost:8085/api/citizen/complaints",
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
+      "http://localhost:8085/api/guest-complaint/send-otp",
+      requestData
     );
 
     console.log(
-      "Complaint Response:",
+      "Complaint OTP Response:",
       response.data
     );
 
-    const complaintNumber =
-      response.data?.complaintNumber;
+    return response.data;
+  };
 
-    const successMessage =
-      response.data?.message ||
-      "Your complaint has been registered successfully.";
+  // =========================================================
+  // SUBMIT FORM
+  // =========================================================
 
-    setComplaintNumber(
-      complaintNumber || ""
-    );
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    setMessage(
-      successMessage
-    );
-
-    // =========================================
-    // SHOW SUCCESS POPUP
-    // =========================================
-
-    setPopup({
-      show: true,
-      type: "success",
-      title: "Complaint Registered!",
-      message: successMessage,
-      details: complaintNumber
-        ? `Complaint Number: ${complaintNumber}`
-        : "",
-    });
-
-  } catch (err) {
-
-    console.error(
-      "Complaint Submit Error:",
-      err
-    );
-
-    const backendMessage =
-      err.response?.data?.message;
-
-    let errorMessage;
-
-    if (backendMessage) {
-      errorMessage = backendMessage;
-    } else if (
-      typeof err.response?.data === "string"
-    ) {
-      errorMessage = err.response.data;
-    } else {
-      errorMessage =
-        "Unable to register complaint. Please try again.";
+    if (submitting) {
+      return;
     }
 
-    setError(errorMessage);
+    setError("");
+    setMessage("");
+    setComplaintNumber("");
 
-    // =========================================
-    // SHOW ERROR POPUP
-    // =========================================
+    // =======================================================
+    // VALIDATION
+    // =======================================================
 
-    setPopup({
-      show: true,
-      type: "error",
-      title: "Complaint Registration Failed",
-      message: errorMessage,
-      details: "",
-    });
+    const validationError =
+      validateForm();
 
-  } finally {
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
-    setSubmitting(false);
+    // =======================================================
+    // SEND OTP
+    // =======================================================
 
-  }
-};
+    try {
+      setSubmitting(true);
 
-  // =========================================
+      await sendComplaintOtp();
+
+      setShowOtpModal(true);
+    } catch (err) {
+      console.error(
+        "Send OTP Error:",
+        err
+      );
+
+      const backendMessage =
+        err.response?.data?.message ||
+        err.response?.data;
+
+      const errorMessage =
+        typeof backendMessage === "string"
+          ? backendMessage
+          : "Unable to send OTP. Please try again.";
+
+      setError(errorMessage);
+
+      setPopup({
+        show: true,
+        type: "error",
+        title: "OTP Sending Failed",
+        message: errorMessage,
+        details: "",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // =========================================================
+  // OTP VERIFIED
+  // =========================================================
+
+  const handleVerified = (responseData) => {
+    try {
+      setSubmitting(true);
+
+      // =====================================================
+      // OTP MODAL ALREADY CALLED:
+      //
+      // POST /api/guest-complaint/verify-otp
+      //
+      // So NO /create API call is required here.
+      // =====================================================
+
+      setShowOtpModal(false);
+
+      console.log(
+        "Guest Complaint Final Response:",
+        responseData
+      );
+
+      // =====================================================
+      // RESPONSE DATA
+      // =====================================================
+
+      const data =
+        responseData?.data ||
+        responseData ||
+        {};
+
+      const number =
+        data.complaintNumber || "";
+
+      const successMessage =
+        data.message ||
+        "Your complaint has been registered successfully.";
+
+      setComplaintNumber(number);
+      setMessage(successMessage);
+
+      // =====================================================
+      // SAVE JWT
+      // =====================================================
+
+      const token =
+        data.token || "";
+
+      if (token) {
+        localStorage.setItem(
+          "token",
+          token
+        );
+      }
+
+      // =====================================================
+      // SUCCESS POPUP
+      // =====================================================
+
+      setPopup({
+        show: true,
+        type: "success",
+        title: "Complaint Registered!",
+        message: successMessage,
+        details: number
+          ? `Complaint Number: ${number}`
+          : "Your login details have been sent to your email address.",
+      });
+
+      // =====================================================
+      // RESET FORM
+      // =====================================================
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        contact: "",
+        title: "",
+        department: "",
+        departmentId: "",
+        category: "",
+        description: "",
+        address: "",
+        pincode: "",
+        latitude: "",
+        longitude: "",
+        attachments: [],
+        confirm: false,
+      });
+
+      setCategories([]);
+    } catch (err) {
+      console.error(
+        "Guest Complaint Response Handling Error:",
+        err
+      );
+
+      const errorMessage =
+        err.response?.data?.message ||
+        "Unable to complete complaint registration.";
+
+      setError(errorMessage);
+
+      setPopup({
+        show: true,
+        type: "error",
+        title: "Complaint Registration Failed",
+        message: errorMessage,
+        details: "",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // =========================================================
   // LOADING DEPARTMENTS
-  // =========================================
+  // =========================================================
 
   if (loadingDepartments) {
     return (
       <div className="complaint-page">
         <div className="complaint-card">
-
-          <h1>
-            Report a Complaint
-          </h1>
-
-          <p>
-            Loading complaint form...
-          </p>
-
+          <h1>Report a Complaint</h1>
+          <p>Loading complaint form...</p>
         </div>
-
       </div>
     );
   }
 
- // =========================================
-// PAGE
-// =========================================
+  // =========================================================
+  // PAGE
+  // =========================================================
 
-return (
-  <div className="complaint-page">
+  return (
+    <div className="complaint-page">
 
-    <div className="complaint-card">
+      <div className="complaint-card">
 
-      <h1>
-        Report a Complaint
-      </h1>
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
-      <p>
-        Help improve your city by reporting
-        civic issues quickly and accurately.
-      </p>
+        <h1>Report a Complaint</h1>
 
-      {/* =====================================
-          SUCCESS MESSAGE
-      ====================================== */}
-
-      {message && (
-        <div className="success-message">
-
-          <h3>
-            Complaint Registered Successfully
-          </h3>
-
-          <p>
-            {message}
-          </p>
-
-          {complaintNumber && (
-            <p>
-              <strong>
-                Complaint Number:
-              </strong>{" "}
-              {complaintNumber}
-            </p>
-          )}
-
-        </div>
-      )}
-
-      {/* =====================================
-          ERROR MESSAGE
-      ====================================== */}
-
-      {error && (
-        <div className="error-message">
-          <p>{error}</p>
-        </div>
-      )}
-
-      {/* =====================================
-          FORM
-      ====================================== */}
-
-      <form onSubmit={handleSubmit}>
-
-        {/* =====================================
-            CITIZEN INFORMATION
-        ====================================== */}
-
-        <h2 className="section-title">
-          Citizen Information
-        </h2>
-
-        <p className="form-info">
-          Your registered citizen information is
-          automatically taken from your login account.
-          You do not need to enter it again.
+        <p>
+          Help improve your city by reporting civic
+          issues quickly and accurately.
         </p>
 
-        {/* =====================================
-            COMPLAINT DETAILS
-        ====================================== */}
+        {/* =================================================
+            SUCCESS MESSAGE
+        ================================================= */}
 
-        <h2 className="section-title">
-          Complaint Details
-        </h2>
+        {message && (
+          <div className="success-message">
+            <h3>
+              Complaint Registered Successfully
+            </h3>
 
-        {/* Department + Category */}
+            <p>{message}</p>
 
-        <div className="grid-2">
+            {complaintNumber && (
+              <p>
+                <strong>
+                  Complaint Number:
+                </strong>{" "}
+                {complaintNumber}
+              </p>
+            )}
+          </div>
+        )}
 
-          <div className="form-group">
+        {/* =================================================
+            ERROR MESSAGE
+        ================================================= */}
 
-            <label>
-              Department
-            </label>
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        )}
 
-            <select
-              name="departmentId"
-              value={formData.departmentId}
-              onChange={handleChange}
-              disabled={loadingDepartments}
-            >
+        {/* =================================================
+            FORM
+        ================================================= */}
 
-              <option value="">
-                Select Department
-              </option>
+        <form onSubmit={handleSubmit}>
 
-              {departments.map((department) => (
-                <option
-                  key={department.departmentId}
-                  value={department.departmentId}
-                >
-                  {department.name}
-                </option>
-              ))}
+          {/* =================================================
+              CITIZEN INFORMATION
+          ================================================= */}
 
-            </select>
+          <h2 className="section-title">
+            Citizen Information
+          </h2>
+
+          <div className="grid-2">
+
+            {/* First Name */}
+
+            <div className="form-group">
+              <label>First Name</label>
+
+              <input
+                type="text"
+                name="firstName"
+                placeholder="Enter First Name"
+                value={formData.firstName}
+                onChange={handleChange}
+                disabled={submitting}
+              />
+            </div>
+
+            {/* Last Name */}
+
+            <div className="form-group">
+              <label>Last Name</label>
+
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Enter Last Name"
+                value={formData.lastName}
+                onChange={handleChange}
+                disabled={submitting}
+              />
+            </div>
 
           </div>
 
+          <div className="grid-2">
+
+            {/* Email */}
+
+            <div className="form-group">
+              <label>Email Address</label>
+
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                disabled={submitting}
+              />
+            </div>
+
+            {/* Contact */}
+
+            <div className="form-group">
+              <label>Contact Number</label>
+
+              <input
+                type="tel"
+                name="contact"
+                placeholder="Enter Contact Number"
+                maxLength={10}
+                value={formData.contact}
+                onChange={(e) => {
+                  const value =
+                    e.target.value.replace(
+                      /\D/g,
+                      ""
+                    );
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    contact: value,
+                  }));
+                }}
+                disabled={submitting}
+              />
+            </div>
+
+          </div>
+
+          {/* =================================================
+              COMPLAINT DETAILS
+          ================================================= */}
+
+          <h2 className="section-title">
+            Complaint Details
+          </h2>
+
+          <div className="grid-2">
+
+            {/* Department */}
+
+            <div className="form-group">
+              <label>Department</label>
+
+              <select
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleChange}
+                disabled={submitting}
+              >
+                <option value="">
+                  Select Department
+                </option>
+
+                {departments.map(
+                  (department) => (
+                    <option
+                      key={department.departmentId}
+                      value={department.departmentId}
+                    >
+                      {department.name}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            {/* Category */}
+
+            <div className="form-group">
+              <label>
+                Complaint Category
+              </label>
+
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={
+                  !formData.departmentId ||
+                  loadingCategories ||
+                  submitting
+                }
+              >
+                <option value="">
+                  {!formData.departmentId
+                    ? "Select Department First"
+                    : loadingCategories
+                    ? "Loading Categories..."
+                    : "Select Category"}
+                </option>
+
+                {categories.map(
+                  (category) => (
+                    <option
+                      key={category.categoryId}
+                      value={category.name}
+                    >
+                      {category.name}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+          </div>
+
+          {/* =================================================
+              TITLE
+          ================================================= */}
+
           <div className="form-group">
 
             <label>
-              Complaint Category
+              Complaint Title
             </label>
 
-            <select
-              name="category"
-              value={formData.category}
+            <input
+              type="text"
+              name="title"
+              placeholder="Enter Complaint Title"
+              value={formData.title}
               onChange={handleChange}
+              disabled={submitting}
+            />
+
+          </div>
+
+          {/* =================================================
+              DESCRIPTION
+          ================================================= */}
+
+          <div className="form-group">
+
+            <label>
+              Description
+            </label>
+
+            <textarea
+              rows="5"
+              name="description"
+              placeholder="Describe the issue in detail..."
+              value={formData.description}
+              onChange={handleChange}
+              disabled={submitting}
+            />
+
+          </div>
+
+          {/* =================================================
+              LOCATION
+          ================================================= */}
+
+          <h2 className="section-title">
+            Complaint Location
+          </h2>
+
+          <LocationPicker
+            onLocationSelect={
+              handleLocationSelect
+            }
+          />
+
+          {/* Selected Address */}
+
+          <div className="form-group">
+
+            <label>
+              Selected Address
+            </label>
+
+            <textarea
+              rows="3"
+              value={formData.address}
+              readOnly
+              placeholder="Select a location from the map"
+            />
+
+          </div>
+
+          {/* Location Information */}
+
+          <div className="grid-3">
+
+            {/* Pincode */}
+
+            <div className="form-group">
+
+              <label>Pincode</label>
+
+              <input
+                type="text"
+                value={formData.pincode}
+                readOnly
+              />
+
+            </div>
+
+            {/* Latitude */}
+
+            <div className="form-group">
+
+              <label>Latitude</label>
+
+              <input
+                type="text"
+                value={formData.latitude}
+                readOnly
+              />
+
+            </div>
+
+            {/* Longitude */}
+
+            <div className="form-group">
+
+              <label>Longitude</label>
+
+              <input
+                type="text"
+                value={formData.longitude}
+                readOnly
+              />
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              ATTACHMENTS
+          ================================================= */}
+
+          <h2 className="section-title">
+            Complaint Evidence
+          </h2>
+
+          <div className="form-group">
+
+            <label>
+              Upload Images, PDF or Video
+            </label>
+
+            <input
+              type="file"
+              name="attachments"
+              accept="image/*,application/pdf,video/*"
+              multiple
+              onChange={handleFileChange}
               disabled={
-                !formData.departmentId ||
-                loadingCategories
+                formData.attachments.length >= 3 ||
+                submitting
               }
-            >
-
-              <option value="">
-                {!formData.departmentId
-                  ? "Select Department First"
-                  : loadingCategories
-                  ? "Loading Categories..."
-                  : "Select Category"}
-              </option>
-
-              {categories.map((category) => (
-                <option
-                  key={category.categoryId}
-                  value={category.name}
-                >
-                  {category.name}
-                </option>
-              ))}
-
-            </select>
-
-          </div>
-
-        </div>
-
-        {/* =====================================
-            TITLE
-        ====================================== */}
-
-        <div className="form-group">
-
-          <label>
-            Title
-          </label>
-
-          <input
-            type="text"
-            name="title"
-            placeholder="Enter Complaint Title"
-            value={formData.title}
-            onChange={handleChange}
-          />
-
-        </div>
-
-        {/* =====================================
-            DESCRIPTION
-        ====================================== */}
-
-        <div className="form-group">
-
-          <label>
-            Description
-          </label>
-
-          <textarea
-            rows="5"
-            name="description"
-            placeholder="Describe the issue in detail..."
-            value={formData.description}
-            onChange={handleChange}
-          />
-
-        </div>
-
-        {/* =====================================
-            LOCATION
-        ====================================== */}
-
-        <h2 className="section-title">
-          Complaint Location
-        </h2>
-
-        <LocationPicker
-          onLocationSelect={handleLocationSelect}
-        />
-
-        <div className="form-group">
-
-          <label>
-            Selected Address
-          </label>
-
-          <textarea
-            rows="3"
-            value={formData.address}
-            readOnly
-            placeholder="Select a location from the map"
-          />
-
-        </div>
-
-        <div className="grid-3">
-
-          <div className="form-group">
-
-            <label>
-              Pincode
-            </label>
-
-            <input
-              type="text"
-              value={formData.pincode}
-              readOnly
             />
 
-          </div>
+            <small className="upload-note">
+              Maximum 3 files total.
+              Supported formats:
+              JPG, PNG, JPEG, PDF and Video.
+            </small>
 
-          <div className="form-group">
-
-            <label>
-              Latitude
-            </label>
-
-            <input
-              type="text"
-              value={formData.latitude}
-              readOnly
-            />
+            <small className="upload-note">
+              {formData.attachments.length} / 3
+              files selected
+            </small>
 
           </div>
 
-          <div className="form-group">
+          {/* =================================================
+              FILE PREVIEW
+          ================================================= */}
 
-            <label>
-              Longitude
-            </label>
+          <div className="preview-grid">
 
-            <input
-              type="text"
-              value={formData.longitude}
-              readOnly
-            />
+            {formData.attachments.map(
+              (file, index) => {
 
-          </div>
+                const fileType =
+                  getFileType(file);
 
-        </div>
-
-        {/* =====================================
-            ATTACHMENTS
-        ====================================== */}
-
-        <h2 className="section-title">
-          Complaint Evidence
-        </h2>
-
-        <div className="form-group">
-
-          <label>
-            Upload Images, PDF or Video
-          </label>
-
-          <input
-            type="file"
-            name="attachments"
-            accept="image/*,application/pdf,video/*"
-            multiple
-            onChange={handleFileChange}
-            disabled={
-              formData.attachments.length >= 3
-            }
-          />
-
-          <small className="upload-note">
-            Maximum 3 files total.
-            Supported formats:
-            JPG, PNG, JPEG, PDF and Video.
-          </small>
-
-          <small className="upload-note">
-            {formData.attachments.length} / 3 files selected
-          </small>
-
-        </div>
-
-        {/* =====================================
-            PREVIEW
-        ====================================== */}
-
-        <div className="preview-grid">
-
-          {formData.attachments.map(
-            (file, index) => {
-
-              const fileType = getFileType(file);
-
-              return (
-                <div
-                  className="preview-card"
-                  key={`${file.name}-${index}`}
-                >
-
-                  <button
-                    type="button"
-                    className="remove-image"
-                    onClick={() =>
-                      removeAttachment(index)
-                    }
+                return (
+                  <div
+                    className="preview-card"
+                    key={`${file.name}-${index}`}
                   >
-                    ×
-                  </button>
 
-                  {fileType === "image" && (
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt={`Complaint ${index + 1}`}
-                    />
-                  )}
+                    {/* Remove */}
 
-                  {fileType === "video" && (
-                    <video
-                      src={URL.createObjectURL(file)}
-                      controls
-                    />
-                  )}
+                    <button
+                      type="button"
+                      className="remove-image"
+                      onClick={() =>
+                        removeAttachment(index)
+                      }
+                      disabled={submitting}
+                    >
+                      ×
+                    </button>
 
-                  {fileType === "pdf" && (
-                    <div className="file-preview">
+                    {/* Image */}
 
-                      <div className="file-icon">
-                        PDF
+                    {fileType === "image" && (
+                      <img
+                        src={URL.createObjectURL(
+                          file
+                        )}
+                        alt={`Complaint ${
+                          index + 1
+                        }`}
+                      />
+                    )}
+
+                    {/* Video */}
+
+                    {fileType === "video" && (
+                      <video
+                        src={URL.createObjectURL(
+                          file
+                        )}
+                        controls
+                      />
+                    )}
+
+                    {/* PDF */}
+
+                    {fileType === "pdf" && (
+                      <div className="file-preview">
+
+                        <div className="file-icon">
+                          PDF
+                        </div>
+
+                        <p>
+                          {file.name}
+                        </p>
+
                       </div>
+                    )}
 
-                      <p>
-                        {file.name}
-                      </p>
+                    {/* Other */}
 
-                    </div>
-                  )}
+                    {fileType === "other" && (
+                      <div className="file-preview">
 
-                  {fileType === "other" && (
-                    <div className="file-preview">
+                        <div className="file-icon">
+                          FILE
+                        </div>
 
-                      <div className="file-icon">
-                        FILE
+                        <p>
+                          {file.name}
+                        </p>
+
                       </div>
+                    )}
 
-                      <p>
-                        {file.name}
-                      </p>
+                    {/* File Name */}
 
+                    <div className="file-name">
+                      {file.name}
                     </div>
-                  )}
 
-                  <div className="file-name">
-                    {file.name}
                   </div>
+                );
+              }
+            )}
 
-                </div>
-              );
+          </div>
+
+          {/* =================================================
+              CONFIRMATION
+          ================================================= */}
+
+          <div className="checkbox-group">
+
+            <input
+              type="checkbox"
+              name="confirm"
+              checked={formData.confirm}
+              onChange={handleChange}
+              disabled={submitting}
+            />
+
+            <span>
+              I confirm that the information provided
+              is correct and the complaint details are
+              accurate.
+            </span>
+
+          </div>
+
+          {/* =================================================
+              SUBMIT BUTTON
+          ================================================= */}
+
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={submitting}
+          >
+            {submitting
+              ? "Processing..."
+              : "Submit Complaint"}
+          </button>
+
+        </form>
+
+      </div>
+
+      {/* =====================================================
+          OTP MODAL
+      ====================================================== */}
+
+      {showOtpModal && (
+        <EmailOtpModal
+          email={formData.email}
+          attachments={formData.attachments}
+          onVerify={handleVerified}
+          onClose={() =>
+            setShowOtpModal(false)
+          }
+        />
+      )}
+
+      {/* =====================================================
+          STATUS POPUP
+      ====================================================== */}
+
+      {popup.show && (
+        <StatusPopup
+          type={popup.type}
+          title={popup.title}
+          message={popup.message}
+          details={popup.details}
+          buttonText={
+            popup.type === "success"
+              ? "Go to Login"
+              : "Close"
+          }
+          onClose={() => {
+            const popupType = popup.type;
+
+            setPopup({
+              show: false,
+              type: "success",
+              title: "",
+              message: "",
+              details: "",
+            });
+
+            if (popupType === "success") {
+              navigate("/login");
             }
-          )}
-
-        </div>
-
-        {/* =====================================
-            DECLARATION
-        ====================================== */}
-
-        <div className="checkbox-group">
-
-          <input
-            type="checkbox"
-            name="confirm"
-            checked={formData.confirm}
-            onChange={handleChange}
-          />
-
-          <span>
-            I confirm that the information
-            provided is correct and the
-            complaint details are accurate.
-          </span>
-
-        </div>
-
-        {/* =====================================
-            SUBMIT
-        ====================================== */}
-
-        <button
-          type="submit"
-          className="submit-btn"
-          disabled={submitting}
-        >
-
-          {submitting
-            ? "Submitting Complaint..."
-            : "Submit Complaint"}
-
-        </button>
-
-      </form>
+          }}
+        />
+      )}
 
     </div>
-
-    {/* =====================================
-        STATUS POPUP
-    ====================================== */}
-
-    {popup.show && (
-      <StatusPopup
-        type={popup.type}
-        title={popup.title}
-        message={popup.message}
-        details={popup.details}
-        buttonText={
-          popup.type === "success"
-            ? "Go to Dashboard"
-            : "Close"
-        }
-        onClose={() => {
-
-          const popupType = popup.type;
-
-          setPopup({
-            show: false,
-            type: "success",
-            title: "",
-            message: "",
-            details: "",
-          });
-
-          if (popupType === "success") {
-            navigate("/user/dashboard");
-          }
-
-        }}
-      />
-    )}
-
-  </div>
-);
+  );
 }
 
 export default ReportComplaint;

@@ -1189,9 +1189,9 @@ function DepartmentCategory() {
                                         Description
                                     </th>
 
-                                    <th>
+                                    {/* <th>
                                         Complaints
-                                    </th>
+                                    </th> */}
 
                                     <th>
                                         Status
@@ -1280,7 +1280,7 @@ function DepartmentCategory() {
 
                                                 {/* COMPLAINTS */}
 
-                                                <td>
+                                                {/* <td>
 
                                                     <span className="dept-category-complaint-number">
 
@@ -1288,7 +1288,7 @@ function DepartmentCategory() {
 
                                                     </span>
 
-                                                </td>
+                                                </td> */}
 
 
                                                 {/* STATUS */}

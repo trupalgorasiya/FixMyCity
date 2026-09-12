@@ -59,6 +59,7 @@ import ReviewEngineerRequest from "./pages/admin/ReviewEngineerRequest";
 
 import CategoryManagement from "./pages/admin/CategoryManagement";
 import ManageCategory from "./pages/department/ManageCategory"
+import Messages from "./pages/admin/Messages";
 
 function App() {
   return (
@@ -141,6 +142,7 @@ function App() {
     <Route path="viewfeedback" element={<ViewFeedback/>}/>
     <Route path="enginner-request" element={<ReviewEngineerRequest/>}/>
     <Route path="category" element={<CategoryManagement/>} />
+    <Route path="messages" element={<Messages />} />
 </Route>
         
       </Routes> 

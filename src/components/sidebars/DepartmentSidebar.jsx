@@ -3,10 +3,10 @@ import {
     FaHome,
     FaClipboardCheck,
     FaTasks,
-    FaComments,
+    //FaComments,
     FaUsers,
     FaChartBar,
-    FaInbox,
+   // FaInbox,
     FaUser,
     FaSignOutAlt
 } from "react-icons/fa";
@@ -48,7 +48,7 @@ function DepartmentSidebar() {
 
                         <li><NavLink to="/department/categories"><FaUser /><span>Category</span></NavLink></li>
 
-                        <li><NavLink to="/department/view-feedback"><FaComments /><span>Feedback</span></NavLink></li>
+                        {/* <li><NavLink to="/department/view-feedback"><FaComments /><span>Feedback</span></NavLink></li> */}
 
                         {/* <li><NavLink to="/department/view-enginner-request"><FaInbox /><span>Engineer Applications</span></NavLink></li> */}
 

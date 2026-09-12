@@ -450,7 +450,7 @@ function UserInformation() {
               <tr>
 
                 <th>
-                  Citizen ID
+                  No.
                 </th>
 
                 <th>
@@ -505,7 +505,7 @@ function UserInformation() {
 
                 /* CITIZEN DATA */
 
-                currentUsers.map((user) => (
+                currentUsers.map((user, index) => (
 
                   <tr
                     key={user.citizenId}
@@ -516,7 +516,7 @@ function UserInformation() {
 
                     <td>
 
-                      {user.citizenId || "-"}
+                     {indexOfFirst + index + 1}
 
                     </td>
 

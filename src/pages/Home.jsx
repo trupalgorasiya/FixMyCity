@@ -1,11 +1,46 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/Home.css";
-// import heroBanner from "../assets/hero-banner.jpg";
-// import roadRepair from "../assets/road-repair.jpg";
-// import garbage from "../assets/garbage.jpg";
-// import park from "../assets/park.jpg";
 
 function Home() {
+
+  const navigate = useNavigate();
+
+  const handleReportComplaint = () => {
+    const token =
+      localStorage.getItem("token") ||
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("jwt");
+
+    // No login
+    if (!token) {
+      navigate("/com");
+      return;
+    }
+
+    // Get logged-in user
+    const storedUser = localStorage.getItem("user");
+
+    if (!storedUser) {
+      navigate("/com");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(storedUser);
+
+      // Only Citizen can directly access citizen report page
+      if (user?.role === "CITIZEN") {
+        navigate("/user/report");
+      } else {
+        navigate("/com");
+      }
+
+    } catch (error) {
+      console.error("Invalid user data:", error);
+      navigate("/com");
+    }
+  };
+
   return (
     <div className="home">
 
@@ -26,16 +61,24 @@ function Home() {
           </p>
 
           <div className="hero-buttons">
-           <Link to="/com"><button className="primary-btn">
-              Report Complaint
-            </button></Link> 
 
-            <Link to="tracking"><button className="secondary-btn">
-              Track Complaint
-            </button></Link>
+            <button
+              className="primary-btn"
+              onClick={handleReportComplaint}
+            >
+              Report Complaint
+            </button>
+
+            <Link to="tracking">
+              <button className="secondary-btn">
+                Track Complaint
+              </button>
+            </Link>
+
           </div>
 
         </div>
+
       </section>
 
       {/* ================= COUNTERS ================= */}

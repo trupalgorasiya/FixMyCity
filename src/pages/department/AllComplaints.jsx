@@ -1538,7 +1538,7 @@ function AllComplaints() {
 
                 <div className="image-section">
 
-                  <h4>
+                  {/* <h4>
                     Complaint Media
                   </h4>
 
@@ -1550,7 +1550,7 @@ function AllComplaints() {
                         renderMedia
                       )}
 
-                  </div>
+                  </div> */}
 
                 </div>
 
@@ -1636,7 +1636,7 @@ function AllComplaints() {
                   CITIZEN FEEDBACK
               ================================================= */}
 
-              <div className="address-box">
+              {/* <div className="address-box">
 
                 <h4>
                   Citizen Rating
@@ -1682,7 +1682,7 @@ function AllComplaints() {
 
                 </p>
 
-              </div>
+              </div> */}
 
 
               {/* =================================================

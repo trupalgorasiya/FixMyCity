@@ -477,7 +477,7 @@ function ComplaintManagement() {
         </div>
 
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <div className="summary-info">
 
@@ -497,7 +497,7 @@ function ComplaintManagement() {
 
           </div>
 
-        </div>
+        </div> */}
 
 
         <div className="summary-card">
@@ -568,7 +568,7 @@ function ComplaintManagement() {
 
         </div>
 
-
+{/* 
         <div className="summary-card">
 
           <div className="summary-info">
@@ -589,7 +589,7 @@ function ComplaintManagement() {
 
           </div>
 
-        </div>
+        </div> */}
 
 
       </div>

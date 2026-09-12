@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./Dashboard.css";
-
 import {
   FaClipboardList,
   FaUserCog,
@@ -615,12 +615,13 @@ function Dashboard() {
         </div>
 
 
-        <button
-          className="dashboard-btn"
-          type="button"
-        >
-          Generate Report
-        </button>
+       <Link
+  to="/department/department-report"
+  className="dashboard-btn"
+>
+  Generate Report
+</Link>
+
 
       </div>
 

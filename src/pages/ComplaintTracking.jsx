@@ -1308,7 +1308,7 @@ function ComplaintTracking() {
 
                             {complaint.resolveAt ? (
 
-                                <div className="resolution-complete">
+                                <div className="resolution-completed">
 
                                     <p>
                                         Your complaint has been
@@ -1351,7 +1351,7 @@ function ComplaintTracking() {
                             FEEDBACK
                         ====================================== */}
 
-                        <div className="card feedback-card">
+                        {/* <div className="card feedback-card">
 
                             <div className="card-title">
 
@@ -1410,7 +1410,7 @@ function ComplaintTracking() {
 
                             )}
 
-                        </div>
+                        </div> */}
 
 
                     </div>

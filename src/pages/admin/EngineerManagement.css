@@ -78,7 +78,15 @@
     font-size:.9rem;
     font-weight:600;
 }
-
+.dashboard-box {
+    max-width: 1150px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+    transition: .3s;
+}
 /* ==========================================================
    TOP BAR
 ========================================================== */

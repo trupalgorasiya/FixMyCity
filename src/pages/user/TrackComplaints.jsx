@@ -1216,7 +1216,7 @@ function TrackComplaints() {
                             FEEDBACK
                         ================================== */}
 
-                        <div className="card feedback-card">
+                        {/* <div className="card feedback-card">
 
                             <div className="card-title">
 
@@ -1271,7 +1271,7 @@ function TrackComplaints() {
 
                             )}
 
-                        </div>
+                        </div> */}
 
                     </div>
 

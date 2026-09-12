@@ -495,7 +495,8 @@ function DepartmentManagement() {
   ========================================================== */
 
   const openEditModal = (department) => {
-
+console.log("EDIT DEPARTMENT:", department);
+  console.log("EDIT ADDRESS:", department.address);
     setSelectedDepartment(
       department
     );
@@ -1039,7 +1040,7 @@ function DepartmentManagement() {
               <tr>
 
                 <th>
-                  ID
+                  No.
                 </th>
 
                 <th>
@@ -1084,7 +1085,7 @@ function DepartmentManagement() {
               ) : currentDepartments.length > 0 ? (
 
                 currentDepartments.map(
-                  (department) => (
+                  (department, index) => (
 
                     <tr
                       key={
@@ -1093,9 +1094,9 @@ function DepartmentManagement() {
                     >
 
                       <td>
-                        {
-                          department.departmentId
-                        }
+                        
+                          {indexOfFirstRow + index + 1}
+                        
                       </td>
 
                       <td>
@@ -1603,23 +1604,6 @@ function DepartmentManagement() {
                       handleEditChange
                     }
                     rows="4"
-                  />
-
-                </div>
-
-                <div className="form-group">
-
-                  <label>
-                    Profile Image
-                  </label>
-
-                  <input
-                    type="file"
-                    name="profileImage"
-                    accept="image/*"
-                    onChange={
-                      handleEditChange
-                    }
                   />
 
                 </div>
