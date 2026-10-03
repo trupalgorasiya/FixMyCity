@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import profile from "../assets/default-profile.jpeg";
 
 function Profile() {
@@ -37,7 +38,7 @@ function Profile() {
         }
 
         const response = await axios.get(
-          "http://localhost:8085/api/auth/profile",
+          `${API_BASE_URL}/auth/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

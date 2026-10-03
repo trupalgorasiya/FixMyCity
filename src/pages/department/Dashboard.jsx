@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../api/axios";
 import "./Dashboard.css";
 import {
   FaClipboardList,
@@ -126,7 +127,7 @@ function Dashboard() {
 
         const response =
           await fetch(
-            "http://localhost:8085/api/department/dashboard",
+            `${API_BASE_URL}/department/dashboard`,
             {
               method: "GET",
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./AssignedComplaints.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 
 import {
   FaSearch,
@@ -68,7 +69,7 @@ function AssignedComplaints() {
       }
 
       const response = await axios.get(
-        "http://localhost:8085/api/engineer/complaints",
+        `${API_BASE_URL}/engineer/complaints`,
         {
           params: {
             page: currentPage,
@@ -427,7 +428,7 @@ function AssignedComplaints() {
       const response =
         await axios.put(
 
-          `http://localhost:8085/api/engineer/${complaintNumber}/work`,
+          `${API_BASE_URL}/engineer/${complaintNumber}/work`,
 
           {
             status: newStatus

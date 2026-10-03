@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL, BASE_URL } from "../../api/axios";
 import "./AllComplaints.css";
 
 import {
@@ -76,7 +77,7 @@ function AllComplaints() {
 
       const response =
         await axios.get(
-          "http://localhost:8085/api/department/assigned",
+          `${API_BASE_URL}/department/assigned`,
           {
             params: {
               page: 0,
@@ -652,7 +653,7 @@ function AllComplaints() {
         .replace(/\\/g, "/");
 
 
-    return `http://localhost:8085/${normalizedPath}`;
+    return `${BASE_URL}/${normalizedPath.startsWith('/') ? normalizedPath.slice(1) : normalizedPath}`;
 
   };
 

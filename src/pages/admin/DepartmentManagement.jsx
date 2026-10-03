@@ -8,14 +8,11 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import "./DepartmentManagement.css";
+import { API_BASE_URL } from "../../api/axios";
 
 function DepartmentManagement() {
 
-  /* ==========================================================
-     API
-  ========================================================== */
 
-  const API_URL = "http://localhost:8085";
 
   /* ==========================================================
      GET JWT
@@ -99,7 +96,7 @@ function DepartmentManagement() {
       }
 
       const response = await fetch(
-        `${API_URL}/api/admin/departments`,
+        `${API_BASE_URL}/admin/departments`,
         {
           method: "GET",
           headers: {
@@ -381,7 +378,7 @@ function DepartmentManagement() {
       }
 
       const response = await fetch(
-        `${API_URL}/api/departments`,
+        `${API_BASE_URL}/departments`,
         {
           method: "POST",
 
@@ -600,7 +597,7 @@ console.log("EDIT DEPARTMENT:", department);
       );
 
       const response = await fetch(
-        `${API_URL}/api/departments/update/${departmentId}`,
+        `${API_BASE_URL}/departments/update/${departmentId}`,
         {
           method: "PUT",
 
@@ -757,7 +754,7 @@ console.log("EDIT DEPARTMENT:", department);
         selectedDepartment.departmentId;
 
       const response = await fetch(
-        `${API_URL}/api/departments/${departmentId}`,
+        `${API_BASE_URL}/departments/${departmentId}`,
         {
           method: "DELETE",
 

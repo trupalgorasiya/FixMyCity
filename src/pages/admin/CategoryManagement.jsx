@@ -18,8 +18,7 @@ import {
 } from "react-icons/fa";
 
 import "./CategoryManagement.css";
-
-const API_BASE_URL = "http://localhost:8085";
+import { API_BASE_URL } from "../../api/axios";
 
 function CategoryManagement() {
 
@@ -117,7 +116,7 @@ function CategoryManagement() {
             setError("");
 
             const response = await fetch(
-                `${API_BASE_URL}/api/departments`,
+                `${API_BASE_URL}/departments`,
                 {
                     method: "GET",
                     headers: getHeaders()
@@ -181,7 +180,7 @@ function CategoryManagement() {
                 try {
 
                     const response = await fetch(
-                        `${API_BASE_URL}/api/categories/department/${department.departmentId}`,
+                        `${API_BASE_URL}/categories/department/${department.departmentId}`,
                         {
                             method: "GET",
                             headers: getHeaders()
@@ -546,7 +545,7 @@ function CategoryManagement() {
             */
 
             const response = await fetch(
-                `${API_BASE_URL}/api/categories/${category.categoryId}`,
+                `${API_BASE_URL}/categories/${category.categoryId}`,
                 {
                     method: "GET",
                     headers: getHeaders()
@@ -702,7 +701,7 @@ function CategoryManagement() {
 
 
         const response = await fetch(
-            `${API_BASE_URL}/api/categories`,
+            `${API_BASE_URL}/categories`,
             {
                 method: "POST",
 
@@ -765,7 +764,7 @@ function CategoryManagement() {
 
 
         const response = await fetch(
-            `${API_BASE_URL}/api/categories/${editingCategory.categoryId}`,
+            `${API_BASE_URL}/categories/${editingCategory.categoryId}`,
             {
                 method: "PUT",
 
@@ -908,7 +907,7 @@ function CategoryManagement() {
 
             const response =
                 await fetch(
-                    `${API_BASE_URL}/api/categories/${id}`,
+                    `${API_BASE_URL}/categories/${id}`,
                     {
                         method: "DELETE",
 

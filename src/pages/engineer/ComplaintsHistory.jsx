@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import "./ComplaintsHistory.css";
 
 import {
@@ -77,7 +78,7 @@ function ComplaintsHistory() {
         }
 
         const response = await axios.get(
-          "http://localhost:8085/api/engineer/complaints",
+          `${API_BASE_URL}/engineer/complaints`,
           {
             params: params,
 

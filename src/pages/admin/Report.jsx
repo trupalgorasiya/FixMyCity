@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../../api/axios";
 import "./Report.css";
 
 import {
@@ -17,13 +18,11 @@ import {
    API URLS
 ========================================================== */
 
-const API_BASE_URL = "http://localhost:8085";
-
 const DEPARTMENT_API_URL =
-    `${API_BASE_URL}/api/departments`;
+    `${API_BASE_URL}/departments`;
 
 const REPORT_API_URL =
-    `${API_BASE_URL}/api/admin/reports/complaints`;
+    `${API_BASE_URL}/admin/reports/complaints`;
 
 
 /* ==========================================================
@@ -822,7 +821,7 @@ const handleGenerateReport = async () => {
 
         const response =
             await fetch(
-                `${API_BASE_URL}/api/admin/reports/complaints`,
+                `${API_BASE_URL}/admin/reports/complaints`,
                 {
 
                     method: "POST",
@@ -1115,7 +1114,7 @@ const handleDownloadReport = async () => {
 
         const response =
             await fetch(
-                `${API_BASE_URL}/api/admin/reports/complaints`,
+                `${API_BASE_URL}/admin/reports/complaints`,
                 {
 
                     method: "POST",

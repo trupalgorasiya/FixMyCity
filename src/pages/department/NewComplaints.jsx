@@ -791,6 +791,7 @@ import { useEffect, useState } from "react";
 import "./NewComplaints.css";
 
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 
 import {
   FaSearch,
@@ -804,26 +805,8 @@ import {
 
 function NewComplaints() {
 
-  /* =========================================================
-     API
-  ========================================================= */
-
-  const API_BASE_URL =
-    "http://localhost:8085";
-
-  /*
-   * IMPORTANT:
-   * Replace this URL with your actual assignment API.
-   *
-   * The request body will be:
-   *
-   * {
-   *     "priority": "HIGH",
-   *     "engineerId": 5
-   * }
-   */
   const ASSIGN_API_URL =
-    `${API_BASE_URL}/api/department`;
+    `${API_BASE_URL}/department`;
 
 
   /* =========================================================
@@ -1050,7 +1033,7 @@ function NewComplaints() {
 
       const response = await axios.get(
 
-        `${API_BASE_URL}/api/department/unassigned`,
+        `${API_BASE_URL}/department/unassigned`,
 
         {
 
@@ -1158,7 +1141,7 @@ function NewComplaints() {
 
       const response = await axios.get(
 
-        `${API_BASE_URL}/api/department/engineersAll`,
+        `${API_BASE_URL}/department/engineersAll`,
 
         {
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import "../styles/ReportComplaint.css";
 import "../styles/LocationPicker.css";
 import LocationPicker from "../pages/LocationPicker";
@@ -109,7 +110,7 @@ function ReportComplaint() {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get("http://localhost:8085/api/departments");
+        const response = await axios.get(`${API_BASE_URL}/departments`);
         const data = Array.isArray(response.data) ? response.data : response.data?.data || [];
         if (data && data.length > 0) {
           setDepartments(data);
@@ -135,7 +136,7 @@ function ReportComplaint() {
 
     try {
       const response = await axios.get(
-        `http://localhost:8085/api/categories/department/${selectedDept.departmentId}`
+        `${API_BASE_URL}/categories/department/${selectedDept.departmentId}`
       );
       const data = Array.isArray(response.data) ? response.data : response.data?.data || [];
       setCategories(data);
@@ -408,7 +409,7 @@ function ReportComplaint() {
 
       // STEP 1: Check if user email is present in backend database
       const checkRes = await axios.get(
-        `http://localhost:8085/api/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
+        `${API_BASE_URL}/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
       );
 
       const isRegistered = checkRes.data?.exists === true;
@@ -438,7 +439,7 @@ function ReportComplaint() {
         }
 
         const directResponse = await axios.post(
-          "http://localhost:8085/api/guest-complaint/direct-complaint",
+          `${API_BASE_URL}/guest-complaint/direct-complaint`,
           directData
         );
 
@@ -463,7 +464,7 @@ function ReportComplaint() {
         // FLOW 2: EMAIL NOT PRESENT -> SEND OTP & OPEN MODAL
         // =======================================================
         await axios.post(
-          "http://localhost:8085/api/guest-complaint/send-otp",
+          `${API_BASE_URL}/guest-complaint/send-otp`,
           {
             firstName: formData.firstName.trim(),
             lastName: formData.lastName.trim(),
@@ -533,7 +534,7 @@ function ReportComplaint() {
   // Resend OTP handler for modal
   const handleResendOtp = async () => {
     await axios.post(
-      "http://localhost:8085/api/guest-complaint/send-otp",
+      `${API_BASE_URL}/guest-complaint/send-otp`,
       {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),

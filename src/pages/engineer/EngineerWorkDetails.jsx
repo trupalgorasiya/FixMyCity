@@ -472,7 +472,7 @@
 //       const response =
 //         await axios.post(
 
-//           `http://localhost:8085/api/engineer/${complaint.id}/work`,
+//           `${API_BASE_URL}/engineer/${complaint.id}/work`,
 
 //           formData,
 
@@ -1408,6 +1408,7 @@
 import { useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import "leaflet/dist/leaflet.css";
 import "./EngineerWorkDetails.css";
 import CustomPopup from "../../configure/CustomPopup";
@@ -2037,7 +2038,7 @@ function EngineerWorkDetails() {
       const response =
         await axios.post(
 
-          `http://localhost:8085/api/engineer/${complaint.id}/work`,
+          `${API_BASE_URL}/engineer/${complaint.id}/work`,
 
           formData,
 

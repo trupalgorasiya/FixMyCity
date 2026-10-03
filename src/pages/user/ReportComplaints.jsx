@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 
 import "../../styles/ReportComplaint.css";
 import "../../styles/LocationPicker.css";
@@ -95,7 +96,7 @@ function ReportComplaint() {
         setError("");
 
         const response = await axios.get(
-          "http://localhost:8085/api/departments"
+          `${API_BASE_URL}/departments`
         );
 
         const data = Array.isArray(response.data)
@@ -139,7 +140,7 @@ function ReportComplaint() {
       setError("");
 
       const response = await axios.get(
-        `http://localhost:8085/api/categories/department/${departmentId}`
+        `${API_BASE_URL}/categories/department/${departmentId}`
       );
 
       const data = Array.isArray(response.data)
@@ -388,7 +389,7 @@ function ReportComplaint() {
     };
 
     const response = await axios.post(
-      "http://localhost:8085/api/guest-complaint/send-otp",
+      `${API_BASE_URL}/guest-complaint/send-otp`,
       requestData
     );
 
@@ -436,7 +437,7 @@ function ReportComplaint() {
 
       // Check if email already exists in backend
       const checkRes = await axios.get(
-        `http://localhost:8085/api/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
+        `${API_BASE_URL}/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
       );
 
       const isRegistered = checkRes.data?.exists === true;
@@ -466,7 +467,7 @@ function ReportComplaint() {
         }
 
         const directResponse = await axios.post(
-          "http://localhost:8085/api/guest-complaint/direct-complaint",
+          `${API_BASE_URL}/guest-complaint/direct-complaint`,
           directData
         );
 

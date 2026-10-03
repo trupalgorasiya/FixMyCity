@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL, BASE_URL } from "../../api/axios";
 import "./EngineerRequest.css";
 
 import {
@@ -19,10 +20,8 @@ import {
     FaFileAlt
 } from "react-icons/fa";
 
-const API_BASE_URL = "http://localhost:8085";
-
 const ENGINEER_REQUEST_API =
-    `${API_BASE_URL}/api/admin/engineers/requests`;
+    `${API_BASE_URL}/admin/engineers/requests`;
 
 const getToken = () => {
     return (
@@ -1004,10 +1003,10 @@ function EngineerRequest() {
         }
 
         if (path.startsWith("/")) {
-            return `${API_BASE_URL}${path}`;
+            return `${BASE_URL}${path}`;
         }
 
-        return `${API_BASE_URL}/${path}`;
+        return `${BASE_URL}/${path}`;
     };
 
 

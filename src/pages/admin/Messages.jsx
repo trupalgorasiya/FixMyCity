@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import {
   FaEnvelope,
   FaUser,
@@ -10,7 +11,7 @@ import {
 } from "react-icons/fa";
 import "./Messages.css";
 
-const API_URL = "http://localhost:8085/api/contact";
+const API_URL = `${API_BASE_URL}/contact`;
 
 function Messages() {
   const [messages, setMessages] = useState([]);

@@ -12,8 +12,7 @@ import {
 } from "react-icons/fa";
 
 import "./EngineerRequest.css";
-
-const API_BASE_URL = "http://localhost:8085";
+import { API_BASE_URL, BASE_URL } from "../../api/axios";
 
 
 /* ==========================================================
@@ -190,7 +189,7 @@ function EngineerManagement() {
             if (isAdmin) {
 
                 url =
-                    `${API_BASE_URL}/api/admin/engineers`;
+                    `${API_BASE_URL}/admin/engineers`;
 
             }
 
@@ -209,7 +208,7 @@ function EngineerManagement() {
                 }
 
                 url =
-                    `${API_BASE_URL}/api/department/engineers?departmentId=${departmentId}`;
+                    `${API_BASE_URL}/department/engineers?departmentId=${departmentId}`;
 
             }
 
@@ -443,7 +442,7 @@ function EngineerManagement() {
 
                 const response =
                     await fetch(
-                        `${API_BASE_URL}/api/${
+                        `${API_BASE_URL}/${
                             isAdmin
                                 ? "admin"
                                 : "department"
@@ -566,7 +565,7 @@ function EngineerManagement() {
 
                 const response =
                     await fetch(
-                        `${API_BASE_URL}/api/${
+                        `${API_BASE_URL}/${
                             isAdmin
                                 ? "admin"
                                 : "department"
@@ -672,7 +671,7 @@ function EngineerManagement() {
 
                 const response =
                     await fetch(
-                        `${API_BASE_URL}/api/${
+                        `${API_BASE_URL}/${
                             isAdmin
                                 ? "admin"
                                 : "department"
@@ -768,7 +767,7 @@ function EngineerManagement() {
 
                 const response =
                     await fetch(
-                        `${API_BASE_URL}/api/${
+                        `${API_BASE_URL}/${
                             isAdmin
                                 ? "admin"
                                 : "department"
@@ -862,7 +861,7 @@ function EngineerManagement() {
             const url =
                 path.startsWith("http")
                     ? path
-                    : `${API_BASE_URL}${path}`;
+                    : `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 
 
             window.open(

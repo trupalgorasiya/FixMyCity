@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api/axios";
 
 import {
   FaClipboardList,
@@ -71,7 +72,7 @@ export default function Dashboard() {
         */
 
         const response = await fetch(
-          "http://localhost:8085/api/citizen/profile",
+          `${API_BASE_URL}/citizen/profile`,
           {
             method: "GET",
 

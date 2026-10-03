@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import "../styles/Contact.css";
 
 function Contact() {
@@ -43,7 +44,7 @@ function Contact() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://localhost:8085/api/contact",
+        `${API_BASE_URL}/contact`,
         formData
       );
 

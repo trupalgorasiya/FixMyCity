@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import "../styles/dashbord.css";
 import "../styles/EditProfile.css";
 import {
@@ -48,7 +49,7 @@ function EditProfile() {
         }
 
         const response = await axios.get(
-          "http://localhost:8085/api/auth/profile",
+          `${API_BASE_URL}/auth/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -200,7 +201,7 @@ function EditProfile() {
       // =========================================
 
       const response = await axios.put(
-        "http://localhost:8085/api/auth/update-profile",
+        `${API_BASE_URL}/auth/update-profile`,
         data,
         {
           headers: {

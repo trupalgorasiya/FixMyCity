@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import "../styles/EmailOtpModel.css";
 
 function EmailOtpModal({
@@ -104,7 +105,7 @@ function EmailOtpModal({
       // =====================================================
 
       const response = await axios.post(
-        "http://localhost:8085/api/guest-complaint/verify-otp",
+        `${API_BASE_URL}/guest-complaint/verify-otp`,
         formData
       );
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api/axios";
 import "./ComplaintManagement.css";
 
 import {
@@ -80,7 +81,7 @@ function ComplaintManagement() {
 
 
         const response = await fetch(
-          "http://localhost:8085/api/complaint/assigned",
+          `${API_BASE_URL}/complaint/assigned`,
           {
             method: "GET",
             headers: {

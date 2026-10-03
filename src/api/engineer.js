@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from "./axios";
 const token = localStorage.getItem("token");
 
 export const response = await axios.get(
-    "http://localhost:8085/api/engineer/complaints",
+    `${API_BASE_URL}/engineer/complaints`,
     {
         params: {
             page: 0,

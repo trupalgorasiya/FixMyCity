@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import "./AdminDashboard.css";
 
 import {
@@ -156,7 +157,7 @@ function Dashboard() {
           localStorage.getItem("token");
 
         const response = await axios.get(
-          "http://localhost:8085/api/admin/dashboard",
+          `${API_BASE_URL}/admin/dashboard`,
           {
             headers: {
               Authorization: `Bearer ${token}`

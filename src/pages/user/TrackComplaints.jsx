@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../../styles/ComplaintTracking.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { getComplaintByNumber } from "../../api/citizenApi";
+import { API_BASE_URL } from "../../api/axios";
 
 
 function MediaSection({ title, subtitle, media }) {
@@ -42,7 +43,7 @@ function MediaSection({ title, subtitle, media }) {
                     const mediaUrl =
                         file.fileUrl?.startsWith("http")
                             ? file.fileUrl
-                            : `http://localhost:8085/api/citizen/media/${file.mediaId}`;
+                            : `${API_BASE_URL}/citizen/media/${file.mediaId}`;
 
                     const fileType =
                         file.fileType?.toLowerCase() || "";

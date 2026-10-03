@@ -1,5 +1,6 @@
 import "../department/EngineerManage.css";
 import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../../api/axios";
 
 import {
   FaSearch,
@@ -48,7 +49,7 @@ function DepartmentManagement() {
         }
 
         const response = await fetch(
-          "http://localhost:8085/api/department/engineersAll",
+          `${API_BASE_URL}/department/engineersAll`,
           {
             method: "GET",
 

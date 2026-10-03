@@ -1678,6 +1678,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL, BASE_URL } from "../../api/axios";
 
 import {
     FaUser,
@@ -1703,8 +1704,6 @@ import "./Engineer_profile.css";
 function EngineerProfile() {
 
     const navigate = useNavigate();
-
-    const API_BASE_URL = "http://localhost:8085";
 
 
     /* =========================================================
@@ -1765,7 +1764,7 @@ function EngineerProfile() {
         const normalizedPath =
             filePath.replace(/\\/g, "/");
 
-        return `${API_BASE_URL}/${normalizedPath}`;
+        return `${BASE_URL}/${normalizedPath.startsWith('/') ? normalizedPath.slice(1) : normalizedPath}`;
     };
 
 
@@ -1796,7 +1795,7 @@ function EngineerProfile() {
 
             const response =
                 await axios.get(
-                    `${API_BASE_URL}/api/auth/profile`,
+                    `${API_BASE_URL}/auth/profile`,
                     {
                         headers: {
                             Authorization:

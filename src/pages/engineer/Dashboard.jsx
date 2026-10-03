@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../api/axios";
 
 import "./Dashboard.css";
 
@@ -124,7 +125,7 @@ function Dashboard() {
 
         const response =
           await fetch(
-            "http://localhost:8085/api/engineer/dashboard",
+            `${API_BASE_URL}/engineer/dashboard`,
             {
               method: "GET",
 

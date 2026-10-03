@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api/axios";
 import "./UserManagement.css";
 
 import {
@@ -54,7 +55,7 @@ function UserInformation() {
          * Call Admin Citizen API
          */
         const response = await fetch(
-          "http://localhost:8085/api/admin/citizens?page=0&size=10",
+          `${API_BASE_URL}/admin/citizens?page=0&size=10`,
           {
             method: "GET",
 

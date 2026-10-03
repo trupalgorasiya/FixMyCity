@@ -17,18 +17,14 @@ import {
 } from "react-icons/fa";
 
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 
 import "./ManageCategory.css";
 
 
 function DepartmentCategory() {
 
-    /* =====================================================
-       API BASE URL
-    ===================================================== */
 
-    const API_BASE_URL =
-        "http://localhost:8085";
 
 
     /* =====================================================
@@ -196,7 +192,7 @@ function DepartmentCategory() {
 
             const response =
                 await axios.get(
-                    `${API_BASE_URL}/api/categories/department/${departmentId}`,
+                    `${API_BASE_URL}/categories/department/${departmentId}`,
                     {
                         headers: getHeaders()
                     }
@@ -573,7 +569,7 @@ function DepartmentCategory() {
             const response =
                 await axios.put(
 
-                    `${API_BASE_URL}/api/categories/${editingCategory.categoryId}`,
+                    `${API_BASE_URL}/categories/${editingCategory.categoryId}`,
 
                     requestData,
 
@@ -791,7 +787,7 @@ function DepartmentCategory() {
 
             await axios.delete(
 
-                `${API_BASE_URL}/api/categories/${categoryId}`,
+                `${API_BASE_URL}/categories/${categoryId}`,
 
                 {
                     headers: getHeaders()

@@ -2,11 +2,12 @@ import { useState } from "react";
 import "../styles/ComplaintTracking.css";
 import { useNavigate } from "react-router-dom";
 import { getComplaintByNumber } from "../api/citizenApi";
+import { API_BASE_URL } from "../api/axios";
 
 function MediaCard({ file }) {
 
     const mediaUrl =
-        `http://localhost:8085/api/citizen/media/${file.mediaId}`;
+        `${API_BASE_URL}/citizen/media/${file.mediaId}`;
 
     const fileType =
         file.fileType?.toLowerCase() || "";

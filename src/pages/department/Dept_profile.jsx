@@ -529,6 +529,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE_URL } from "../../api/axios";
 import "./Dept_profile.css";
 
 import {
@@ -695,7 +696,7 @@ function Dept_profile() {
             const response =
                 await axios.get(
 
-                    "http://localhost:8085/api/auth/profile",
+                    `${API_BASE_URL}/auth/profile`,
 
                     {
                         headers: {

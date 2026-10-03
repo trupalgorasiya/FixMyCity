@@ -456,11 +456,10 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api/axios";
 import "../styles/EngineerRequest.css";
 
 import CustomPopup from "../configure/CustomPopup"
-
-const API_BASE_URL = "http://localhost:8085";
 
 const INITIAL_FORM_DATA = {
     firstName: "",
@@ -579,7 +578,7 @@ const EngineerRequest = () => {
                 setDepartmentLoading(true);
 
                 const response = await axios.get(
-                    `${API_BASE_URL}/api/departments`
+                    `${API_BASE_URL}/departments`
                 );
 
                 console.log(
@@ -974,7 +973,7 @@ const EngineerRequest = () => {
             const response =
                 await axios.post(
 
-                    `${API_BASE_URL}/api/enginners/add-engineer`,
+                    `${API_BASE_URL}/enginners/add-engineer`,
 
                     data,
 
