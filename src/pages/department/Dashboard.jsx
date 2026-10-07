@@ -47,19 +47,21 @@ COMPLAINT MARKER ICONS
 */
 
 const complaintIcons = {
+  CREATED: createMarkerIcon("#ef4444"),
+  PENDING: createMarkerIcon("#ef4444"),
+  ASSIGNED: createMarkerIcon("#f59e0b"),
+  IN_PROGRESS: createMarkerIcon("#8b5cf6"),
+  RESOLVED: createMarkerIcon("#22c55e"),
+  REJECTED: createMarkerIcon("#6b7280"),
+};
 
-  CREATED:
-    createMarkerIcon("#ef4444"),
-
-  ASSIGNED:
-    createMarkerIcon("#f59e0b"),
-
-  IN_PROGRESS:
-    createMarkerIcon("#8b5cf6"),
-
-  RESOLVED:
-    createMarkerIcon("#22c55e"),
-
+const getStatusMarkerIcon = (status) => {
+  const s = String(status || "").toUpperCase();
+  if (s.includes("RESOLV")) return complaintIcons.RESOLVED;
+  if (s.includes("PROGRESS") || s.includes("PROCESS")) return complaintIcons.IN_PROGRESS;
+  if (s.includes("ASSIGN")) return complaintIcons.ASSIGNED;
+  if (s.includes("REJECT")) return complaintIcons.REJECTED;
+  return complaintIcons.CREATED;
 };
 
 
@@ -781,12 +783,7 @@ function Dashboard() {
                       ),
                     ]}
 
-                    icon={
-                      complaintIcons[
-                        item.status
-                      ] ||
-                      complaintIcons.CREATED
-                    }
+                    icon={getStatusMarkerIcon(item.status)}
 
                   >
 
@@ -1000,6 +997,16 @@ function Dashboard() {
               ></span>
 
               Resolved
+
+            </div>
+
+            <div>
+
+              <span
+                className="legend-dot rejected"
+              ></span>
+
+              Rejected
 
             </div>
 

@@ -778,6 +778,45 @@
 
 
 /* =========================================================
+   ADDRESS FIELD
+========================================================= */
+
+.engineer-edit-address-field {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 18px 20px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-sizing: border-box;
+
+    transition: .3s;
+}
+
+
+.engineer-edit-address-field:focus-within {
+
+    background: #ffffff;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, .10);
+}
+
+
+/* =========================================================
    LABEL
 ========================================================= */
 

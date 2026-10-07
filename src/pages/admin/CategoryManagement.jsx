@@ -1070,7 +1070,7 @@ function CategoryManagement() {
                 </div>
 
 
-                <div className="category-management-stat-card">
+                {/* <div className="category-management-stat-card">
 
                     <div className="category-management-stat-icon green">
 
@@ -1090,10 +1090,10 @@ function CategoryManagement() {
 
                     </div>
 
-                </div>
+                </div> */}
 
 
-                <div className="category-management-stat-card">
+                {/* <div className="category-management-stat-card">
 
                     <div className="category-management-stat-icon orange">
 
@@ -1113,10 +1113,10 @@ function CategoryManagement() {
 
                     </div>
 
-                </div>
+                </div> */}
 
 
-                <div className="category-management-stat-card">
+                {/* <div className="category-management-stat-card">
 
                     <div className="category-management-stat-icon purple">
 
@@ -1136,7 +1136,7 @@ function CategoryManagement() {
 
                     </div>
 
-                </div>
+                </div> */}
 
             </div>
 
@@ -1460,13 +1460,13 @@ function CategoryManagement() {
 
                                                 <div className="category-management-name">
 
-                                                    <div className="category-management-category-icon">
+                                                    {/* <div className="category-management-category-icon">
 
                                                         {getIcon(
                                                             category.icon
                                                         )}
 
-                                                    </div>
+                                                    </div> */}
 
                                                     <strong>
 
@@ -1869,7 +1869,7 @@ function CategoryManagement() {
 
                                 {/* ICON */}
 
-                                <div className="category-management-form-group">
+                                {/* <div className="category-management-form-group">
 
                                     <label>
                                         Category Icon
@@ -1907,12 +1907,12 @@ function CategoryManagement() {
 
                                     </select>
 
-                                </div>
+                                </div> */}
 
 
                                 {/* STATUS */}
 
-                                <div className="category-management-form-group">
+                                {/* <div className="category-management-form-group">
 
                                     <label>
                                         Status
@@ -1938,7 +1938,7 @@ function CategoryManagement() {
 
                                     </select>
 
-                                </div>
+                                </div> */}
 
                             </div>
 

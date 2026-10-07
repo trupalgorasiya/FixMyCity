@@ -344,12 +344,32 @@ function AllComplaints() {
       );
 
     } catch {
-
       return "-";
-
     }
-
   }
+
+  const renderMedia = (media, idx) => {
+    if (!media) return null;
+    const mediaId = media.mediaId || media.id;
+    const mediaUrl = media.fileUrl?.startsWith("http")
+      ? media.fileUrl
+      : `${API_BASE_URL}/citizen/media/${mediaId}`;
+    const fileType = (media.fileType || "").toLowerCase();
+    const isVideo = fileType.startsWith("video/");
+    return (
+      <div key={mediaId || idx} className="repair-image-card" style={{ display: "inline-block", margin: "6px", borderRadius: "10px", overflow: "hidden", border: "1px solid #e2e8f0" }}>
+        {isVideo ? (
+          <video controls style={{ width: "160px", height: "120px" }}>
+            <source src={mediaUrl} type={media.fileType} />
+          </video>
+        ) : (
+          <a href={mediaUrl} target="_blank" rel="noopener noreferrer">
+            <img src={mediaUrl} alt={media.fileName || "Media"} style={{ width: "160px", height: "120px", objectFit: "cover", display: "block" }} />
+          </a>
+        )}
+      </div>
+    );
+  };
 
 
   /* ==========================================================
@@ -662,147 +682,147 @@ function AllComplaints() {
      MEDIA PREVIEW
   ========================================================== */
 
-  const renderMedia = (
-    file,
-    index
-  ) => {
+  // const renderMedia = (
+  //   file,
+  //   index
+  // ) => {
 
-    const url =
-      getMediaUrl(file);
-
-
-    if (!url) {
-      return null;
-    }
+  //   const url =
+  //     getMediaUrl(file);
 
 
-    const fileType =
-      file.fileType || "";
+  //   if (!url) {
+  //     return null;
+  //   }
 
 
-    /* IMAGE */
-
-    if (
-      fileType.startsWith("image/")
-    ) {
-
-      return (
-
-        <div
-          className="repair-card"
-          key={
-            file.mediaId ||
-            `${file.fileName}-${index}`
-          }
-        >
-
-          <h4>
-            {file.fileName ||
-              `Image ${index + 1}`}
-          </h4>
-
-          <img
-            src={url}
-            alt={
-              file.fileName ||
-              "Complaint media"
-            }
-          />
-
-        </div>
-
-      );
-
-    }
+  //   const fileType =
+  //     file.fileType || "";
 
 
-    /* VIDEO */
+  //   /* IMAGE */
 
-    if (
-      fileType.startsWith("video/")
-    ) {
+  //   if (
+  //     fileType.startsWith("image/")
+  //   ) {
 
-      return (
+  //     return (
 
-        <div
-          className="repair-card"
-          key={
-            file.mediaId ||
-            `${file.fileName}-${index}`
-          }
-        >
+  //       <div
+  //         className="repair-card"
+  //         key={
+  //           file.mediaId ||
+  //           `${file.fileName}-${index}`
+  //         }
+  //       >
 
-          <h4>
-            <FaVideo />
-            {" "}
-            {file.fileName ||
-              `Video ${index + 1}`}
-          </h4>
+  //         <h4>
+  //           {file.fileName ||
+  //             `Image ${index + 1}`}
+  //         </h4>
 
-          <video
-            controls
-            src={url}
-            style={{
-              width: "100%",
-              maxHeight: "300px"
-            }}
-          />
+  //         <img
+  //           src={url}
+  //           alt={
+  //             file.fileName ||
+  //             "Complaint media"
+  //           }
+  //         />
 
-        </div>
+  //       </div>
 
-      );
+  //     );
 
-    }
+  //   }
 
 
-    /* PDF */
+  //   /* VIDEO */
 
-    if (
-      fileType ===
-      "application/pdf"
-    ) {
+  //   if (
+  //     fileType.startsWith("video/")
+  //   ) {
 
-      return (
+  //     return (
 
-        <div
-          className="repair-card"
-          key={
-            file.mediaId ||
-            `${file.fileName}-${index}`
-          }
-        >
+  //       <div
+  //         className="repair-card"
+  //         key={
+  //           file.mediaId ||
+  //           `${file.fileName}-${index}`
+  //         }
+  //       >
 
-          <h4>
+  //         <h4>
+  //           <FaVideo />
+  //           {" "}
+  //           {file.fileName ||
+  //             `Video ${index + 1}`}
+  //         </h4>
 
-            <FaFilePdf />
+  //         <video
+  //           controls
+  //           src={url}
+  //           style={{
+  //             width: "100%",
+  //             maxHeight: "300px"
+  //           }}
+  //         />
 
-            {" "}
+  //       </div>
 
-            {file.fileName ||
-              "PDF File"}
+  //     );
 
-          </h4>
-
-          <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-          >
-
-            Open PDF
-
-          </a>
-
-        </div>
-
-      );
-
-    }
+  //   }
 
 
-    return null;
+  //   /* PDF */
 
-  };
+  //   if (
+  //     fileType ===
+  //     "application/pdf"
+  //   ) {
+
+  //     return (
+
+  //       <div
+  //         className="repair-card"
+  //         key={
+  //           file.mediaId ||
+  //           `${file.fileName}-${index}`
+  //         }
+  //       >
+
+  //         <h4>
+
+  //           <FaFilePdf />
+
+  //           {" "}
+
+  //           {file.fileName ||
+  //             "PDF File"}
+
+  //         </h4>
+
+  //         <a
+  //           href={url}
+  //           target="_blank"
+  //           rel="noreferrer"
+  //         >
+
+  //           Open PDF
+
+  //         </a>
+
+  //       </div>
+
+  //     );
+
+  //   }
+
+
+  //   return null;
+
+  // };
 
 
   /* ==========================================================
@@ -1539,7 +1559,7 @@ function AllComplaints() {
 
                 <div className="image-section">
 
-                  {/* <h4>
+                  <h4>
                     Complaint Media
                   </h4>
 
@@ -1551,7 +1571,7 @@ function AllComplaints() {
                         renderMedia
                       )}
 
-                  </div> */}
+                  </div>
 
                 </div>
 

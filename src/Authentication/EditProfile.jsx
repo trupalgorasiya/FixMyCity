@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { API_BASE_URL } from "../api/axios";
+import { API_BASE_URL, BASE_URL } from "../api/axios";
 import "../styles/dashbord.css";
 import "../styles/EditProfile.css";
+import CustomPopup from "../configure/CustomPopup";
 import {
   FaUser,
   FaEnvelope,
   FaPhoneAlt,
- // FaCamera,
+  FaMapMarkerAlt,
   FaSave,
   FaTimes
 } from "react-icons/fa";
@@ -22,19 +23,42 @@ function EditProfile() {
     lastName: "",
     email: "",
     contact: "",
+    address: "",
     profileImage: null,
+    role: "",
   });
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+    onConfirm: null
+  });
 
+  // =========================================
+  // HELPER: PROFILE IMAGE URL
+  // =========================================
+  const getProfileImageUrl = (img) => {
+    if (!img) return updated_imgs;
+    if (
+      img.startsWith("http://") ||
+      img.startsWith("https://") ||
+      img.startsWith("data:") ||
+      img.startsWith("blob:")
+    ) {
+      return img;
+    }
+    const cleanPath = img.replace(/\\/g, "/").replace(/^\/+/, "");
+    return `${BASE_URL}/${cleanPath}`;
+  };
 
   // =========================================
   // GET LOGGED-IN USER PROFILE
   // =========================================
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -57,39 +81,25 @@ function EditProfile() {
           }
         );
 
-        console.log(
-          "Profile Response:",
-          response.data
-        );
+        const data = response.data;
+        const roleData = data.roleData || {};
 
         setUser({
-          firstName:
-            response.data.firstName || "",
-
-          lastName:
-            response.data.lastName || "",
-
-          email:
-            response.data.email || "",
-
-          contact:
-            response.data.contact || "",
-
-          profileImage:
-            response.data.profileImage || null,
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          email: data.email || "",
+          contact: data.contact || "",
+          address: roleData.address || "",
+          profileImage: data.profileImage || null,
+          role: data.role || "",
         });
 
       } catch (err) {
-        console.error(
-          "Profile Fetch Error:",
-          err
-        );
-
+        console.error("Profile Fetch Error:", err);
         setError(
           err.response?.data?.message ||
           "Unable to load profile information."
         );
-
       } finally {
         setLoading(false);
       }
@@ -101,13 +111,8 @@ function EditProfile() {
   // =========================================
   // HANDLE TEXT CHANGE
   // =========================================
-
   const handleChange = (e) => {
-    const {
-      name,
-      value
-    } = e.target;
-
+    const { name, value } = e.target;
     setUser((prev) => ({
       ...prev,
       [name]: value,
@@ -115,27 +120,8 @@ function EditProfile() {
   };
 
   // =========================================
-  // HANDLE IMAGE CHANGE
-  // =========================================
-
-//   const handleImageChange = (e) => {
-//     const file = e.target.files[0];
-
-//     if (!file) {
-//       return;
-//     }
-
-
-//     setUser((prev) => ({
-//       ...prev,
-//       profileImage: URL.createObjectURL(file),
-//     }));
-//   };
-
-  // =========================================
   // SUBMIT UPDATE
   // =========================================
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -143,291 +129,172 @@ function EditProfile() {
       return;
     }
 
-    setMessage("");
     setError("");
 
-    // =========================================
     // VALIDATION
-    // =========================================
-
     if (!user.firstName.trim()) {
-      setError("Please enter your first name.");
+      setPopup({
+        isOpen: true,
+        type: "warning",
+        title: "Validation Error",
+        message: "Please enter your first name."
+      });
       return;
     }
 
     if (!user.lastName.trim()) {
-      setError("Please enter your last name.");
+      setPopup({
+        isOpen: true,
+        type: "warning",
+        title: "Validation Error",
+        message: "Please enter your last name."
+      });
       return;
     }
 
     if (!user.contact.trim()) {
-      setError("Please enter your contact number.");
+      setPopup({
+        isOpen: true,
+        type: "warning",
+        title: "Validation Error",
+        message: "Please enter your contact number."
+      });
       return;
     }
 
-    // =========================================
-    // GET TOKEN
-    // =========================================
-
     const token = localStorage.getItem("token");
-
     if (!token) {
-      setError(
-        "You are not logged in. Please login again."
-      );
+      setPopup({
+        isOpen: true,
+        type: "error",
+        title: "Authentication Required",
+        message: "You are not logged in. Please login again."
+      });
       return;
     }
 
     try {
       setSaving(true);
 
-      // =========================================
-      // REQUEST BODY
-      // =========================================
-
       const data = {
         firstName: user.firstName.trim(),
         lastName: user.lastName.trim(),
         contact: user.contact.trim(),
+        address: (user.address || "").trim(),
+        profileImage: user.profileImage,
       };
 
-      console.log(
-        "Update Profile Request:",
-        data
-      );
-
-      // =========================================
-      // UPDATE PROFILE
-      // =========================================
-
-      const response = await axios.put(
-        `${API_BASE_URL}/auth/update-profile`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log(
-        "Update Profile Response:",
-        response.data
-      );
-
-      // =========================================
-      // SUCCESS
-      // =========================================
-
-      setMessage(
-        response.data?.message ||
-        "Profile updated successfully."
-      );
-
-      alert(
-        response.data?.message ||
-        "Profile updated successfully."
-      );
-
-      // =========================================
-      // GO BACK
-      // =========================================
-
-      navigate(-1);
-
-    } catch (err) {
-
-      console.error(
-        "Update Profile Error:",
-        err
-      );
-
-      const backendMessage =
-        err.response?.data?.message;
-
-      if (backendMessage) {
-
-        setError(backendMessage);
-
-      } else if (
-        typeof err.response?.data ===
-        "string"
-      ) {
-
-        setError(
-          err.response.data
+      if (user.role === "ENGINEER") {
+        await axios.put(
+          `${API_BASE_URL}/engineers`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
-
       } else {
-
-        setError(
-          "Unable to update profile. Please try again."
+        await axios.put(
+          `${API_BASE_URL}/auth/update-profile`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
       }
 
-    } finally {
+      setPopup({
+        isOpen: true,
+        type: "success",
+        title: "Profile Updated",
+        message: "Your profile has been updated successfully.",
+        onConfirm: () => navigate(-1)
+      });
 
+    } catch (err) {
+      console.error("Update Profile Error:", err);
+      const backendMessage =
+        err.response?.data?.message ||
+        (typeof err.response?.data === "string" ? err.response.data : "") ||
+        "Unable to update profile. Please try again.";
+
+      setPopup({
+        isOpen: true,
+        type: "error",
+        title: "Update Failed",
+        message: backendMessage
+      });
+    } finally {
       setSaving(false);
     }
   };
 
-  // =========================================
-  // LOADING
-  // =========================================
-
   if (loading) {
     return (
       <div className="edit-profile-page">
-
         <div className="edit-profile-card">
-
-          <h2>
-            Edit Profile
-          </h2>
-
-          <p>
-            Loading your profile...
-          </p>
-
+          <h2>Edit Profile</h2>
+          <p>Loading your profile...</p>
         </div>
-
       </div>
     );
   }
 
-  // =========================================
-  // ERROR WHILE LOADING PROFILE
-  // =========================================
-
-  if (error && !user.email) {
+  if (error) {
     return (
       <div className="edit-profile-page">
-
         <div className="edit-profile-card">
-
-          <h2>
-            Edit Profile
-          </h2>
-
-          <div className="error-message">
-            {error}
-          </div>
-
-          <div className="edit-profile-actions">
-
-            <button
-              type="button"
-              className="cancel-btn"
-              onClick={() =>
-                navigate(-1)
-              }
-            >
-              <FaTimes />
-              <span>
-                Go Back
-              </span>
-            </button>
-
-          </div>
-
+          <h2>Unable to Load Profile</h2>
+          <p>{error}</p>
+          <button
+            type="button"
+            className="cancel-btn"
+            style={{ marginTop: "20px" }}
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </button>
         </div>
-
       </div>
     );
   }
-
-  // =========================================
-  // EDIT PROFILE
-  // =========================================
 
   return (
     <div className="edit-profile-page">
-
       <div className="edit-profile-card">
+        {/* HEADER */}
+        <div className="edit-profile-header">
+          <h2>Edit Profile</h2>
+          {/* <p>Update your personal information below.</p> */}
+        </div>
 
-        <h2>
-          Edit Profile
-        </h2>
-
-        {/* <p>
-          Update your personal information
-          below.
-        </p> */}
-
-        {/* =====================================
-            SUCCESS MESSAGE
-        ====================================== */}
-
-        {message && (
-          <div className="success-message">
-            {message}
-          </div>
-        )}
-
-        {/* =====================================
-            ERROR MESSAGE
-        ====================================== */}
-
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
-
-          {/* =====================================
-              PROFILE IMAGE
-          ====================================== */}
-
+          {/* PROFILE IMAGE */}
           <div className="profile-image-section">
-
             <img
-              src={
-                user.profileImage
-                  ? user.profileImage
-                  : updated_imgs
-              }
+              src={getProfileImageUrl(user.profileImage)}
               alt="Profile"
               className="edit-profile-image"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = updated_imgs;
+              }}
             />
-
-            {/* <label className="upload-btn">
-
-             
-
-             
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                hidden
-              />
-
-            </label> */}
-
           </div>
 
-          {/* =====================================
-              PROFILE FORM
-          ====================================== */}
-
+          {/* GRID */}
           <div className="edit-profile-grid">
-
             {/* FIRST NAME */}
-
             <div className="form-group">
-
-              <label>
-                First Name
-              </label>
-
+              <label>First Name</label>
               <div className="input-box">
-
                 <FaUser />
-
                 <input
                   type="text"
                   name="firstName"
@@ -435,23 +302,14 @@ function EditProfile() {
                   onChange={handleChange}
                   required
                 />
-
               </div>
-
             </div>
 
             {/* LAST NAME */}
-
             <div className="form-group">
-
-              <label>
-                Last Name
-              </label>
-
+              <label>Last Name</label>
               <div className="input-box">
-
                 <FaUser />
-
                 <input
                   type="text"
                   name="lastName"
@@ -459,46 +317,28 @@ function EditProfile() {
                   onChange={handleChange}
                   required
                 />
-
               </div>
-
             </div>
 
-            {/* EMAIL */}
-
-            <div className="form-group full-width">
-
-              <label>
-                Email Address
-              </label>
-
-              <div className="input-box readonly">
-
+            {/* EMAIL (READ ONLY) */}
+            <div className="form-group">
+              <label>Email Address</label>
+              <div className="input-box">
                 <FaEnvelope />
-
                 <input
                   type="email"
                   name="email"
                   value={user.email}
                   readOnly
                 />
-
               </div>
-
             </div>
 
             {/* CONTACT */}
-
-            <div className="form-group full-width">
-
-              <label>
-                Mobile Number
-              </label>
-
+            <div className="form-group">
+              <label>Mobile Number</label>
               <div className="input-box">
-
                 <FaPhoneAlt />
-
                 <input
                   type="tel"
                   name="contact"
@@ -506,62 +346,67 @@ function EditProfile() {
                   onChange={handleChange}
                   required
                 />
-
               </div>
-
             </div>
 
+            {/* ADDRESS (FOR ENGINEER) */}
+            {user.role === "ENGINEER" && (
+              <div className="form-group full-width">
+                <label>Address</label>
+                <div className="input-box">
+                  <FaMapMarkerAlt />
+                  <input
+                    type="text"
+                    name="address"
+                    value={user.address || ""}
+                    onChange={handleChange}
+                    placeholder="Enter your address"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* =====================================
-              ACTION BUTTONS
-          ====================================== */}
-
+          {/* ACTION BUTTONS */}
           <div className="edit-profile-actions">
-
-            {/* CANCEL */}
-
             <button
               type="button"
               className="cancel-btn"
-              onClick={() =>
-                navigate(-1)
-              }
+              onClick={() => navigate(-1)}
               disabled={saving}
             >
-
               <FaTimes />
-
-              <span>
-                Cancel
-              </span>
-
+              <span>Cancel</span>
             </button>
-
-            {/* SAVE */}
 
             <button
               type="submit"
               className="dashboard-btn"
               disabled={saving}
             >
-
               <FaSave />
-
-              <span>
-                {saving
-                  ? "Saving Changes..."
-                  : "Save Changes"}
-              </span>
-
+              <span>{saving ? "Saving..." : "Save Changes"}</span>
             </button>
-
           </div>
-
         </form>
-
       </div>
 
+      {/* CUSTOM POPUP */}
+      {popup.isOpen && (
+        <CustomPopup
+          isOpen={popup.isOpen}
+          type={popup.type}
+          title={popup.title}
+          message={popup.message}
+          onClose={() => {
+            setPopup((p) => ({ ...p, isOpen: false }));
+            if (popup.onConfirm) {
+              popup.onConfirm();
+            }
+          }}
+          onConfirm={popup.onConfirm}
+        />
+      )}
     </div>
   );
 }

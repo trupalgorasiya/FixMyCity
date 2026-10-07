@@ -110,7 +110,7 @@ function EngineerManagement() {
         useState("");
 
     const [statusFilter, setStatusFilter] =
-        useState("All");
+        useState("Pending");
 
     const [selectedEngineer, setSelectedEngineer] =
         useState(null);
@@ -126,6 +126,9 @@ function EngineerManagement() {
 
     const [processing, setProcessing] =
         useState(false);
+
+    const [previewDoc, setPreviewDoc] =
+        useState(null);
 
 
     /* ======================================================
@@ -1470,44 +1473,96 @@ function EngineerManagement() {
                             <div className="engineer-documents">
 
                                 <h3>
-                                    Documents
+                                    Submitted Documents & Certificates
                                 </h3>
 
+                                <div className="document-cards-grid">
 
-                                <button
-                                    onClick={() =>
-                                        openDocument(
-                                            selectedEngineer.degreeCertificate
-                                        )
-                                    }
-                                >
-
-                                    <FaFilePdf />
-
-                                    Degree Certificate
-
-                                </button>
-
-
-                                {
-                                    selectedEngineer.experienceCertificate && (
-
-                                        <button
-                                            onClick={() =>
-                                                openDocument(
-                                                    selectedEngineer.experienceCertificate
-                                                )
-                                            }
+                                    {/* DEGREE CERTIFICATE */}
+                                    <div className="doc-card">
+                                        <div className="doc-card-header">
+                                            <span className="doc-type-badge">Degree Certificate</span>
+                                            <button
+                                                type="button"
+                                                className="doc-open-link"
+                                                onClick={() => openDocument(selectedEngineer.degreeCertificate)}
+                                                title="Open in new tab"
+                                            >
+                                                External ↗
+                                            </button>
+                                        </div>
+                                        <div
+                                            className="doc-image-wrapper"
+                                            onClick={() => setPreviewDoc({
+                                                title: "Degree Certificate",
+                                                url: `${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/degree`
+                                            })}
                                         >
+                                            <img
+                                                src={`${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/degree`}
+                                                alt="Degree Certificate"
+                                                className="doc-preview-img"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    if (e.target.nextSibling) {
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }
+                                                }}
+                                            />
+                                            <div className="doc-fallback-view" style={{ display: 'none' }}>
+                                                <FaFilePdf />
+                                                <span>Click to View Certificate</span>
+                                            </div>
+                                            <div className="doc-overlay-hover">
+                                                <FaEye /> Click to View Full Size
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                            <FaFilePdf />
+                                    {/* EXPERIENCE CERTIFICATE */}
+                                    {selectedEngineer.experienceCertificate && (
+                                        <div className="doc-card">
+                                            <div className="doc-card-header">
+                                                <span className="doc-type-badge">Experience Certificate</span>
+                                                <button
+                                                    type="button"
+                                                    className="doc-open-link"
+                                                    onClick={() => openDocument(selectedEngineer.experienceCertificate)}
+                                                    title="Open in new tab"
+                                                >
+                                                    External ↗
+                                                </button>
+                                            </div>
+                                            <div
+                                                className="doc-image-wrapper"
+                                                onClick={() => setPreviewDoc({
+                                                    title: "Experience Certificate",
+                                                    url: `${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/experience`
+                                                })}
+                                            >
+                                                <img
+                                                    src={`${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/experience`}
+                                                    alt="Experience Certificate"
+                                                    className="doc-preview-img"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        if (e.target.nextSibling) {
+                                                            e.target.nextSibling.style.display = 'flex';
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="doc-fallback-view" style={{ display: 'none' }}>
+                                                    <FaFilePdf />
+                                                    <span>Click to View Certificate</span>
+                                                </div>
+                                                <div className="doc-overlay-hover">
+                                                    <FaEye /> Click to View Full Size
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                            Experience Certificate
-
-                                        </button>
-
-                                    )
-                                }
+                                </div>
 
                             </div>
 
@@ -1761,9 +1816,55 @@ function EngineerManagement() {
                         </div>
 
                     </div>
-
                 )
+            
             }
+
+            {/* ==================================================
+                FULL DOCUMENT ZOOM MODAL
+            ================================================== */}
+            {previewDoc && (
+                <div
+                    className="document-zoom-overlay"
+                    onClick={() => setPreviewDoc(null)}
+                >
+                    <div
+                        className="document-zoom-container"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="document-zoom-header">
+                            <h3>{previewDoc.title}</h3>
+                            <button
+                                type="button"
+                                className="zoom-close-btn"
+                                onClick={() => setPreviewDoc(null)}
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+                        <div className="document-zoom-body">
+                            <img
+                                src={previewDoc.url}
+                                alt={previewDoc.title}
+                                className="document-zoom-img"
+                                onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    if (e.target.nextSibling) {
+                                        e.target.nextSibling.style.display = 'block';
+                                    }
+                                }}
+                            />
+                            <div className="zoom-fallback-frame" style={{ display: 'none' }}>
+                                <iframe
+                                    src={previewDoc.url}
+                                    title={previewDoc.title}
+                                    className="document-zoom-iframe"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
 

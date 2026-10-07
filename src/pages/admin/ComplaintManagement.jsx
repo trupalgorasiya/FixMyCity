@@ -81,7 +81,7 @@ function ComplaintManagement() {
 
 
         const response = await fetch(
-          `${API_BASE_URL}/complaint/assigned`,
+          `${API_BASE_URL}/complaint/all?page=0&size=500`,
           {
             method: "GET",
             headers: {
@@ -193,7 +193,7 @@ function ComplaintManagement() {
 
   const pendingComplaints =
     complaints.filter(
-      (item) => item.status === "PENDING"
+      (item) => item.status === "PENDING" || item.status === "CREATED"
     ).length;
 
   const assignedComplaints =
@@ -478,7 +478,7 @@ function ComplaintManagement() {
         </div>
 
 
-        {/* <div className="summary-card">
+        <div className="summary-card">
 
           <div className="summary-info">
 
@@ -498,7 +498,7 @@ function ComplaintManagement() {
 
           </div>
 
-        </div> */}
+        </div>
 
 
         <div className="summary-card">
@@ -938,24 +938,21 @@ function ComplaintManagement() {
                           </button>
 
 
-                          <button
-                            className="assign-btn"
-                            onClick={() => {
-
-                              setSelectedComplaint(
-                                item
-                              );
-
-                              setShowAssignModal(
-                                true
-                              );
-
-                            }}
-                          >
-
-                            Assign
-
-                          </button>
+                          {/* {(!item.engineerFirstName && !item.engineerLastName && (!item.status || item.status.toUpperCase() === "PENDING" || item.status.toUpperCase() === "CREATED")) && (
+                            <button
+                              className="assign-btn"
+                              onClick={() => {
+                                setSelectedComplaint(
+                                  item
+                                );
+                                setShowAssignModal(
+                                  true
+                                );
+                              }}
+                            >
+                              Assign
+                            </button>
+                          )} */}
 
 
                         </div>
@@ -1588,32 +1585,53 @@ function ComplaintManagement() {
               <div className="details-section">
 
                 <h3>
-                  Complaint Media
+                  Complaint Media ({selectedComplaint.media.length})
                 </h3>
 
-
-                <div className="details-grid">
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "16px", marginTop: "14px" }}>
 
                   {selectedComplaint.media.map(
-                    (media) => (
-
-                      <div
-                        key={media.mediaId}
-                      >
-
-                        <label>
-                          {media.mediaType === "AFTER"
-                            ? "After Image"
-                            : "Complaint Image"}
-                        </label>
-
-                        <p>
-                          {media.fileName}
-                        </p>
-
-                      </div>
-
-                    )
+                    (media) => {
+                      const mediaUrl = `${API_BASE_URL}/citizen/media/${media.mediaId}`;
+                      const isVideo = media.fileType?.toLowerCase().startsWith("video/");
+                      return (
+                        <div
+                          key={media.mediaId}
+                          style={{
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "12px",
+                            overflow: "hidden",
+                            background: "#f8fafc",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.06)"
+                          }}
+                        >
+                          <div style={{ height: "130px", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                            {isVideo ? (
+                              <video controls style={{ width: "100%", maxHeight: "130px" }}>
+                                <source src={mediaUrl} type={media.fileType} />
+                              </video>
+                            ) : (
+                              <a href={mediaUrl} target="_blank" rel="noopener noreferrer" title="Click to view full image">
+                                <img
+                                  src={mediaUrl}
+                                  alt={media.fileName}
+                                  style={{ width: "100%", height: "130px", objectFit: "cover", display: "block" }}
+                                  onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                              </a>
+                            )}
+                          </div>
+                          <div style={{ padding: "8px 12px" }}>
+                            <span style={{ fontSize: "11px", fontWeight: "700", color: media.mediaType === "AFTER" ? "#16a34a" : "#2563eb", textTransform: "uppercase" }}>
+                              {media.mediaType === "AFTER" ? "After Work" : "Complaint Photo"}
+                            </span>
+                            <p style={{ fontSize: "12px", color: "#64748b", margin: "3px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {media.fileName}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
                   )}
 
                 </div>

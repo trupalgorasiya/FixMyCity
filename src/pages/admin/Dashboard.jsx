@@ -717,6 +717,17 @@ function Dashboard() {
               </div>
 
 
+              <div>
+
+                <span
+                  className="legend-dot rejected"
+                ></span>
+
+                Rejected
+
+              </div>
+
+
             </div>
 
 
@@ -730,38 +741,7 @@ function Dashboard() {
 
           <div className="dashboard-box">
 
-            <div className="card-header">
-
-              <div>
-
-                <h2>
-
-                  <FaChartLine />
-
-                  {" "}Monthly Complaint Analytics
-
-                </h2>
-
-                <p>
-                  Complaint distribution
-                  across the year
-                </p>
-
-              </div>
-
-              <div className="monthly-total">
-
-                <span>
-                  Total
-                </span>
-
-                <strong>
-                  {dashboardData?.totalComplaints ?? 0}
-                </strong>
-
-              </div>
-
-            </div>
+            
 
 
             <div className="dashboard-box">

@@ -177,6 +177,15 @@ function EngineerManagement() {
      SEARCH ENGINEERS
   ========================================================== */
 
+  const processedEngineers = useMemo(() => {
+    // Only show engineers that have been approved or rejected (not pending)
+    return engineers.filter(
+      (engineer) =>
+        engineer.isRejected !== null &&
+        engineer.isRejected !== undefined
+    );
+  }, [engineers]);
+
   const filteredEngineers = useMemo(() => {
 
     const keyword = search
@@ -186,12 +195,12 @@ function EngineerManagement() {
 
     if (!keyword) {
 
-      return engineers;
+      return processedEngineers;
 
     }
 
 
-    return engineers.filter((engineer) => {
+    return processedEngineers.filter((engineer) => {
 
       const fullName =
         `${engineer.firstName || ""} ${engineer.lastName || ""}`
@@ -230,7 +239,7 @@ function EngineerManagement() {
 
     });
 
-  }, [engineers, search]);
+  }, [processedEngineers, search]);
 
 
   /* ==========================================================
@@ -404,7 +413,7 @@ function EngineerManagement() {
 
         {/* DEPARTMENTS */}
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <div className="summary-info">
 
@@ -418,7 +427,7 @@ function EngineerManagement() {
 
           </div>
 
-        </div>
+        </div> */}
 
       </div>
 
@@ -520,6 +529,10 @@ function EngineerManagement() {
 
                 <th>
                   Department
+                </th>
+
+                <th>
+                  Application
                 </th>
 
                 <th>
@@ -626,6 +639,27 @@ function EngineerManagement() {
                       <td>
 
                         {engineer.department || "-"}
+
+                      </td>
+
+
+                      {/* APPLICATION STATUS */}
+
+                      <td>
+
+                        <span
+                          className={
+                            engineer.isRejected
+                              ? "status inactive"
+                              : "status active"
+                          }
+                        >
+
+                          {engineer.isRejected
+                            ? "Rejected"
+                            : "Approved"}
+
+                        </span>
 
                       </td>
 

@@ -613,7 +613,7 @@
 
 .timeline{
     margin-top:35px;
-    border-left:3px solid #2563eb;
+    /* border-left:3px solid #2563eb; */
     padding-left:25px;
 }
 
@@ -626,7 +626,7 @@
     padding-bottom:0;
 }
 
-.timeline-item::before{
+/* .timeline-item::before{
     content:"";
     position:absolute;
     left:-34px;
@@ -636,7 +636,7 @@
     border-radius:50%;
     background:#2563eb;
     border:4px solid #dbeafe;
-}
+} */
 
 .timeline-item h4{
     margin-bottom:6px;
@@ -1304,26 +1304,24 @@
 }
 
 .legend-dot.pending{
-
     background:#ef4444;
-
 }
 
 .legend-dot.assigned{
-
     background:#f59e0b;
-
 }
 
 .legend-dot.in-progress{
-
-    background:#9333ea;
-
+    background:#8b5cf6;
 }
+
+.legend-dot.resolved,
 .legend-dot.completed{
-
     background:#22c55e;
+}
 
+.legend-dot.rejected{
+    background:#6b7280;
 }
 
 
@@ -1360,4 +1358,155 @@
 
 .work-btn:hover{
     background:#15803d;
+}
+
+/* =========================================================
+   ACTIVE WORK (RECENT COMPLAINTS) CARDS
+========================================================= */
+
+.active-work-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 22px;
+  margin-top: 18px;
+}
+
+.active-work-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.active-work-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: #2563eb;
+  border-radius: 4px 0 0 4px;
+}
+
+.active-work-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+  border-color: #cbd5e1;
+}
+
+.active-work-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.active-work-info > div:first-child {
+  flex: 1;
+}
+
+.active-work-info .complaint-id {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.active-work-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.active-work-info .complaint-category {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.active-work-info p {
+  font-size: 14px;
+  color: #475569;
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.active-work-info p strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.active-work-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.active-work-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+}
+
+.active-work-footer span {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.active-work-footer .work-btn {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.active-work-footer .work-btn:hover {
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+@media (max-width: 768px) {
+  .active-work-list {
+    grid-template-columns: 1fr;
+  }
 }

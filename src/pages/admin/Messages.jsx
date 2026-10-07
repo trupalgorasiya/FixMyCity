@@ -241,7 +241,7 @@ function Messages() {
                     {/* ID */}
                     <td>
                       <strong>
-                        #{message.getInTouchId}
+                        {message.getInTouchId}
                       </strong>
                     </td>
 
@@ -340,8 +340,7 @@ function Messages() {
                 </h2>
 
                 <span>
-                  Message #
-                  {selectedMessage.getInTouchId}
+                  Message ID: {selectedMessage.getInTouchId}
                 </span>
               </div>
 

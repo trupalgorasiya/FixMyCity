@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import "./DepartmentManagement.css";
 import { API_BASE_URL } from "../../api/axios";
+import CustomPopup from "../../configure/CustomPopup";
 
 function DepartmentManagement() {
 
@@ -47,6 +48,12 @@ function DepartmentManagement() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [popupConfig, setPopupConfig] = useState(null);
+
+  const showPopup = (message, type = "info", title = "") => {
+    setPopupConfig({ message, type, title });
+  };
 
   const rowsPerPage = 5;
 
@@ -369,8 +376,10 @@ function DepartmentManagement() {
         addFormData.confirmPassword
       ) {
 
-        alert(
-          "Password and Confirm Password do not match."
+        showPopup(
+          "Password and Confirm Password do not match.",
+          "warning",
+          "Validation Error"
         );
 
         return;
@@ -452,9 +461,10 @@ function DepartmentManagement() {
         data
       );
 
-      alert(
-        data.message ||
-        "Department added successfully."
+      showPopup(
+        data.message || "Department added successfully.",
+        "success",
+        "Department Added"
       );
 
       setShowAddModal(false);
@@ -478,9 +488,10 @@ function DepartmentManagement() {
         error
       );
 
-      alert(
-        error.message ||
-        "Failed to add department."
+      showPopup(
+        error.message || "Failed to add department.",
+        "error",
+        "Error"
       );
 
     }
@@ -675,9 +686,10 @@ console.log("EDIT DEPARTMENT:", department);
         data
       );
 
-      alert(
-        data.message ||
-        "Department updated successfully."
+      showPopup(
+        data.message || "Department updated successfully.",
+        "success",
+        "Department Updated"
       );
 
       setShowEditModal(false);
@@ -701,9 +713,10 @@ console.log("EDIT DEPARTMENT:", department);
         error
       );
 
-      alert(
-        error.message ||
-        "Failed to update department."
+      showPopup(
+        error.message || "Failed to update department.",
+        "error",
+        "Error"
       );
 
     }
@@ -803,9 +816,10 @@ console.log("EDIT DEPARTMENT:", department);
         data
       );
 
-      alert(
-        data.message ||
-        "Department deleted successfully."
+      showPopup(
+        data.message || "Department deleted successfully.",
+        "success",
+        "Department Deleted"
       );
 
       setShowDeleteModal(false);
@@ -821,9 +835,10 @@ console.log("EDIT DEPARTMENT:", department);
         error
       );
 
-      alert(
-        error.message ||
-        "Failed to delete department."
+      showPopup(
+        error.message || "Failed to delete department.",
+        "error",
+        "Error"
       );
 
     }
@@ -900,7 +915,7 @@ console.log("EDIT DEPARTMENT:", department);
 
         </div>
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <span>
             Active Departments
@@ -910,9 +925,9 @@ console.log("EDIT DEPARTMENT:", department);
             {activeDepartments}
           </h3>
 
-        </div>
+        </div> */}
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <span>
             Inactive Departments
@@ -922,9 +937,9 @@ console.log("EDIT DEPARTMENT:", department);
             {inactiveDepartments}
           </h3>
 
-        </div>
+        </div> */}
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <span>
             Registered Departments
@@ -934,7 +949,7 @@ console.log("EDIT DEPARTMENT:", department);
             {departments.length}
           </h3>
 
-        </div>
+        </div> */}
 
       </div>
 
@@ -1637,69 +1652,32 @@ console.log("EDIT DEPARTMENT:", department);
       )}
 
       {/* ======================================================
-          DELETE MODAL
+          DELETE CONFIRMATION POPUP
       ====================================================== */}
 
       {showDeleteModal && (
+        <CustomPopup
+          title="Delete Department"
+          message={`Are you sure you want to delete the department "${selectedDepartment?.name}"? All associated department records and assignments may be permanently affected.`}
+          type="warning"
+          showCancel={true}
+          buttonText="Yes, Delete"
+          cancelText="Cancel"
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={deleteDepartment}
+        />
+      )}
 
-        <div
-          className="modal-overlay"
-          onClick={() =>
-            setShowDeleteModal(false)
-          }
-        >
-
-          <div
-            className="delete-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
-
-            <h2>
-              Delete Department
-            </h2>
-
-            <p>
-
-              Are you sure you want to
-              delete
-
-              <strong>
-                {" "}
-                {selectedDepartment?.name}
-              </strong>
-
-              ?
-
-            </p>
-
-            <div className="delete-actions">
-
-              <button
-                className="cancel-btn"
-                onClick={() =>
-                  setShowDeleteModal(false)
-                }
-              >
-                Cancel
-              </button>
-
-              <button
-                className="delete-confirm-btn"
-                onClick={
-                  deleteDepartment
-                }
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
+      {/* ======================================================
+          NOTIFICATION / FEEDBACK POPUP
+      ====================================================== */}
+      {popupConfig && (
+        <CustomPopup
+          title={popupConfig.title}
+          message={popupConfig.message}
+          type={popupConfig.type}
+          onClose={() => setPopupConfig(null)}
+        />
       )}
 
     </div>

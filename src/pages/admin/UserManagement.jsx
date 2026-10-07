@@ -52,10 +52,10 @@ function UserInformation() {
 
 
         /*
-         * Call Admin Citizen API
+         * Call Admin Citizen API (fetch all pages)
          */
         const response = await fetch(
-          `${API_BASE_URL}/admin/citizens?page=0&size=10`,
+          `${API_BASE_URL}/admin/citizens?page=0&size=100`,
           {
             method: "GET",
 
@@ -99,10 +99,6 @@ function UserInformation() {
 
         /*
          * Backend returns Page< Citizen >
-         *
-         * {
-         *   content: [...]
-         * }
          */
         setUsers(
           Array.isArray(data.content)
@@ -298,7 +294,7 @@ function UserInformation() {
 
         {/* REGISTERED CITIZENS */}
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <div className="summary-info">
 
@@ -318,12 +314,12 @@ function UserInformation() {
 
           </div>
 
-        </div>
+        </div> */}
 
 
         {/* CITIZEN RECORDS */}
 
-        <div className="summary-card">
+        {/* <div className="summary-card">
 
           <div className="summary-info">
 
@@ -343,7 +339,7 @@ function UserInformation() {
 
           </div>
 
-        </div>
+        </div> */}
 
 
         {/* CITIZEN ROLE */}
@@ -523,44 +519,27 @@ function UserInformation() {
 
 
                     {/* NAME */}
-
                     <td>
-
                       <strong>
-
-                        {user.firstName || "-"}{" "}
-
-                        {user.lastName || ""}
-
+                        {user.firstName || user.lastName
+                          ? `${user.firstName || ""} ${user.lastName || ""}`.trim()
+                          : (user.email ? user.email.split("@")[0] : `Citizen #${user.citizenId}`)}
                       </strong>
-
                     </td>
-
 
                     {/* EMAIL */}
-
                     <td>
-
                       {user.email || "-"}
-
                     </td>
-
 
                     {/* MOBILE */}
-
                     <td>
-
                       {user.contact || "-"}
-
                     </td>
 
-
                     {/* CREATED DATE */}
-
                     <td>
-
                       {user.createdAt
-
                         ? new Date(
                             user.createdAt
                           ).toLocaleDateString(
@@ -571,20 +550,15 @@ function UserInformation() {
                               year: "numeric",
                             }
                           )
-
                         : "-"
-
                       }
-
                     </td>
 
-
                     {/* ROLE */}
-
                     <td>
-
-                      {user.role || "-"}
-
+                      <span className="badge role-badge">
+                        {user.role || "CITIZEN"}
+                      </span>
                     </td>
 
 

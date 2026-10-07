@@ -5,11 +5,9 @@ import { API_BASE_URL } from "../../api/axios";
 
 import "../../styles/ReportComplaint.css";
 import "../../styles/LocationPicker.css";
-import "../../styles/EmailOtpModel.css";
 
 import StatusPopup from "../../configure/StatusPopup";
 import LocationPicker from "../../pages/LocationPicker";
-import EmailOtpModal from "./../EmailOtpModal";
 
 function ReportComplaint() {
   const navigate = useNavigate();
@@ -21,18 +19,14 @@ function ReportComplaint() {
   const [departments, setDepartments] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const [loadingDepartments, setLoadingDepartments] =
-    useState(true);
-
-  const [loadingCategories, setLoadingCategories] =
-    useState(false);
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   // =========================================================
-  // SUBMIT / OTP
+  // SUBMIT
   // =========================================================
 
   const [submitting, setSubmitting] = useState(false);
-  const [showOtpModal, setShowOtpModal] = useState(false);
 
   // =========================================================
   // MESSAGE
@@ -59,12 +53,6 @@ function ReportComplaint() {
   // =========================================================
 
   const [formData, setFormData] = useState({
-    // Citizen information
-    firstName: "",
-    lastName: "",
-    email: "",
-    contact: "",
-
     // Complaint information
     title: "",
     department: "",
@@ -310,37 +298,6 @@ function ReportComplaint() {
   // =========================================================
 
   const validateForm = () => {
-    if (!formData.firstName.trim()) {
-      return "Please enter your first name.";
-    }
-
-    if (!formData.lastName.trim()) {
-      return "Please enter your last name.";
-    }
-
-    if (!formData.email.trim()) {
-      return "Please enter your email address.";
-    }
-
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(formData.email.trim())) {
-      return "Please enter a valid email address.";
-    }
-
-    if (!formData.contact.trim()) {
-      return "Please enter your contact number.";
-    }
-
-    if (
-      !/^[0-9]{10}$/.test(
-        formData.contact.trim()
-      )
-    ) {
-      return "Contact number must be exactly 10 digits.";
-    }
-
     if (!formData.departmentId) {
       return "Please select a department.";
     }
@@ -369,39 +326,6 @@ function ReportComplaint() {
   };
 
   // =========================================================
-  // SEND OTP
-  // =========================================================
-
-  const sendComplaintOtp = async () => {
-    const requestData = {
-      firstName: formData.firstName.trim(),
-      lastName: formData.lastName.trim(),
-      email: formData.email.trim(),
-      contact: formData.contact.trim(),
-      department: formData.department,
-      category: formData.category,
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      address: formData.address,
-      pincode: formData.pincode || "",
-      latitude: formData.latitude != null ? String(formData.latitude) : "",
-      longitude: formData.longitude != null ? String(formData.longitude) : "",
-    };
-
-    const response = await axios.post(
-      `${API_BASE_URL}/guest-complaint/send-otp`,
-      requestData
-    );
-
-    console.log(
-      "Complaint OTP Response:",
-      response.data
-    );
-
-    return response.data;
-  };
-
-  // =========================================================
   // SUBMIT FORM
   // =========================================================
 
@@ -420,99 +344,164 @@ function ReportComplaint() {
     // VALIDATION
     // =======================================================
 
-    const validationError =
-      validateForm();
+    const validationError = validateForm();
 
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
+if (validationError) {
+  setError(validationError);
+
+  setPopup({
+    show: true,
+    type: "error",
+    title: "Confirmation Required",
+    message: validationError,
+    details: "",
+  });
+
+  return;
+}
 
     // =======================================================
-    // SEND OTP
+    // SUBMIT COMPLAINT
     // =======================================================
 
     try {
       setSubmitting(true);
 
-      // Check if email already exists in backend
-      const checkRes = await axios.get(
-        `${API_BASE_URL}/guest-complaint/check-email?email=${encodeURIComponent(formData.email.trim())}`
+      const complaintData = new FormData();
+
+      complaintData.append(
+        "department",
+        formData.department
       );
 
-      const isRegistered = checkRes.data?.exists === true;
+      complaintData.append(
+        "category",
+        formData.category
+      );
 
-      if (isRegistered) {
-        // =====================================================
-        // DIRECT COMPLAINT (Existing User)
-        // =====================================================
-        const directData = new FormData();
-        directData.append("firstName", formData.firstName.trim());
-        directData.append("lastName", formData.lastName.trim());
-        directData.append("email", formData.email.trim());
-        directData.append("contact", formData.contact.trim());
-        directData.append("department", formData.department);
-        directData.append("category", formData.category);
-        directData.append("title", formData.title.trim());
-        directData.append("description", formData.description.trim());
-        directData.append("address", formData.address);
-        directData.append("pincode", formData.pincode || "");
-        directData.append("latitude", formData.latitude || "");
-        directData.append("longitude", formData.longitude || "");
+      complaintData.append(
+        "title",
+        formData.title.trim()
+      );
 
-        if (formData.attachments && formData.attachments.length > 0) {
-          formData.attachments.forEach((file) => {
-            directData.append("media", file);
-          });
-        }
+      complaintData.append(
+        "description",
+        formData.description.trim()
+      );
 
-        const directResponse = await axios.post(
-          `${API_BASE_URL}/guest-complaint/direct-complaint`,
-          directData
-        );
+      complaintData.append(
+        "address",
+        formData.address
+      );
 
-        const compNumber = directResponse.data?.complaintNumber || "";
-        const successMsg =
-          directResponse.data?.message ||
-          "Complaint registered successfully under your registered account.";
+      complaintData.append(
+        "pincode",
+        formData.pincode || ""
+      );
 
-        setComplaintNumber(compNumber);
-        setMessage(successMsg);
+      complaintData.append(
+        "latitude",
+        formData.latitude || ""
+      );
 
+      complaintData.append(
+        "longitude",
+        formData.longitude || ""
+      );
+
+      // =====================================================
+      // ATTACHMENTS
+      // =====================================================
+
+      if (
+        formData.attachments &&
+        formData.attachments.length > 0
+      ) {
+        formData.attachments.forEach((file) => {
+          complaintData.append("media", file);
+        });
+      }
+
+      // =====================================================
+      // API REQUEST
+      // =====================================================
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
         setPopup({
           show: true,
-          type: "success",
-          title: "Complaint Registered!",
-          message: successMsg,
-          details: compNumber
-            ? `Complaint Number: ${compNumber}`
-            : "Your complaint details have been emailed to you.",
+          type: "error",
+          title: "Authentication Required",
+          message: "You must be logged in as a citizen to submit a complaint. Please log in first.",
+          details: "",
         });
-
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          contact: "",
-          title: "",
-          department: "",
-          departmentId: "",
-          category: "",
-          description: "",
-          address: "",
-          pincode: "",
-          latitude: "",
-          longitude: "",
-          attachments: [],
-          confirm: false,
-        });
-      } else {
-        // =====================================================
-        // SEND OTP FOR NEW USER
-        // =====================================================
-        await sendComplaintOtp();
-        setShowOtpModal(true);
+        return;
       }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/citizen/complaints`,
+        complaintData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      // =====================================================
+      // RESPONSE
+      // =====================================================
+
+      const responseData =
+        response.data?.data ||
+        response.data ||
+        {};
+
+      const compNumber =
+        responseData.complaintNumber || "";
+
+      const successMessage =
+        responseData.message ||
+        "Your complaint has been registered successfully.";
+
+      setComplaintNumber(compNumber);
+      setMessage(successMessage);
+
+      // =====================================================
+      // SUCCESS POPUP
+      // =====================================================
+
+      setPopup({
+        show: true,
+        type: "success",
+        title: "Complaint Registered!",
+        message: successMessage,
+        details: compNumber
+          ? `Complaint Number: ${compNumber}`
+          : "Your complaint has been registered successfully.",
+      });
+
+      // =====================================================
+      // RESET FORM
+      // =====================================================
+
+      setFormData({
+        title: "",
+        department: "",
+        departmentId: "",
+        category: "",
+        description: "",
+        address: "",
+        pincode: "",
+        latitude: "",
+        longitude: "",
+        attachments: [],
+        confirm: false,
+      });
+
+      setCategories([]);
     } catch (err) {
       console.error(
         "Submit Complaint Error:",
@@ -543,123 +532,6 @@ function ReportComplaint() {
   };
 
   // =========================================================
-  // OTP VERIFIED
-  // =========================================================
-
-  const handleVerified = (responseData) => {
-    try {
-      setSubmitting(true);
-
-      // =====================================================
-      // OTP MODAL ALREADY CALLED:
-      //
-      // POST /api/guest-complaint/verify-otp
-      //
-      // So NO /create API call is required here.
-      // =====================================================
-
-      setShowOtpModal(false);
-
-      console.log(
-        "Guest Complaint Final Response:",
-        responseData
-      );
-
-      // =====================================================
-      // RESPONSE DATA
-      // =====================================================
-
-      const data =
-        responseData?.data ||
-        responseData ||
-        {};
-
-      const number =
-        data.complaintNumber || "";
-
-      const successMessage =
-        data.message ||
-        "Your complaint has been registered successfully.";
-
-      setComplaintNumber(number);
-      setMessage(successMessage);
-
-      // =====================================================
-      // SAVE JWT
-      // =====================================================
-
-      const token =
-        data.token || "";
-
-      if (token) {
-        localStorage.setItem(
-          "token",
-          token
-        );
-      }
-
-      // =====================================================
-      // SUCCESS POPUP
-      // =====================================================
-
-      setPopup({
-        show: true,
-        type: "success",
-        title: "Complaint Registered!",
-        message: successMessage,
-        details: number
-          ? `Complaint Number: ${number}`
-          : "Your login details have been sent to your email address.",
-      });
-
-      // =====================================================
-      // RESET FORM
-      // =====================================================
-
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        contact: "",
-        title: "",
-        department: "",
-        departmentId: "",
-        category: "",
-        description: "",
-        address: "",
-        pincode: "",
-        latitude: "",
-        longitude: "",
-        attachments: [],
-        confirm: false,
-      });
-
-      setCategories([]);
-    } catch (err) {
-      console.error(
-        "Guest Complaint Response Handling Error:",
-        err
-      );
-
-      const errorMessage =
-        err.response?.data?.message ||
-        "Unable to complete complaint registration.";
-
-      setError(errorMessage);
-
-      setPopup({
-        show: true,
-        type: "error",
-        title: "Complaint Registration Failed",
-        message: errorMessage,
-        details: "",
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // =========================================================
   // LOADING DEPARTMENTS
   // =========================================================
 
@@ -680,7 +552,6 @@ function ReportComplaint() {
 
   return (
     <div className="complaint-page">
-
       <div className="complaint-card">
 
         {/* =================================================
@@ -732,94 +603,6 @@ function ReportComplaint() {
         ================================================= */}
 
         <form onSubmit={handleSubmit}>
-
-          {/* =================================================
-              CITIZEN INFORMATION
-          ================================================= */}
-
-          <h2 className="section-title">
-            Citizen Information
-          </h2>
-
-          <div className="grid-2">
-
-            {/* First Name */}
-
-            <div className="form-group">
-              <label>First Name</label>
-
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Enter First Name"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled={submitting}
-              />
-            </div>
-
-            {/* Last Name */}
-
-            <div className="form-group">
-              <label>Last Name</label>
-
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Enter Last Name"
-                value={formData.lastName}
-                onChange={handleChange}
-                disabled={submitting}
-              />
-            </div>
-
-          </div>
-
-          <div className="grid-2">
-
-            {/* Email */}
-
-            <div className="form-group">
-              <label>Email Address</label>
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={submitting}
-              />
-            </div>
-
-            {/* Contact */}
-
-            <div className="form-group">
-              <label>Contact Number</label>
-
-              <input
-                type="tel"
-                name="contact"
-                placeholder="Enter Contact Number"
-                maxLength={10}
-                value={formData.contact}
-                onChange={(e) => {
-                  const value =
-                    e.target.value.replace(
-                      /\D/g,
-                      ""
-                    );
-
-                  setFormData((prev) => ({
-                    ...prev,
-                    contact: value,
-                  }));
-                }}
-                disabled={submitting}
-              />
-            </div>
-
-          </div>
 
           {/* =================================================
               COMPLAINT DETAILS
@@ -1200,21 +983,6 @@ function ReportComplaint() {
       </div>
 
       {/* =====================================================
-          OTP MODAL
-      ====================================================== */}
-
-      {showOtpModal && (
-        <EmailOtpModal
-          email={formData.email}
-          attachments={formData.attachments}
-          onVerify={handleVerified}
-          onClose={() =>
-            setShowOtpModal(false)
-          }
-        />
-      )}
-
-      {/* =====================================================
           STATUS POPUP
       ====================================================== */}
 
@@ -1226,7 +994,7 @@ function ReportComplaint() {
           details={popup.details}
           buttonText={
             popup.type === "success"
-              ? "Go to Login"
+              ? "Go to My Complaints"
               : "Close"
           }
           onClose={() => {
@@ -1241,7 +1009,7 @@ function ReportComplaint() {
             });
 
             if (popupType === "success") {
-              navigate("/login");
+              navigate("/user/my-complaints");
             }
           }}
         />

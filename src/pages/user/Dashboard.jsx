@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../api/axios";
-
 import {
   FaClipboardList,
   FaClock,
@@ -9,26 +8,74 @@ import {
   FaUserCircle,
   FaMapMarkerAlt,
 } from "react-icons/fa";
-
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
 } from "react-leaflet";
-
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./Dashboard.css";
 
+/*
+=========================================================
+CUSTOM MAP MARKER
+=========================================================
+*/
+
+const createMarkerIcon = (color) => {
+  return new L.DivIcon({
+    html: `
+      <div
+        class="complaint-marker"
+        style="background:${color};"
+      ></div>
+    `,
+    className: "custom-marker",
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+};
+
+const complaintIcons = {
+  CREATED: createMarkerIcon("#ef4444"),
+  PENDING: createMarkerIcon("#ef4444"),
+  ASSIGNED: createMarkerIcon("#f59e0b"),
+  IN_PROGRESS: createMarkerIcon("#8b5cf6"),
+  RESOLVED: createMarkerIcon("#22c55e"),
+  REJECTED: createMarkerIcon("#6b7280"),
+};
+
+const getStatusMarkerIcon = (status) => {
+  const s = String(status || "").toUpperCase();
+
+  if (s.includes("RESOLV")) {
+    return complaintIcons.RESOLVED;
+  }
+
+  if (
+    s.includes("PROGRESS") ||
+    s.includes("PROCESS")
+  ) {
+    return complaintIcons.IN_PROGRESS;
+  }
+
+  if (s.includes("ASSIGN")) {
+    return complaintIcons.ASSIGNED;
+  }
+
+  if (s.includes("REJECT")) {
+    return complaintIcons.REJECTED;
+  }
+
+  return complaintIcons.CREATED;
+};
 
 export default function Dashboard() {
-
   const [profile, setProfile] = useState(null);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
-
 
   /*
   =====================================================
@@ -37,15 +84,10 @@ export default function Dashboard() {
   */
 
   useEffect(() => {
-
     const fetchCitizenProfile = async () => {
-
       try {
-
         setLoading(true);
-
         setError("");
-
 
         /*
         =================================================
@@ -55,15 +97,11 @@ export default function Dashboard() {
 
         const token = localStorage.getItem("token");
 
-
         if (!token) {
-
           throw new Error(
             "Citizen authentication token not found."
           );
-
         }
-
 
         /*
         =================================================
@@ -75,14 +113,12 @@ export default function Dashboard() {
           `${API_BASE_URL}/citizen/profile`,
           {
             method: "GET",
-
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }
         );
-
 
         /*
         =================================================
@@ -91,13 +127,10 @@ export default function Dashboard() {
         */
 
         if (!response.ok) {
-
           let errorMessage =
             `Failed to load citizen profile: ${response.status}`;
 
-
           try {
-
             const errorData =
               await response.json();
 
@@ -106,32 +139,19 @@ export default function Dashboard() {
               errorData
             );
 
-
-            if (
-              errorData.message
-            ) {
-
+            if (errorData.message) {
               errorMessage =
                 errorData.message;
-
             }
-
           } catch (error) {
-
             console.error(
               "Could not read error response:",
               error
             );
-
           }
 
-
-          throw new Error(
-            errorMessage
-          );
-
+          throw new Error(errorMessage);
         }
-
 
         /*
         =================================================
@@ -142,43 +162,29 @@ export default function Dashboard() {
         const data =
           await response.json();
 
-
         console.log(
           "Citizen Profile Response:",
           data
         );
 
-
         setProfile(data);
-
-
       } catch (error) {
-
         console.error(
           "Error loading citizen profile:",
           error
         );
 
-
         setError(
           error.message ||
           "Unable to load citizen profile."
         );
-
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
-
     fetchCitizenProfile();
-
   }, []);
-
 
   /*
   =====================================================
@@ -187,35 +193,23 @@ export default function Dashboard() {
   */
 
   if (loading) {
-
     return (
-
       <div className="user-dashboard">
-
         <div className="dashboard-box">
-
           <div className="box-header">
-
             <h2>
               Loading Dashboard...
             </h2>
-
           </div>
-
 
           <p>
             Please wait while we load your
             citizen information.
           </p>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   /*
   =====================================================
@@ -224,34 +218,22 @@ export default function Dashboard() {
   */
 
   if (error) {
-
     return (
-
       <div className="user-dashboard">
-
         <div className="dashboard-box">
-
           <div className="box-header">
-
             <h2>
               Unable to Load Dashboard
             </h2>
-
           </div>
-
 
           <p>
             {error}
           </p>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   /*
   =====================================================
@@ -260,25 +242,16 @@ export default function Dashboard() {
   */
 
   if (!profile) {
-
     return (
-
       <div className="user-dashboard">
-
         <div className="dashboard-box">
-
           <p>
             No citizen information found.
           </p>
-
         </div>
-
       </div>
-
     );
-
   }
-
 
   /*
   =====================================================
@@ -288,7 +261,6 @@ export default function Dashboard() {
 
   const recentComplaints =
     profile.recentComplaints || [];
-
 
   /*
   =====================================================
@@ -309,7 +281,6 @@ export default function Dashboard() {
   const activeComplaints =
     profile.activeComplaints || [];
 
-
   /*
   =====================================================
   ACTIVE COMPLAINT COUNT
@@ -318,7 +289,6 @@ export default function Dashboard() {
 
   const activeComplaintCount =
     activeComplaints.length;
-
 
   /*
   =====================================================
@@ -333,7 +303,6 @@ export default function Dashboard() {
         complaint.longitude
     );
 
-
   const mapCenter =
     firstActiveComplaint
       ? [
@@ -346,7 +315,6 @@ export default function Dashboard() {
         ]
       : [23.0225, 72.5714];
 
-
   /*
   =====================================================
   FORMAT STATUS
@@ -354,13 +322,9 @@ export default function Dashboard() {
   */
 
   const formatStatus = (status) => {
-
     if (!status) {
-
       return "Unknown";
-
     }
-
 
     return status
       .replace(/_/g, " ")
@@ -370,9 +334,7 @@ export default function Dashboard() {
         (letter) =>
           letter.toUpperCase()
       );
-
   };
-
 
   /*
   =====================================================
@@ -381,13 +343,9 @@ export default function Dashboard() {
   */
 
   const formatDate = (date) => {
-
     if (!date) {
-
       return "-";
-
     }
-
 
     return new Date(
       date
@@ -399,9 +357,7 @@ export default function Dashboard() {
         year: "numeric",
       }
     );
-
   };
-
 
   /*
   =====================================================
@@ -410,9 +366,7 @@ export default function Dashboard() {
   */
 
   return (
-
     <div className="user-dashboard">
-
 
       {/* =================================================
           WELCOME SECTION
@@ -421,11 +375,9 @@ export default function Dashboard() {
       <div className="welcome-card">
 
         <div>
-
           <h1>
             Welcome back, {profile.citizenName} 👋
           </h1>
-
 
           <p>
             Thank you for helping keep your city clean
@@ -433,32 +385,22 @@ export default function Dashboard() {
             services from one place.
           </p>
 
-
           <div className="system-status">
-
             <span className="status-dot"></span>
 
             {activeComplaintCount}
             {" "}
             Complaints Currently Active
-
           </div>
 
-
           <div className="citizen-info">
-
             <span>
-
               Citizen ID :
               {" "}
               CIT-{profile.citizenId}
-
             </span>
-
           </div>
-
         </div>
-
 
         <FaUserCircle
           className="welcome-avatar"
@@ -466,30 +408,23 @@ export default function Dashboard() {
 
       </div>
 
-
-
       {/* =================================================
           STATISTICS
       ================================================= */}
 
       <div className="stats-grid">
 
-
         {/* TOTAL */}
 
         <div className="stats-card">
 
           <div className="stats-icon">
-
             <FaClipboardList />
-
           </div>
-
 
           <h2>
             {profile.totalComplaint}
           </h2>
-
 
           <p>
             Total Complaints
@@ -497,23 +432,17 @@ export default function Dashboard() {
 
         </div>
 
-
-
         {/* PENDING */}
 
         <div className="stats-card">
 
           <div className="stats-icon warning">
-
             <FaClock />
-
           </div>
-
 
           <h2>
             {profile.pendingComplaint}
           </h2>
-
 
           <p>
             Pending
@@ -521,23 +450,17 @@ export default function Dashboard() {
 
         </div>
 
-
-
         {/* IN PROGRESS */}
 
         <div className="stats-card">
 
           <div className="stats-icon progress">
-
             <FaSpinner />
-
           </div>
-
 
           <h2>
             {profile.inProgressComplaint}
           </h2>
-
 
           <p>
             In Progress
@@ -545,23 +468,17 @@ export default function Dashboard() {
 
         </div>
 
-
-
         {/* RESOLVED */}
 
         <div className="stats-card">
 
           <div className="stats-icon success">
-
             <FaCheckCircle />
-
           </div>
-
 
           <h2>
             {profile.resolveComplaint}
           </h2>
-
 
           <p>
             Resolved
@@ -570,8 +487,6 @@ export default function Dashboard() {
         </div>
 
       </div>
-
-
 
       {/* =================================================
           RECENT COMPLAINTS
@@ -587,18 +502,15 @@ export default function Dashboard() {
               Recent Complaints
             </h2>
 
-
             <p>
               Your latest registered complaints.
             </p>
 
           </div>
 
-
           <FaClipboardList />
 
         </div>
-
 
         <div className="table-wrapper">
 
@@ -632,7 +544,6 @@ export default function Dashboard() {
 
             </thead>
 
-
             <tbody>
 
               {recentComplaints.length > 0 ? (
@@ -656,16 +567,13 @@ export default function Dashboard() {
 
                       </td>
 
-
                       <td>
                         {complaint.title}
                       </td>
 
-
                       <td>
                         {complaint.category}
                       </td>
-
 
                       <td>
 
@@ -691,7 +599,6 @@ export default function Dashboard() {
                         </span>
 
                       </td>
-
 
                       <td>
 
@@ -731,14 +638,11 @@ export default function Dashboard() {
 
       </div>
 
-
-
       {/* =================================================
           ALL ACTIVE COMPLAINT LOCATIONS
       ================================================= */}
 
       <div className="dashboard-box full-map-section">
-
 
         <div className="box-header">
 
@@ -748,7 +652,6 @@ export default function Dashboard() {
               Active Complaint Locations
             </h2>
 
-
             <p>
               All your complaints that are not
               resolved yet.
@@ -756,37 +659,25 @@ export default function Dashboard() {
 
           </div>
 
-
           <FaMapMarkerAlt />
 
         </div>
 
-
         <div className="map-container">
 
-
           <MapContainer
-
             center={mapCenter}
-
             zoom={13}
-
             style={{
               height: "100%",
               width: "100%",
             }}
-
           >
 
-
             <TileLayer
-
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-
               attribution="&copy; OpenStreetMap contributors"
-
             />
-
 
             {/* =================================================
                 ACTIVE COMPLAINT MARKERS
@@ -795,41 +686,29 @@ export default function Dashboard() {
             {activeComplaints
               .filter(
                 (complaint) => {
-
-                  if (
-                    !complaint.latitude ||
-                    !complaint.longitude
-                  ) {
-
-                    return false;
-
-                  }
-
-
-                  if (
-                    complaint.status
-                      ?.toUpperCase() ===
-                    "RESOLVED"
-                  ) {
-
-                    return false;
-
-                  }
-
-
-                  return true;
-
+                  return !!(
+                    complaint.latitude &&
+                    complaint.longitude &&
+                    !Number.isNaN(
+                      Number(
+                        complaint.latitude
+                      )
+                    ) &&
+                    !Number.isNaN(
+                      Number(
+                        complaint.longitude
+                      )
+                    )
+                  );
                 }
               )
               .map(
                 (complaint) => (
 
                   <Marker
-
                     key={
                       complaint.complaintId
                     }
-
                     position={[
                       Number(
                         complaint.latitude
@@ -838,126 +717,117 @@ export default function Dashboard() {
                         complaint.longitude
                       ),
                     ]}
-
+                    icon={
+                      getStatusMarkerIcon(
+                        complaint.status
+                      )
+                    }
                   >
-
 
                     <Popup>
 
-                      <div>
+                      <div className="popup-content">
 
-                        <h4>
-
+                        <h3>
                           {
                             complaint.complaintNumber
                           }
-
-                        </h4>
-
+                        </h3>
 
                         <p>
-
-                          <b>
+                          <strong>
                             Title:
-                          </b>{" "}
-
-                          {
-                            complaint.title
-                          }
-
+                          </strong>{" "}
+                          {complaint.title || "N/A"}
                         </p>
 
-
                         <p>
-
-                          <b>
+                          <strong>
                             Category:
-                          </b>{" "}
-
-                          {
-                            complaint.category
-                          }
-
+                          </strong>{" "}
+                          {complaint.category || "N/A"}
                         </p>
 
-
                         <p>
-
-                          <b>
+                          <strong>
                             Status:
-                          </b>{" "}
-
-                          {
-                            formatStatus(
-                              complaint.status
-                            )
-                          }
-
+                          </strong>{" "}
+                          {formatStatus(
+                            complaint.status
+                          )}
                         </p>
 
+                        {/* <p>
+                          <strong>
+                            Priority:
+                          </strong>{" "}
+                          {complaint.priority || "Normal"}
+                        </p> */}
 
-                        <p>
-
-                          <b>
+                        {/* <p>
+                          <strong>
                             Date:
-                          </b>{" "}
+                          </strong>{" "}
+                          {formatDate(
+                            complaint.createdAt
+                          )}
+                        </p> */}
 
-                          {
-                            formatDate(
-                              complaint.createdAt
-                            )
-                          }
-
-                        </p>
-
-
-                        <p>
-
-                          <b>
-                            Latitude:
-                          </b>{" "}
-
-                          {
-                            complaint.latitude
-                          }
-
-                        </p>
-
-
-                        <p>
-
-                          <b>
-                            Longitude:
-                          </b>{" "}
-
-                          {
-                            complaint.longitude
-                          }
-
-                        </p>
+                        {/* <p>
+                          <strong>
+                            Location:
+                          </strong>{" "}
+                          {complaint.address || "N/A"}
+                        </p> */}
 
                       </div>
 
                     </Popup>
-
 
                   </Marker>
 
                 )
               )}
 
-
           </MapContainer>
-
 
         </div>
 
+        {/* =================================================
+            MAP LEGENDS
+        ================================================= */}
+
+        <div className="map-legends">
+
+          <div>
+            <span className="legend-dot pending"></span>
+            Pending
+          </div>
+
+          <div>
+            <span className="legend-dot assigned"></span>
+            Assigned
+          </div>
+
+          <div>
+            <span className="legend-dot in-progress"></span>
+            In Progress
+          </div>
+
+          <div>
+            <span className="legend-dot resolved"></span>
+            Resolved
+          </div>
+
+          <div>
+            <span className="legend-dot rejected"></span>
+            Rejected
+          </div>
+
+        </div>
 
       </div>
 
-
     </div>
-
   );
-
 }

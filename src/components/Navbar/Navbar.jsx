@@ -115,7 +115,7 @@ function Navbar() {
 
                 <div className="nav-user">
 
-                    <button
+                    {/* <button
                         className="icon-btn"
                         onClick={openNotification}
                         title="Notifications"
@@ -124,7 +124,7 @@ function Navbar() {
 
                         <span className="notification-dot"></span>
 
-                    </button>
+                    </button> */}
 
                     <button className="icon-btn" onClick={openDashboard} title="Dashboard" >
                         <FaUserCircle />
