@@ -60,6 +60,7 @@ import ReviewEngineerRequest from "./pages/admin/ReviewEngineerRequest";
 import CategoryManagement from "./pages/admin/CategoryManagement";
 import ManageCategory from "./pages/department/ManageCategory"
 import Messages from "./pages/admin/Messages";
+import AnnouncementManagement from "./pages/admin/AnnouncementManagement";
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function App() {
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/com" element={<ReportComplaint />} /> 
         <Route path="/tracking" element={<ComplaintTracking />} />
+        <Route path="/tracking/:id" element={<ComplaintTracking />} />
         <Route path="/location" element={<MultiPointLocation />} />
         
         
@@ -143,6 +145,7 @@ function App() {
     <Route path="enginner-request" element={<ReviewEngineerRequest/>}/>
     <Route path="category" element={<CategoryManagement/>} />
     <Route path="messages" element={<Messages />} />
+    <Route path="announcements" element={<AnnouncementManagement />} />
 </Route>
         
       </Routes> 

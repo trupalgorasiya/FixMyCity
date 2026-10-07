@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/ComplaintTracking.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getComplaintByNumber } from "../api/citizenApi";
 import { API_BASE_URL } from "../api/axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
@@ -156,6 +156,8 @@ function MediaSection({ title, subtitle, media, onPreview }) {
 
 function ComplaintTracking() {
     const navigate = useNavigate();
+    const { id: paramId } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const [complaintId, setComplaintId] = useState("");
     const [complaint, setComplaint] = useState(null);
@@ -167,9 +169,36 @@ function ComplaintTracking() {
     const [rating, setRating] = useState(5);
     const [feedbackText, setFeedbackText] = useState("");
     const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+    const [existingFeedback, setExistingFeedback] = useState(null);
+    const [submittingFeedback, setSubmittingFeedback] = useState(false);
+    const [isEditingFeedback, setIsEditingFeedback] = useState(false);
+    const [feedbackError, setFeedbackError] = useState("");
 
-    const handleTrack = async () => {
-        if (!complaintId.trim()) {
+    const fetchExistingFeedback = async (complaintNum) => {
+        if (!complaintNum) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/feedback/complaint/${complaintNum}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.rating) {
+                    setExistingFeedback(data);
+                    setRating(data.rating);
+                    setFeedbackText(data.comments || "");
+                    setFeedbackSubmitted(true);
+                }
+            } else {
+                setExistingFeedback(null);
+                setFeedbackSubmitted(false);
+            }
+        } catch {
+            setExistingFeedback(null);
+            setFeedbackSubmitted(false);
+        }
+    };
+
+    const handleTrack = async (targetId) => {
+        const idToSearch = (targetId !== undefined && typeof targetId === "string" ? targetId : complaintId).trim();
+        if (!idToSearch) {
             setError("Please enter Complaint ID.");
             setComplaint(null);
             return;
@@ -180,9 +209,22 @@ function ComplaintTracking() {
             setError("");
             setComplaint(null);
             setFeedbackSubmitted(false);
+            setExistingFeedback(null);
+            setIsEditingFeedback(false);
 
-            const response = await getComplaintByNumber(complaintId.trim());
-            setComplaint(response.data);
+            const response = await getComplaintByNumber(idToSearch);
+            const comp = response.data;
+            setComplaint(comp);
+            setComplaintId(idToSearch);
+
+            // Update URL search query if not already matching
+            if (!paramId && searchParams.get("id") !== idToSearch) {
+                setSearchParams({ id: idToSearch });
+            }
+
+            if (comp && comp.status && comp.status.toUpperCase() === "RESOLVED") {
+                fetchExistingFeedback(comp.complaintNumber);
+            }
         } catch (err) {
             console.error("Complaint Fetch Error:", err);
             if (err.response?.data?.message) {
@@ -200,6 +242,15 @@ function ComplaintTracking() {
             setLoading(false);
         }
     };
+
+    // Auto-fetch if ID passed via path (/tracking/:id) or query param (/tracking?id=...)
+    useEffect(() => {
+        const urlId = paramId || searchParams.get("id") || searchParams.get("complaintId") || searchParams.get("complaintNumber");
+        if (urlId && urlId.trim()) {
+            setComplaintId(urlId.trim());
+            handleTrack(urlId.trim());
+        }
+    }, [paramId, searchParams]);
 
     const formatDate = (date) => {
         if (!date) return "-";
@@ -264,9 +315,48 @@ function ComplaintTracking() {
         parseFloat(complaint.latitude) !== 0 &&
         parseFloat(complaint.longitude) !== 0;
 
-    const handleFeedbackSubmit = (e) => {
+    const handleFeedbackSubmit = async (e) => {
         e.preventDefault();
-        setFeedbackSubmitted(true);
+        if (!complaint) return;
+        try {
+            setSubmittingFeedback(true);
+            setFeedbackError("");
+            const token =
+                localStorage.getItem("token") ||
+                localStorage.getItem("jwt") ||
+                localStorage.getItem("accessToken") ||
+                "";
+
+            const payload = {
+                complaintNumber: complaint.complaintNumber,
+                complaintId: complaint.complaintId,
+                rating: Number(rating),
+                comments: feedbackText.trim()
+            };
+
+            const res = await fetch(`${API_BASE_URL}/feedback`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.message || "Failed to submit feedback.");
+            }
+
+            const data = await res.json();
+            setExistingFeedback(data);
+            setFeedbackSubmitted(true);
+            setIsEditingFeedback(false);
+        } catch (err) {
+            setFeedbackError(err.message || "Unable to save feedback.");
+        } finally {
+            setSubmittingFeedback(false);
+        }
     };
 
     return (
@@ -285,7 +375,7 @@ function ComplaintTracking() {
                     <div className="search-box">
                         <input
                             type="text"
-                            placeholder="Enter Complaint ID (e.g. CMP20241001)"
+                            placeholder="Enter Complaint ID (e.g. CMP-10082026-31)"
                             value={complaintId}
                             onChange={(e) => setComplaintId(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleTrack()}
@@ -707,38 +797,76 @@ function ComplaintTracking() {
                             </div>
 
                             {isResolved ? (
-                                feedbackSubmitted ? (
-                                    <div className="resolution-complete" style={{ marginTop: "12px" }}>
-                                        <p>Thank you for your feedback! ⭐</p>
-                                        <span>Your response helps us improve municipal services.</span>
+                                feedbackSubmitted && !isEditingFeedback ? (
+                                    <div className="resolution-complete" style={{ marginTop: "12px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: "12px", padding: "18px" }}>
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+                                            <div>
+                                                <p style={{ color: "#166534", fontWeight: "700", margin: 0, fontSize: "16px" }}>
+                                                    Your Rating: <span style={{ color: "#f59e0b", letterSpacing: "2px" }}>{"★".repeat(existingFeedback?.rating || rating)}</span> ({(existingFeedback?.rating || rating)}/5)
+                                                </p>
+                                                <small style={{ color: "#65a30d" }}>Submitted after complaint resolution</small>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsEditingFeedback(true)}
+                                                style={{
+                                                    background: "#ffffff",
+                                                    border: "1px solid #16a34a",
+                                                    color: "#16a34a",
+                                                    padding: "6px 14px",
+                                                    borderRadius: "8px",
+                                                    fontSize: "13px",
+                                                    fontWeight: "600",
+                                                    cursor: "pointer"
+                                                }}
+                                            >
+                                                ✏️ Edit Feedback
+                                            </button>
+                                        </div>
+                                        {existingFeedback?.comments && (
+                                            <div style={{ marginTop: "12px", background: "#ffffff", padding: "12px", borderRadius: "8px", border: "1px solid #bbf7d0" }}>
+                                                <span style={{ color: "#374151", fontStyle: "italic", fontSize: "14px" }}>
+                                                    "{existingFeedback.comments}"
+                                                </span>
+                                            </div>
+                                        )}
+                                        <span style={{ display: "block", marginTop: "10px", fontSize: "12.5px", color: "#64748b" }}>
+                                            Thank you! Your feedback helps the municipality monitor department response and service quality.
+                                        </span>
                                     </div>
                                 ) : (
                                     <form onSubmit={handleFeedbackSubmit} style={{ marginTop: "10px" }}>
                                         <p className="feedback-text">
-                                            How satisfied are you with the resolution of this complaint?
+                                            How satisfied are you with the resolution of this complaint? Give a rating out of 5:
                                         </p>
-                                        <div className="rating" style={{ display: "flex", gap: "8px", margin: "14px 0", cursor: "pointer" }}>
+                                        <div className="rating" style={{ display: "flex", gap: "10px", margin: "14px 0", cursor: "pointer" }}>
                                             {[1, 2, 3, 4, 5].map((star) => (
                                                 <span
                                                     key={star}
                                                     onClick={() => setRating(star)}
                                                     style={{
                                                         color: star <= rating ? "#f59e0b" : "#cbd5e1",
-                                                        fontSize: "28px",
-                                                        transition: "0.2s"
+                                                        fontSize: "32px",
+                                                        transition: "transform 0.15s ease",
+                                                        transform: star <= rating ? "scale(1.1)" : "scale(1)"
                                                     }}
+                                                    title={`${star} Star${star > 1 ? "s" : ""}`}
                                                 >
                                                     ★
                                                 </span>
                                             ))}
+                                            <span style={{ fontSize: "16px", fontWeight: "700", color: "#475569", alignSelf: "center", marginLeft: "8px" }}>
+                                                {rating} / 5 Stars
+                                            </span>
                                         </div>
+
                                         <textarea
-                                            placeholder="Write your feedback or comments here..."
+                                            placeholder="Write your feedback or comments here (e.g., quality of repair, timeliness, engineer behavior)..."
                                             value={feedbackText}
                                             onChange={(e) => setFeedbackText(e.target.value)}
                                             style={{
                                                 width: "100%",
-                                                minHeight: "100px",
+                                                minHeight: "110px",
                                                 padding: "14px",
                                                 borderRadius: "12px",
                                                 border: "1px solid #cbd5e1",
@@ -746,22 +874,53 @@ function ComplaintTracking() {
                                                 fontSize: "14px"
                                             }}
                                         ></textarea>
-                                        <button
-                                            type="submit"
-                                            className="feedback-button"
-                                            style={{
-                                                marginTop: "14px",
-                                                padding: "12px 28px",
-                                                borderRadius: "12px",
-                                                background: "#2563eb",
-                                                color: "#fff",
-                                                fontWeight: "600",
-                                                border: "none",
-                                                cursor: "pointer"
-                                            }}
-                                        >
-                                            Submit Feedback
-                                        </button>
+
+                                        {feedbackError && (
+                                            <p style={{ color: "#ef4444", fontSize: "13px", marginTop: "8px" }}>
+                                                {feedbackError}
+                                            </p>
+                                        )}
+
+                                        <div style={{ display: "flex", gap: "10px", marginTop: "14px", alignItems: "center" }}>
+                                            <button
+                                                type="submit"
+                                                className="feedback-button"
+                                                disabled={submittingFeedback}
+                                                style={{
+                                                    padding: "12px 28px",
+                                                    borderRadius: "12px",
+                                                    background: "#2563eb",
+                                                    color: "#fff",
+                                                    fontWeight: "600",
+                                                    border: "none",
+                                                    cursor: "pointer",
+                                                    opacity: submittingFeedback ? 0.7 : 1
+                                                }}
+                                            >
+                                                {submittingFeedback
+                                                    ? "Saving..."
+                                                    : isEditingFeedback
+                                                    ? "Update Feedback"
+                                                    : "Submit Feedback"}
+                                            </button>
+                                            {isEditingFeedback && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsEditingFeedback(false)}
+                                                    style={{
+                                                        padding: "12px 20px",
+                                                        borderRadius: "12px",
+                                                        background: "#f1f5f9",
+                                                        color: "#475569",
+                                                        fontWeight: "600",
+                                                        border: "1px solid #cbd5e1",
+                                                        cursor: "pointer"
+                                                    }}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+                                        </div>
                                     </form>
                                 )
                             ) : (

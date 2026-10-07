@@ -10,7 +10,8 @@ import {
     FaFileAlt,
     FaEnvelope,
     FaUser,
-    //FaComments,
+    FaBullhorn,
+    FaComments,
     FaSignOutAlt
 } from "react-icons/fa";
 
@@ -40,6 +41,8 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/dashboard"><FaHome /><span>Dashboard</span></NavLink></li>
 
+                        <li><NavLink to="/admin/announcements"><FaBullhorn /><span>Announcements</span></NavLink></li>
+
                         <li><NavLink to="/admin/user-manage"><FaUsers /><span>Users</span></NavLink></li>
                         <li><NavLink to="/admin/messages"><FaEnvelope /><span>Messages</span></NavLink></li>
                         <li><NavLink to="/admin/dept-manage"><FaBuilding /><span>Departments</span></NavLink></li>
@@ -51,7 +54,7 @@ function SuperAdminSidebar() {
 
                         <li><NavLink to="/admin/complaint-manage"><FaClipboardList /><span>Complaints</span></NavLink></li>
 
-                        {/* <li><NavLink to="/admin/viewfeedback"><FaComments /><span>Feedback</span></NavLink></li> */}
+                        <li><NavLink to="/admin/viewfeedback"><FaComments /><span>Feedback</span></NavLink></li>
 
                         <li><NavLink to="/admin/enginner-request"><FaUserTie  /><span>Engineers Applications</span></NavLink></li>
 

@@ -1,12 +1,17 @@
 
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE_URL } from "../../api/axios";
+import { API_BASE_URL, BASE_URL } from "../../api/axios";
 import "./EngineerManagement.css";
 
 import {
   FaSearch,
   FaChevronLeft,
   FaChevronRight,
+  FaEye,
+  FaUserCheck,
+  FaUserSlash,
+  FaTimes,
+  FaFilePdf,
 } from "react-icons/fa";
 
 function EngineerManagement() {
@@ -17,10 +22,25 @@ function EngineerManagement() {
 
   const [engineers, setEngineers] = useState([]);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+  const [selectedEngineer, setSelectedEngineer] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [previewDoc, setPreviewDoc] = useState(null);
 
   const engineersPerPage = 5;
+
+  const getApplicationStatus = (engineer) => {
+    if (engineer.isRejected === null || engineer.isRejected === undefined) {
+      return "Pending";
+    }
+    if (engineer.isRejected === true) {
+      return "Rejected";
+    }
+    return "Approved";
+  };
 
 
   /* ==========================================================
@@ -174,72 +194,160 @@ function EngineerManagement() {
 
 
   /* ==========================================================
-     SEARCH ENGINEERS
+     FILTER & SEARCH ENGINEERS
   ========================================================== */
 
-  const processedEngineers = useMemo(() => {
-    // Only show engineers that have been approved or rejected (not pending)
-    return engineers.filter(
-      (engineer) =>
-        engineer.isRejected !== null &&
-        engineer.isRejected !== undefined
-    );
-  }, [engineers]);
-
   const filteredEngineers = useMemo(() => {
+    const keyword = search.toLowerCase().trim();
 
-    const keyword = search
-      .toLowerCase()
-      .trim();
-
-
-    if (!keyword) {
-
-      return processedEngineers;
-
-    }
-
-
-    return processedEngineers.filter((engineer) => {
-
+    return engineers.filter((engineer) => {
       const fullName =
-        `${engineer.firstName || ""} ${engineer.lastName || ""}`
-          .toLowerCase();
+        `${engineer.firstName || ""} ${engineer.lastName || ""}`.toLowerCase();
+      const applicationStatus = getApplicationStatus(engineer);
 
+      const matchesSearch =
+        !keyword ||
+        String(engineer.engineerId || "").toLowerCase().includes(keyword) ||
+        fullName.includes(keyword) ||
+        String(engineer.email || "").toLowerCase().includes(keyword) ||
+        String(engineer.contact || "").toLowerCase().includes(keyword) ||
+        String(engineer.department || "").toLowerCase().includes(keyword);
 
-      return (
+      const matchesStatus =
+        statusFilter === "All" ||
+        applicationStatus === statusFilter;
 
-        String(engineer.engineerId || "")
-          .toLowerCase()
-          .includes(keyword)
+      return matchesSearch && matchesStatus;
+    });
+  }, [engineers, search, statusFilter]);
 
-        ||
+  /* ==========================================================
+     ACTIVATE ENGINEER
+  ========================================================== */
 
-        fullName.includes(keyword)
+  const activateEngineer = async (engineerId) => {
+    const targetId = engineerId || selectedEngineer?.engineerId;
+    if (!targetId) return;
 
-        ||
+    try {
+      setProcessingId(targetId);
+      const token = getToken();
 
-        String(engineer.email || "")
-          .toLowerCase()
-          .includes(keyword)
-
-        ||
-
-        String(engineer.contact || "")
-          .toLowerCase()
-          .includes(keyword)
-
-        ||
-
-        String(engineer.department || "")
-          .toLowerCase()
-          .includes(keyword)
-
+      const response = await fetch(
+        `${API_BASE_URL}/admin/engineers/${targetId}/activate`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-    });
+      const data = await response.json().catch(() => ({}));
 
-  }, [processedEngineers, search]);
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to activate engineer.");
+      }
+
+      alert("Engineer activated successfully.");
+
+      setEngineers((prev) =>
+        prev.map((eng) =>
+          eng.engineerId === targetId
+            ? { ...eng, isActive: true, isAvailable: true }
+            : eng
+        )
+      );
+
+      if (selectedEngineer && selectedEngineer.engineerId === targetId) {
+        setSelectedEngineer((prev) => ({
+          ...prev,
+          isActive: true,
+          isAvailable: true,
+        }));
+      }
+    } catch (error) {
+      console.error("Activate Error:", error);
+      alert(error.message || "Unable to activate engineer.");
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  /* ==========================================================
+     DEACTIVATE ENGINEER
+  ========================================================== */
+
+  const deactivateEngineer = async (engineerId) => {
+    const targetId = engineerId || selectedEngineer?.engineerId;
+    if (!targetId) return;
+
+    try {
+      setProcessingId(targetId);
+      const token = getToken();
+
+      const response = await fetch(
+        `${API_BASE_URL}/admin/engineers/${targetId}/deactivate`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to deactivate engineer.");
+      }
+
+      alert("Engineer deactivated successfully.");
+
+      setEngineers((prev) =>
+        prev.map((eng) =>
+          eng.engineerId === targetId
+            ? { ...eng, isActive: false, isAvailable: false }
+            : eng
+        )
+      );
+
+      if (selectedEngineer && selectedEngineer.engineerId === targetId) {
+        setSelectedEngineer((prev) => ({
+          ...prev,
+          isActive: false,
+          isAvailable: false,
+        }));
+      }
+    } catch (error) {
+      console.error("Deactivate Error:", error);
+      alert(error.message || "Unable to deactivate engineer.");
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  /* ==========================================================
+     VIEW DETAILS & DOCUMENTS
+  ========================================================== */
+
+  const openDetails = (engineer) => {
+    setSelectedEngineer(engineer);
+    setShowDetails(true);
+  };
+
+  const openDocument = (path) => {
+    if (!path) {
+      alert("Document not available.");
+      return;
+    }
+    const url = path.startsWith("http")
+      ? path
+      : `${BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
 
   /* ==========================================================
@@ -431,9 +539,8 @@ function EngineerManagement() {
 
       </div>
 
-
       {/* ======================================================
-          SEARCH
+          SEARCH & FILTER TOOLBAR
       ====================================================== */}
 
       <div className="complaint-toolbar">
@@ -456,6 +563,20 @@ function EngineerManagement() {
           />
 
         </div>
+
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="engineer-filter-select"
+        >
+          <option value="All">All Applications</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
 
       </div>
 
@@ -531,16 +652,20 @@ function EngineerManagement() {
                   Department
                 </th>
 
-                <th>
+                {/* <th>
                   Application
-                </th>
+                </th> */}
 
                 <th>
                   Status
                 </th>
 
-                <th>
+                {/* <th>
                   Availability
+                </th> */}
+
+                <th>
+                  Action
                 </th>
 
               </tr>
@@ -562,7 +687,7 @@ function EngineerManagement() {
                 <tr>
 
                   <td
-                    colSpan="7"
+                    colSpan="9"
                     className="empty-row"
                   >
 
@@ -645,23 +770,23 @@ function EngineerManagement() {
 
                       {/* APPLICATION STATUS */}
 
-                      <td>
+                      {/* <td>
 
                         <span
                           className={
-                            engineer.isRejected
+                            getApplicationStatus(engineer) === "Approved"
+                              ? "status active"
+                              : getApplicationStatus(engineer) === "Rejected"
                               ? "status inactive"
-                              : "status active"
+                              : "status pending"
                           }
                         >
 
-                          {engineer.isRejected
-                            ? "Rejected"
-                            : "Approved"}
+                          {getApplicationStatus(engineer)}
 
                         </span>
 
-                      </td>
+                      </td> */}
 
 
                       {/* STATUS */}
@@ -687,7 +812,7 @@ function EngineerManagement() {
 
                       {/* AVAILABILITY */}
 
-                      <td>
+                      {/* <td>
 
                         <span
                           className={
@@ -702,6 +827,66 @@ function EngineerManagement() {
                             : "Unavailable"}
 
                         </span>
+
+                      </td> */}
+
+
+                      {/* ACTION */}
+
+                      <td>
+
+                        <div className="action-buttons-cell">
+
+                          {/* <button
+                            type="button"
+                            className="view-engineer-btn"
+                            onClick={() => openDetails(engineer)}
+                            title="View Engineer Details"
+                          >
+
+                            <FaEye /> View
+
+                          </button> */}
+
+                          {getApplicationStatus(engineer) === "Approved" && (
+
+                            engineer.isActive ? (
+
+                              <button
+                                type="button"
+                                className="deactivate-btn-action"
+                                onClick={() => deactivateEngineer(engineer.engineerId)}
+                                disabled={processingId === engineer.engineerId}
+                                title="Deactivate Engineer"
+                              >
+
+                                <FaUserSlash />
+
+                                {processingId === engineer.engineerId ? "..." : "Deactivate"}
+
+                              </button>
+
+                            ) : (
+
+                              <button
+                                type="button"
+                                className="activate-btn-action"
+                                onClick={() => activateEngineer(engineer.engineerId)}
+                                disabled={processingId === engineer.engineerId}
+                                title="Activate Engineer"
+                              >
+
+                                <FaUserCheck />
+
+                                {processingId === engineer.engineerId ? "..." : "Activate"}
+
+                              </button>
+
+                            )
+
+                          )}
+
+                        </div>
 
                       </td>
 
@@ -720,12 +905,12 @@ function EngineerManagement() {
                 <tr>
 
                   <td
-                    colSpan="7"
+                    colSpan="9"
                     className="empty-row"
                   >
 
-                    {search
-                      ? "No engineers found matching your search."
+                    {search || statusFilter !== "All"
+                      ? "No engineers found matching your search and filter."
                       : "No engineers found."
                     }
 
@@ -824,6 +1009,397 @@ function EngineerManagement() {
             <FaChevronRight />
 
           </button>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          VIEW DETAILS MODAL
+      ====================================================== */}
+
+      {showDetails && selectedEngineer && (
+
+        <div className="engineer-modal-overlay">
+
+          <div className="engineer-modal">
+
+            <div className="engineer-modal-header">
+
+              <div>
+
+                <h2>
+
+                  {selectedEngineer.firstName} {selectedEngineer.lastName}
+
+                </h2>
+
+                <p>Engineer ID: ENG-{selectedEngineer.engineerId}</p>
+
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDetails(false);
+                  setSelectedEngineer(null);
+                }}
+              >
+
+                <FaTimes />
+
+              </button>
+
+            </div>
+
+            <div className="engineer-details-grid">
+
+              <div>
+
+                <strong>Email</strong>
+
+                <span>{selectedEngineer.email || "-"}</span>
+
+              </div>
+
+              <div>
+
+                <strong>Contact</strong>
+
+                <span>{selectedEngineer.contact || "-"}</span>
+
+              </div>
+
+              <div>
+
+                <strong>Department</strong>
+
+                <span>{selectedEngineer.department || "-"}</span>
+
+              </div>
+
+              <div>
+
+                <strong>Qualification</strong>
+
+                <span>{selectedEngineer.highestQualification || "-"}</span>
+
+              </div>
+
+              <div>
+
+                <strong>Experience</strong>
+
+                <span>
+
+                  {selectedEngineer.experience != null
+                    ? `${selectedEngineer.experience} Years`
+                    : "-"}
+
+                </span>
+
+              </div>
+
+              <div>
+
+                <strong>Branch</strong>
+
+                <span>{selectedEngineer.engineerBranch || "-"}</span>
+
+              </div>
+
+              <div className="full">
+
+                <strong>Address</strong>
+
+                <span>{selectedEngineer.address || "-"}</span>
+
+              </div>
+
+            </div>
+
+            {/* DOCUMENTS */}
+
+            {(selectedEngineer.degreeCertificate || selectedEngineer.experienceCertificate) && (
+
+              <div className="engineer-documents">
+
+                <h3>Submitted Documents & Certificates</h3>
+
+                <div className="document-cards-grid">
+
+                  {selectedEngineer.degreeCertificate && (
+
+                    <div className="doc-card">
+
+                      <div className="doc-card-header">
+
+                        <span className="doc-type-badge">Degree Certificate</span>
+
+                        <button
+                          type="button"
+                          className="doc-open-link"
+                          onClick={() => openDocument(selectedEngineer.degreeCertificate)}
+                          title="Open in new tab"
+                        >
+
+                          External ↗
+
+                        </button>
+
+                      </div>
+
+                      <div
+                        className="doc-image-wrapper"
+                        onClick={() =>
+                          setPreviewDoc({
+                            title: "Degree Certificate",
+                            url: `${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/degree`,
+                          })
+                        }
+                      >
+
+                        <img
+                          src={`${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/degree`}
+                          alt="Degree Certificate"
+                          className="doc-preview-img"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            if (e.target.nextSibling) {
+                              e.target.nextSibling.style.display = "flex";
+                            }
+                          }}
+                        />
+
+                        <div className="doc-fallback-view" style={{ display: "none" }}>
+
+                          <FaFilePdf />
+
+                          <span>Click to View Certificate</span>
+
+                        </div>
+
+                        <div className="doc-overlay-hover">
+
+                          <FaEye /> Click to View Full Size
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  )}
+
+                  {selectedEngineer.experienceCertificate && (
+
+                    <div className="doc-card">
+
+                      <div className="doc-card-header">
+
+                        <span className="doc-type-badge">Experience Certificate</span>
+
+                        <button
+                          type="button"
+                          className="doc-open-link"
+                          onClick={() => openDocument(selectedEngineer.experienceCertificate)}
+                          title="Open in new tab"
+                        >
+
+                          External ↗
+
+                        </button>
+
+                      </div>
+
+                      <div
+                        className="doc-image-wrapper"
+                        onClick={() =>
+                          setPreviewDoc({
+                            title: "Experience Certificate",
+                            url: `${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/experience`,
+                          })
+                        }
+                      >
+
+                        <img
+                          src={`${API_BASE_URL}/admin/engineers/${selectedEngineer.engineerId}/document/experience`}
+                          alt="Experience Certificate"
+                          className="doc-preview-img"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                            if (e.target.nextSibling) {
+                              e.target.nextSibling.style.display = "flex";
+                            }
+                          }}
+                        />
+
+                        <div className="doc-fallback-view" style={{ display: "none" }}>
+
+                          <FaFilePdf />
+
+                          <span>Click to View Certificate</span>
+
+                        </div>
+
+                        <div className="doc-overlay-hover">
+
+                          <FaEye /> Click to View Full Size
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              </div>
+
+            )}
+
+            {/* REJECTION REASON */}
+
+            {selectedEngineer.isRejected === true && (
+
+              <div className="rejection-box">
+
+                <strong>Rejection Reason</strong>
+
+                <p>{selectedEngineer.rejectedReason || "No reason specified."}</p>
+
+              </div>
+
+            )}
+
+            {/* MODAL ACTIONS - ACTIVE / DISACTIVE BUTTON */}
+
+            <div className="engineer-modal-actions">
+
+              {getApplicationStatus(selectedEngineer) === "Approved" && (
+
+                selectedEngineer.isActive ? (
+
+                  <button
+                    type="button"
+                    className="deactivate-btn"
+                    onClick={() => deactivateEngineer(selectedEngineer.engineerId)}
+                    disabled={processingId === selectedEngineer.engineerId}
+                  >
+
+                    <FaUserSlash />
+
+                    {processingId === selectedEngineer.engineerId
+                      ? "Deactivating..."
+                      : "Deactivate"}
+
+                  </button>
+
+                ) : (
+
+                  <button
+                    type="button"
+                    className="activate-btn"
+                    onClick={() => activateEngineer(selectedEngineer.engineerId)}
+                    disabled={processingId === selectedEngineer.engineerId}
+                  >
+
+                    <FaUserCheck />
+
+                    {processingId === selectedEngineer.engineerId
+                      ? "Activating..."
+                      : "Activate"}
+
+                  </button>
+
+                )
+
+              )}
+
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => {
+                  setShowDetails(false);
+                  setSelectedEngineer(null);
+                }}
+              >
+
+                Close
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          FULL DOCUMENT ZOOM MODAL
+      ====================================================== */}
+
+      {previewDoc && (
+
+        <div
+          className="document-zoom-overlay"
+          onClick={() => setPreviewDoc(null)}
+        >
+
+          <div
+            className="document-zoom-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <div className="document-zoom-header">
+
+              <h3>{previewDoc.title}</h3>
+
+              <button
+                type="button"
+                className="zoom-close-btn"
+                onClick={() => setPreviewDoc(null)}
+              >
+
+                <FaTimes />
+
+              </button>
+
+            </div>
+
+            <div className="document-zoom-body">
+
+              <img
+                src={previewDoc.url}
+                alt={previewDoc.title}
+                className="document-zoom-img"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  if (e.target.nextSibling) {
+                    e.target.nextSibling.style.display = "block";
+                  }
+                }}
+              />
+
+              <div className="zoom-fallback-frame" style={{ display: "none" }}>
+
+                <iframe
+                  src={previewDoc.url}
+                  title={previewDoc.title}
+                  className="document-zoom-iframe"
+                />
+
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
 

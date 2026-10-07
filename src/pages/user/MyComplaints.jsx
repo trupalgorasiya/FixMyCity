@@ -5,10 +5,13 @@ import {
     FaCheckCircle,
     FaExclamationTriangle,
     FaSearch,
-    FaTimes
+    FaTimes,
+    FaStar,
+    FaRegStar
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getCitizenComplaints } from "../../api/citizenApi";
+import { API_BASE_URL } from "../../api/axios";
 import "./MyComplaints.css";
 
 function MyComplaints() {
@@ -36,6 +39,14 @@ function MyComplaints() {
     const [loading, setLoading] = useState(false);
 
     const [error, setError] = useState("");
+
+    // Feedback Modal State
+    const [feedbackComplaint, setFeedbackComplaint] = useState(null);
+    const [feedbackRating, setFeedbackRating] = useState(5);
+    const [feedbackComments, setFeedbackComments] = useState("");
+    const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+    const [feedbackStatusMsg, setFeedbackStatusMsg] = useState(null);
+    const [existingFeedbackRecord, setExistingFeedbackRecord] = useState(null);
 
     // ==========================================================
     // FETCH COMPLAINTS
@@ -214,6 +225,82 @@ function MyComplaints() {
             `/user/complaint-tracking/${complaintNumber}`
         );
 
+    };
+
+    // ==========================================================
+    // FEEDBACK HANDLERS
+    // ==========================================================
+
+    const handleOpenFeedback = async (complaint) => {
+        setFeedbackComplaint(complaint);
+        setFeedbackStatusMsg(null);
+        setFeedbackSubmitting(false);
+        setFeedbackRating(5);
+        setFeedbackComments("");
+        setExistingFeedbackRecord(null);
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/feedback/complaint/${complaint.complaintNumber}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.rating) {
+                    setExistingFeedbackRecord(data);
+                    setFeedbackRating(data.rating);
+                    setFeedbackComments(data.comments || "");
+                }
+            }
+        } catch {
+            // New feedback
+        }
+    };
+
+    const handleFeedbackSubmit = async (e) => {
+        e.preventDefault();
+        if (!feedbackComplaint) return;
+
+        try {
+            setFeedbackSubmitting(true);
+            setFeedbackStatusMsg(null);
+
+            const token =
+                localStorage.getItem("token") ||
+                localStorage.getItem("jwt") ||
+                localStorage.getItem("accessToken") ||
+                "";
+
+            const payload = {
+                complaintNumber: feedbackComplaint.complaintNumber,
+                complaintId: feedbackComplaint.complaintId,
+                rating: Number(feedbackRating),
+                comments: feedbackComments.trim()
+            };
+
+            const res = await fetch(`${API_BASE_URL}/feedback`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.message || "Failed to submit feedback");
+            }
+
+            const data = await res.json();
+            setExistingFeedbackRecord(data);
+            setFeedbackStatusMsg({ text: "Feedback submitted successfully! Thank you ⭐", isError: false });
+            setTimeout(() => {
+                setFeedbackComplaint(null);
+                setFeedbackStatusMsg(null);
+            }, 1800);
+        } catch (err) {
+            setFeedbackStatusMsg({ text: err.message || "Unable to save feedback", isError: true });
+        } finally {
+            setFeedbackSubmitting(false);
+        }
     };
 
     // ==========================================================
@@ -726,21 +813,46 @@ function MyComplaints() {
                                             {/* ACTION */}
 
                                             <td>
+                                                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                                                    <button
+                                                        type="button"
+                                                        className="track-btn"
+                                                        onClick={() =>
+                                                            handleTrack(
+                                                                complaint.complaintNumber
+                                                            )
+                                                        }
+                                                    >
+                                                        Track
+                                                    </button>
 
-                                                <button
-                                                    type="button"
-                                                    className="track-btn"
-                                                    onClick={() =>
-                                                        handleTrack(
-                                                            complaint.complaintNumber
-                                                        )
-                                                    }
-                                                >
-
-                                                    Track
-
-                                                </button>
-
+                                                    {complaint.status &&
+                                                        complaint.status.toUpperCase() === "RESOLVED" && (
+                                                            <button
+                                                                type="button"
+                                                                className="feedback-action-btn"
+                                                                onClick={() =>
+                                                                    handleOpenFeedback(complaint)
+                                                                }
+                                                                style={{
+                                                                    background: "#f59e0b",
+                                                                    color: "#ffffff",
+                                                                    border: "none",
+                                                                    borderRadius: "8px",
+                                                                    padding: "8px 12px",
+                                                                    fontSize: "12px",
+                                                                    fontWeight: "600",
+                                                                    cursor: "pointer",
+                                                                    display: "inline-flex",
+                                                                    alignItems: "center",
+                                                                    gap: "4px"
+                                                                }}
+                                                            >
+                                                                <FaStar style={{ fontSize: "11px" }} />
+                                                                Feedback
+                                                            </button>
+                                                        )}
+                                                </div>
                                             </td>
 
                                         </tr>
@@ -888,6 +1000,186 @@ function MyComplaints() {
                 )}
 
             </div>
+
+            {/* ==========================================================
+                FEEDBACK MODAL
+            ========================================================== */}
+            {feedbackComplaint && (
+                <div
+                    className="modal-overlay"
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: "rgba(15, 23, 42, 0.65)",
+                        backdropFilter: "blur(4px)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 9999,
+                        padding: "20px"
+                    }}
+                    onClick={() => setFeedbackComplaint(null)}
+                >
+                    <div
+                        className="feedback-modal-content"
+                        style={{
+                            background: "#ffffff",
+                            borderRadius: "20px",
+                            padding: "32px",
+                            maxWidth: "520px",
+                            width: "100%",
+                            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+                            position: "relative"
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* HEADER */}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+                            <div>
+                                <h2 style={{ fontSize: "22px", fontWeight: "700", color: "#0f172a", margin: 0 }}>
+                                    {existingFeedbackRecord ? "Update Feedback" : "Complaint Feedback"}
+                                </h2>
+                                <p style={{ fontSize: "14px", color: "#64748b", marginTop: "4px" }}>
+                                    Ticket: <strong>{feedbackComplaint.complaintNumber}</strong>
+                                    {feedbackComplaint.title ? ` • ${feedbackComplaint.title}` : ""}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setFeedbackComplaint(null)}
+                                style={{
+                                    background: "#f1f5f9",
+                                    border: "none",
+                                    width: "32px",
+                                    height: "32px",
+                                    borderRadius: "50%",
+                                    cursor: "pointer",
+                                    fontSize: "16px",
+                                    color: "#64748b",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
+                                <FaTimes />
+                            </button>
+                        </div>
+
+                        {/* STATUS MESSAGE */}
+                        {feedbackStatusMsg && (
+                            <div
+                                style={{
+                                    padding: "12px 16px",
+                                    borderRadius: "10px",
+                                    marginBottom: "16px",
+                                    fontSize: "14px",
+                                    fontWeight: "600",
+                                    backgroundColor: feedbackStatusMsg.isError ? "#fef2f2" : "#f0fdf4",
+                                    color: feedbackStatusMsg.isError ? "#b91c1c" : "#15803d",
+                                    border: `1px solid ${feedbackStatusMsg.isError ? "#fecaca" : "#bbf7d0"}`
+                                }}
+                            >
+                                {feedbackStatusMsg.text}
+                            </div>
+                        )}
+
+                        {/* FORM */}
+                        <form onSubmit={handleFeedbackSubmit}>
+                            <div style={{ marginBottom: "20px" }}>
+                                <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
+                                    Rate the Resolution Quality (1 - 5 Stars):
+                                </label>
+                                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <span
+                                            key={star}
+                                            onClick={() => setFeedbackRating(star)}
+                                            style={{
+                                                fontSize: "32px",
+                                                cursor: "pointer",
+                                                color: star <= feedbackRating ? "#f59e0b" : "#cbd5e1",
+                                                transition: "transform 0.15s ease",
+                                                transform: star <= feedbackRating ? "scale(1.1)" : "scale(1)"
+                                            }}
+                                            title={`${star} Star`}
+                                        >
+                                            ★
+                                        </span>
+                                    ))}
+                                    <span style={{ fontSize: "14px", fontWeight: "700", color: "#475569", marginLeft: "10px" }}>
+                                        {feedbackRating === 5 && "5/5 - Excellent ⭐⭐⭐⭐⭐"}
+                                        {feedbackRating === 4 && "4/5 - Good ⭐⭐⭐⭐"}
+                                        {feedbackRating === 3 && "3/5 - Average ⭐⭐⭐"}
+                                        {feedbackRating === 2 && "2/5 - Poor ⭐⭐"}
+                                        {feedbackRating === 1 && "1/5 - Very Poor ⭐"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: "24px" }}>
+                                <label style={{ display: "block", fontSize: "14px", fontWeight: "600", color: "#334155", marginBottom: "8px" }}>
+                                    Your Feedback & Comments:
+                                </label>
+                                <textarea
+                                    value={feedbackComments}
+                                    onChange={(e) => setFeedbackComments(e.target.value)}
+                                    placeholder="Write your feedback regarding the resolution quality, response speed, or engineer service..."
+                                    rows={4}
+                                    style={{
+                                        width: "100%",
+                                        padding: "14px",
+                                        borderRadius: "12px",
+                                        border: "1px solid #cbd5e1",
+                                        fontFamily: "inherit",
+                                        fontSize: "14px",
+                                        outline: "none",
+                                        boxSizing: "border-box"
+                                    }}
+                                />
+                            </div>
+
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setFeedbackComplaint(null)}
+                                    style={{
+                                        padding: "10px 20px",
+                                        borderRadius: "10px",
+                                        border: "1px solid #cbd5e1",
+                                        background: "#ffffff",
+                                        color: "#475569",
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={feedbackSubmitting}
+                                    style={{
+                                        padding: "10px 24px",
+                                        borderRadius: "10px",
+                                        border: "none",
+                                        background: "#2563eb",
+                                        color: "#ffffff",
+                                        fontSize: "14px",
+                                        fontWeight: "600",
+                                        cursor: "pointer",
+                                        opacity: feedbackSubmitting ? 0.7 : 1
+                                    }}
+                                >
+                                    {feedbackSubmitting ? "Submitting..." : existingFeedbackRecord ? "Update Feedback" : "Submit Feedback"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
         </div>
 
